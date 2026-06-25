@@ -318,7 +318,6 @@ function ListBlock({ title, items }: { title: string; items: string[] }) {
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [lightbox, setLightbox] = useState<number | null>(null);
   const [selectedTour, setSelectedTour] = useState<Tour | null>(null);
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -401,14 +400,19 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
       <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 md:px-5">
         <nav
           className={cn(
-            "mx-auto flex max-w-7xl items-center justify-between rounded-full border px-4 py-1.5 transition-all duration-500 md:px-5",
+            "mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-full border px-3 py-2 transition-all duration-500 sm:px-4 md:px-5",
             scrolled
               ? "border-black/8 bg-white/90 shadow-sm backdrop-blur-2xl"
               : "border-white/12 bg-obsidian/42 text-white backdrop-blur-2xl"
           )}
         >
-          <a href="#inicio" aria-label="Spirit Qosqo Travel">
-            <BrandLogo inverse={!scrolled} />
+          <a href="#inicio" aria-label="Spirit Qosqo Travel" className="min-w-0 shrink-0" onClick={() => setMenuOpen(false)}>
+            <span className="sm:hidden">
+              <BrandLogo compact inverse={!scrolled} />
+            </span>
+            <span className="hidden sm:block">
+              <BrandLogo inverse={!scrolled} />
+            </span>
           </a>
           <div className="hidden items-center gap-4 lg:flex">
             {navItems.map((item) => (
@@ -428,17 +432,58 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
             <CalendarDays className="size-4" />
             Reservar experiencia
           </button>
-          <Button aria-label="Abrir menu" className="lg:hidden" size="icon" variant={scrolled ? "ghost" : "outline"} onClick={() => setMenuOpen((open) => !open)}>
+          <Button
+            aria-label={menuOpen ? "Cerrar menu" : "Abrir menu"}
+            aria-expanded={menuOpen}
+            className={cn(
+              "shrink-0 lg:hidden",
+              !scrolled && "border-white/45 text-white hover:bg-white/18"
+            )}
+            size="icon"
+            variant={scrolled ? "ghost" : "outline"}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
             {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </Button>
         </nav>
         {menuOpen && (
-          <div className="mx-auto mt-2 max-w-7xl rounded-3xl border border-white/50 bg-white/92 p-4 shadow-sm backdrop-blur-2xl lg:hidden">
-            {navItems.map((item) => (
-              <a key={item} href={`#${sectionId(item)}`} className="block rounded-2xl px-4 py-3 font-semibold text-charcoal" onClick={() => setMenuOpen(false)}>
-                {item}
-              </a>
-            ))}
+          <div className="mx-auto mt-2 max-w-7xl lg:hidden">
+            <div className="overflow-hidden rounded-2xl border border-white/60 bg-white/95 shadow-premium backdrop-blur-2xl">
+              <div className="grid gap-1 p-2">
+                {navItems.map((item) => (
+                  <a
+                    key={item}
+                    href={`#${sectionId(item)}`}
+                    className="flex min-h-12 items-center justify-between rounded-xl px-4 text-sm font-bold text-charcoal transition hover:bg-gold/12 active:bg-gold/18"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {item}
+                    <ChevronRight className="size-4 text-gold" />
+                  </a>
+                ))}
+              </div>
+              <div className="border-t border-black/8 p-3">
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    openBooking();
+                  }}
+                  className={cn(buttonVariants({ variant: "gold", size: "lg" }), "luxury-button w-full")}
+                >
+                  <CalendarDays className="size-5" />
+                  Reservar experiencia
+                </button>
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  className={cn(buttonVariants({ variant: "default", size: "lg" }), "mt-2 w-full bg-emerald hover:bg-emerald")}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <MessageCircle className="size-5" />
+                  WhatsApp
+                </a>
+              </div>
+            </div>
           </div>
         )}
       </header>
@@ -495,8 +540,8 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         </div>
       </section>
 
-      <section className="relative bg-[#F4F0E8] px-4 py-32">
-        <div className="mx-auto max-w-7xl">
+      <section className="relative overflow-hidden bg-[#F4F0E8] px-4 py-32">
+        <div className="relative z-10 mx-auto max-w-7xl">
           <div className="mb-16 max-w-2xl">
             <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">
               Vive Cusco como nunca antes
@@ -505,7 +550,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
               El viaje empieza antes de reservar.
             </h2>
           </div>
-          <div className="grid gap-8 lg:grid-cols-3">
+          <div className="grid gap-5 lg:grid-cols-3">
             {experiencePillars.map(({ title, text, image, icon: Icon }, index) => (
               <motion.article
                 key={title}
@@ -513,7 +558,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.25 }}
                 transition={{ delay: index * 0.08 }}
-                className="group relative min-h-[520px] overflow-hidden rounded-lg"
+                className="group relative min-h-[360px] overflow-hidden rounded-lg sm:min-h-[400px]"
               >
                 <Image
                   src={image}
@@ -523,14 +568,15 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                   sizes="(min-width: 1024px) 33vw, 100vw"
                   className="object-cover transition duration-700 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/82 via-black/24 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-7 text-white">
-                  <div className="mb-5 grid size-14 place-items-center rounded-full bg-white/14 text-gold-soft backdrop-blur-md">
-                    <Icon className="size-7" />
+                <div className="absolute inset-0 bg-black/58" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/62 to-black/46" />
+                <div className="absolute inset-x-0 bottom-0 p-5 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.65)] sm:p-6">
+                  <div className="mb-4 grid size-11 place-items-center rounded-full bg-black/38 text-gold-soft backdrop-blur-md">
+                    <Icon className="size-5" />
                   </div>
-                  <h3 className="font-display text-3xl font-normal leading-tight">{title}</h3>
-                  <p className="mt-3 max-w-sm leading-7 text-white/76">{text}</p>
-                  <a href="#tours" className={cn(buttonVariants({ variant: "outline" }), "mt-6")}>
+                  <h3 className="font-display text-2xl font-normal leading-tight text-white">{title}</h3>
+                  <p className="mt-2 max-w-sm text-sm font-medium leading-6 text-white">{text}</p>
+                  <a href="#tours" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "mt-5")}>
                     Explorar
                   </a>
                 </div>
@@ -540,20 +586,32 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         </div>
       </section>
 
-      <section id="nosotros" className="relative bg-white px-4 py-32">
-        <div className="relative mx-auto grid max-w-7xl gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+      <section id="nosotros" className="relative bg-white px-4 py-24 md:py-28">
+        <div className="relative mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} variants={fadeUp}>
             <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Nosotros</p>
             <h2 className="mt-5 max-w-xl font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">Viajar con calma, cultura y precision.</h2>
-            <p className="mt-8 max-w-2xl text-sm leading-8 text-charcoal/68 md:text-base">
+            <p className="mt-6 max-w-xl text-sm leading-7 text-charcoal/68 md:text-base">
               Creamos experiencias en Cusco con guias certificados, atencion personalizada y rutas pensadas para disfrutar sin prisa.
             </p>
-            <div className="relative mt-12 aspect-[4/3] overflow-hidden rounded-lg">
+            <div className="mt-8 grid max-w-md grid-cols-3 border-y border-black/10 py-5">
+              {[
+                ["15+", "anos"],
+                ["7", "tours"],
+                ["24/7", "soporte"]
+              ].map(([value, label]) => (
+                <div key={label}>
+                  <p className="font-display text-2xl leading-none text-obsidian">{value}</p>
+                  <p className="mt-2 text-xs font-bold uppercase tracking-[0.18em] text-charcoal/48">{label}</p>
+                </div>
+              ))}
+            </div>
+            <div className="relative mt-8 aspect-[16/10] overflow-hidden rounded-lg lg:max-w-xl">
               <div className="image-skeleton absolute inset-0" />
               <Image src={images.guide} alt="Guia turistico con viajeros en Cusco" fill loading="lazy" sizes="(min-width: 1024px) 45vw, 100vw" className="object-cover" />
             </div>
           </motion.div>
-          <div className="grid gap-x-10 gap-y-12 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {[
               ["Guias certificados", "Interpretacion cultural clara y trato cercano.", BadgeCheck],
               ["Atencion personalizada", "Tours familiares, privados y grupos pequenos.", HeartHandshake],
@@ -562,12 +620,12 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
             ].map(([title, text, Icon], index) => {
               const CardIcon = Icon as typeof BadgeCheck;
               return (
-                <motion.div key={title as string} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} whileHover={{ y: -3 }} viewport={{ once: true }} transition={{ delay: index * 0.06 }} className="border-t border-black/10 pt-6">
-                  <div className="mb-5 grid size-11 place-items-center rounded-full bg-obsidian text-gold-soft">
-                    <CardIcon className="size-5" />
+                <motion.div key={title as string} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.06 }} className="border border-black/8 bg-white p-5">
+                  <div className="mb-4 grid size-9 place-items-center rounded-full bg-gold/12 text-gold">
+                    <CardIcon className="size-4" />
                   </div>
-                  <h3 className="text-xl font-bold text-obsidian">{title as string}</h3>
-                  <p className="mt-3 leading-7 text-charcoal/70">{text as string}</p>
+                  <h3 className="text-base font-bold text-obsidian">{title as string}</h3>
+                  <p className="mt-2 text-sm leading-6 text-charcoal/64">{text as string}</p>
                 </motion.div>
               );
             })}
@@ -575,8 +633,8 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         </div>
       </section>
 
-      <section id="tours" className="bg-[#F8F6F0] px-4 py-32">
-        <div className="mx-auto max-w-7xl">
+      <section id="tours" className="relative overflow-hidden bg-[#F8F6F0] px-4 py-32">
+        <div className="relative z-10 mx-auto max-w-7xl">
           <div className="mb-16 flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Tours destacados</p>
@@ -625,31 +683,18 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         </div>
       </section>
 
-      <section className="bg-white px-4 py-32">
+      <section className="bg-white px-4 py-24 md:py-28">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-16 max-w-2xl">
+          <div className="mb-12 max-w-2xl">
             <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Por que elegirnos</p>
             <h2 className="mt-5 font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">Confianza sin exceso.</h2>
           </div>
-          <div className="grid gap-x-12 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-px overflow-hidden border border-black/8 bg-black/8 sm:grid-cols-2 lg:grid-cols-3">
             {reasons.map(({ icon: Icon, title, text }) => (
-              <motion.div key={title} whileHover={{ y: -3 }} className="border-t border-black/10 pt-6">
-                <Icon className="size-8 text-gold" />
-                <h3 className="mt-5 text-xl font-bold text-obsidian">{title}</h3>
-                <p className="mt-3 leading-7 text-charcoal/68">{text}</p>
-              </motion.div>
-            ))}
-          </div>
-          <div className="mt-20 grid gap-4 md:grid-cols-3">
-            {[
-              ["Condor", "Vision amplia para disenar rutas memorables."],
-              ["Puma", "Fuerza logistica y atencion precisa."],
-              ["Serpiente", "Sabiduria andina en cada experiencia."]
-            ].map(([animal, text]) => (
-              <motion.div key={animal} whileHover={{ y: -3 }} className="relative overflow-hidden rounded-lg bg-obsidian p-8 text-white">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(201,154,58,.18),transparent_32%)]" />
-                <p className="relative font-display text-2xl font-normal leading-tight text-gold-soft">{animal}</p>
-                <p className="relative mt-3 text-white/72">{text}</p>
+              <motion.div key={title} whileHover={{ y: -2 }} className="bg-white p-5 md:p-6">
+                <Icon className="size-6 text-gold" />
+                <h3 className="mt-4 text-base font-bold text-obsidian">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-charcoal/64">{text}</p>
               </motion.div>
             ))}
           </div>
@@ -660,16 +705,23 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         <div className="mx-auto max-w-7xl">
           <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold-soft">Galeria</p>
           <h2 className="mt-5 max-w-xl font-display text-3xl font-normal leading-[1.2] md:text-4xl">Paisajes que se quedan contigo.</h2>
-          <div className="mt-16 columns-1 gap-5 sm:columns-2 lg:columns-3">
+          <div className="mt-14 grid auto-rows-[150px] grid-cols-2 gap-3 sm:auto-rows-[180px] md:grid-cols-4 lg:auto-rows-[170px]">
             {gallery.map((item, index) => (
-              <button key={item.alt} className="group relative mb-5 block w-full overflow-hidden rounded-lg text-left" onClick={() => setLightbox(index)}>
-                <div className={cn("relative", index % 3 === 0 ? "h-[430px]" : "h-[300px]")}>
-                  <div className="image-skeleton absolute inset-0" />
-                  <Image src={item.src} alt={item.alt} fill loading="lazy" sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover transition duration-700 group-hover:scale-110" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-80" />
-                  <span className="absolute bottom-4 left-4 font-semibold">{item.alt}</span>
-                </div>
-              </button>
+              <div
+                key={item.alt}
+                className={cn(
+                  "group relative block overflow-hidden rounded-lg text-left",
+                  index === 0 && "col-span-2 row-span-2",
+                  index === 2 && "row-span-2",
+                  index === 4 && "col-span-2",
+                  index === 6 && "col-span-2 md:col-span-1"
+                )}
+              >
+                <div className="image-skeleton absolute inset-0" />
+                <Image src={item.src} alt={item.alt} fill loading="lazy" sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover transition duration-700 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/18 to-transparent opacity-80" />
+                <span className="absolute bottom-3 left-3 right-3 text-sm font-semibold leading-tight">{item.alt}</span>
+              </div>
             ))}
           </div>
         </div>
@@ -698,8 +750,8 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         </div>
       </section>
 
-      <section id="contacto" className="bg-[#F8F6F0] px-4 py-32">
-        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+      <section id="contacto" className="relative overflow-hidden bg-[#F8F6F0] px-4 py-32">
+        <div className="relative z-10 mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Como funciona</p>
             <h2 className="mt-5 max-w-xl font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">
@@ -782,8 +834,8 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
       </footer>
 
       {bookingOpen && (
-        <div className="fixed inset-0 z-[85] overflow-y-auto bg-[#F8F6F0]">
-          <div className="sticky top-0 z-10 border-b border-black/10 bg-white/92 px-4 py-3 backdrop-blur-xl">
+        <div className="fixed inset-0 z-[85] flex h-dvh flex-col overflow-hidden bg-[#F8F6F0]">
+          <div className="shrink-0 border-b border-black/10 bg-white/92 px-3 py-2 backdrop-blur-xl sm:px-4 sm:py-3">
             <div className="mx-auto flex max-w-7xl items-center justify-between">
               <BrandLogo compact />
               <div className="flex items-center gap-3">
@@ -794,33 +846,40 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
               </div>
             </div>
           </div>
-          <div className="mx-auto max-w-7xl px-4 py-8">
-            <Card className="overflow-hidden border-black/5">
+          <div className="mx-auto w-full max-w-7xl flex-1 overflow-y-auto px-0 py-0 sm:px-4 sm:py-4 md:py-8">
+            <Card className="min-h-full overflow-hidden rounded-none border-x-0 border-y border-black/5 sm:min-h-0 sm:rounded-lg sm:border">
               <div className="h-2 bg-black/5"><motion.div className="h-full bg-gold" animate={{ width: `${progress}%` }} /></div>
-              <div className="grid min-h-[680px] lg:grid-cols-[0.34fr_0.66fr]">
-                <aside className="bg-obsidian p-6 text-white md:p-8">
-                  <p className="text-sm font-bold uppercase tracking-[0.28em] text-gold-soft">Spirit Qosqo Travel</p>
-                  <h2 className="mt-4 font-display text-3xl font-normal leading-tight">Reserva tu experiencia</h2>
-                  <div className="mt-10 space-y-3">
+              <div className="grid min-w-0 lg:min-h-[680px] lg:grid-cols-[0.34fr_0.66fr]">
+                <aside className="min-w-0 bg-obsidian p-3 text-white sm:p-6 md:p-8">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold-soft sm:text-sm sm:tracking-[0.28em]">Spirit Qosqo Travel</p>
+                  <h2 className="mt-2 font-display text-xl font-normal leading-tight sm:mt-4 sm:text-3xl">Reserva tu experiencia</h2>
+                  <div className="mt-4 flex max-w-full gap-2 overflow-x-auto pb-1 lg:mt-10 lg:block lg:space-y-3 lg:overflow-visible lg:pb-0">
                     {["Tour", "Fecha", "Viajeros", "Datos", "Preferencias", "Resumen"].map((step, index) => (
-                      <button key={step} onClick={() => setBookingStep(index)} className={cn("flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition", bookingStep === index ? "bg-white text-obsidian" : "bg-white/8 text-white/72 hover:bg-white/12")}>
-                        <span className={cn("grid size-7 place-items-center rounded-full text-xs font-bold", index < bookingStep ? "bg-emerald text-white" : "bg-gold text-obsidian")}>{index < bookingStep ? <Check className="size-4" /> : index + 1}</span>
-                        {step}
+                      <button
+                        key={step}
+                        onClick={() => setBookingStep(index)}
+                        className={cn(
+                          "flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-bold transition lg:w-full lg:shrink lg:gap-3 lg:px-4 lg:py-3",
+                          bookingStep === index ? "bg-white text-obsidian" : "bg-white/8 text-white/72 hover:bg-white/12"
+                        )}
+                      >
+                        <span className={cn("grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold", index < bookingStep ? "bg-emerald text-white" : "bg-gold text-obsidian")}>{index < bookingStep ? <Check className="size-4" /> : index + 1}</span>
+                        <span className={cn(index === bookingStep ? "inline" : "hidden sm:inline lg:inline")}>{step}</span>
                       </button>
                     ))}
                   </div>
                 </aside>
-                <div className="p-6 md:p-10">
-                  <motion.div key={bookingStep} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="min-h-[500px]">
+                <div className="min-w-0 p-4 pb-24 sm:p-6 sm:pb-24 md:p-10 lg:pb-10">
+                  <motion.div key={bookingStep} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="lg:min-h-[500px]">
                     {bookingStep === 0 && (
                       <div>
-                        <h3 className="text-2xl font-semibold leading-snug text-obsidian">Selecciona tu tour</h3>
-                        <div className="mt-6 grid gap-4 md:grid-cols-2">
+                        <h3 className="text-xl font-semibold leading-snug text-obsidian sm:text-2xl">Selecciona tu tour</h3>
+                        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:mt-6">
                           {tours.map((tour) => (
-                            <button key={tour.title} onClick={() => setBooking((current) => ({ ...current, tour: tour.title }))} className={cn("relative overflow-hidden rounded-lg border p-3 text-left transition hover:-translate-y-1", booking.tour === tour.title ? "border-gold bg-gold/10" : "border-black/10 bg-white")}>
-                              <div className="relative h-32 overflow-hidden rounded-md"><Image src={tour.image} alt={tour.title} fill sizes="50vw" className="object-cover" /></div>
-                              <p className="mt-3 font-bold text-obsidian">{tour.title}</p>
-                              {booking.tour === tour.title && <span className="absolute right-4 top-4 grid size-8 place-items-center rounded-full bg-emerald text-white"><Check className="size-4" /></span>}
+                            <button key={tour.title} onClick={() => setBooking((current) => ({ ...current, tour: tour.title }))} className={cn("relative grid grid-cols-[72px_1fr] items-center gap-3 overflow-hidden rounded-lg border p-2 text-left transition hover:-translate-y-1 sm:block sm:p-3", booking.tour === tour.title ? "border-gold bg-gold/10" : "border-black/10 bg-white")}>
+                              <div className="relative h-16 overflow-hidden rounded-md sm:h-28"><Image src={tour.image} alt={tour.title} fill sizes="(min-width: 640px) 50vw, 72px" className="object-cover" /></div>
+                              <p className="pr-8 text-sm font-bold leading-snug text-obsidian sm:mt-3 sm:pr-0 sm:text-base">{tour.title}</p>
+                              {booking.tour === tour.title && <span className="absolute right-3 top-3 grid size-7 place-items-center rounded-full bg-emerald text-white"><Check className="size-4" /></span>}
                             </button>
                           ))}
                         </div>
@@ -828,10 +887,10 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                     )}
                     {bookingStep === 1 && (
                       <div>
-                        <h3 className="text-2xl font-semibold leading-snug text-obsidian">Selecciona fecha</h3>
-                        <p className="mt-3 text-charcoal/68">Elige una fecha tentativa. Confirmaremos disponibilidad por WhatsApp.</p>
-                        <Input className="mt-8 max-w-sm" type="date" value={booking.date} onChange={(event) => setBooking((current) => ({ ...current, date: event.target.value }))} />
-                        <div className="mt-6 flex flex-wrap gap-3">
+                        <h3 className="text-xl font-semibold leading-snug text-obsidian sm:text-2xl">Selecciona fecha</h3>
+                        <p className="mt-2 text-sm text-charcoal/68">Elige una fecha tentativa. Confirmaremos disponibilidad por WhatsApp.</p>
+                        <Input className="mt-5 max-w-sm" type="date" value={booking.date} onChange={(event) => setBooking((current) => ({ ...current, date: event.target.value }))} />
+                        <div className="mt-4 flex flex-wrap gap-2 sm:gap-3">
                           {[3, 5, 7, 10].map((days) => {
                             const date = new Date(Date.now() + 86400000 * days).toISOString().slice(0, 10);
                             return <Button key={date} variant={booking.date === date ? "gold" : "default"} onClick={() => setBooking((current) => ({ ...current, date }))}>{date}</Button>;
@@ -841,30 +900,30 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                     )}
                     {bookingStep === 2 && (
                       <div>
-                        <h3 className="text-2xl font-semibold leading-snug text-obsidian">Viajeros</h3>
-                        <div className="mt-8 max-w-xl space-y-4">
+                        <h3 className="text-xl font-semibold leading-snug text-obsidian sm:text-2xl">Viajeros</h3>
+                        <div className="mt-5 max-w-xl space-y-3">
                           {[
                             ["adults", "Adultos"],
                             ["children", "Ninos"],
                             ["seniors", "Adultos mayores"]
                           ].map(([key, label]) => (
-                            <div key={key} className="flex items-center justify-between rounded-lg border border-black/10 bg-white p-5">
-                              <span className="font-bold text-obsidian">{label}</span>
-                              <div className="flex items-center gap-4">
-                                <Button size="icon" variant="ghost" onClick={() => updateTraveler(key as "adults" | "children" | "seniors", -1)}><Minus className="size-4" /></Button>
-                                <span className="w-8 text-center text-xl font-bold">{booking[key as "adults" | "children" | "seniors"]}</span>
-                                <Button size="icon" variant="gold" onClick={() => updateTraveler(key as "adults" | "children" | "seniors", 1)}><Plus className="size-4" /></Button>
+                            <div key={key} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-black/10 bg-white p-3 sm:gap-3 sm:p-5">
+                              <span className="min-w-0 text-sm font-bold leading-snug text-obsidian sm:text-base">{label}</span>
+                              <div className="flex shrink-0 items-center gap-1.5 sm:gap-4">
+                                <Button className="size-9 sm:size-11" size="icon" variant="ghost" onClick={() => updateTraveler(key as "adults" | "children" | "seniors", -1)}><Minus className="size-4" /></Button>
+                                <span className="w-6 text-center text-lg font-bold sm:w-8 sm:text-xl">{booking[key as "adults" | "children" | "seniors"]}</span>
+                                <Button className="size-9 sm:size-11" size="icon" variant="gold" onClick={() => updateTraveler(key as "adults" | "children" | "seniors", 1)}><Plus className="size-4" /></Button>
                               </div>
                             </div>
                           ))}
                         </div>
-                        <div className="mt-6 rounded-lg bg-gold/10 p-5 text-xl font-bold text-obsidian">Total: {totalTravelers} viajeros</div>
+                        <div className="mt-4 rounded-lg bg-gold/10 p-4 text-lg font-bold text-obsidian sm:p-5 sm:text-xl">Total: {totalTravelers} viajeros</div>
                       </div>
                     )}
                     {bookingStep === 3 && (
                       <div>
-                        <h3 className="text-2xl font-semibold leading-snug text-obsidian">Datos personales</h3>
-                        <div className="mt-8 grid gap-5 md:grid-cols-2">
+                        <h3 className="text-xl font-semibold leading-snug text-obsidian sm:text-2xl">Datos personales</h3>
+                        <div className="mt-5 grid gap-3 md:grid-cols-2">
                           <Input placeholder="Nombre completo" value={booking.name} onChange={(e) => setBooking((c) => ({ ...c, name: e.target.value }))} />
                           <Input placeholder="Correo" type="email" value={booking.email} onChange={(e) => setBooking((c) => ({ ...c, email: e.target.value }))} />
                           <Input placeholder="WhatsApp" value={booking.phone} onChange={(e) => setBooking((c) => ({ ...c, phone: e.target.value }))} />
@@ -876,19 +935,19 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                     )}
                     {bookingStep === 4 && (
                       <div>
-                        <h3 className="text-2xl font-semibold leading-snug text-obsidian">Preferencias</h3>
-                        <div className="mt-8 grid gap-6">
+                        <h3 className="text-xl font-semibold leading-snug text-obsidian sm:text-2xl">Preferencias</h3>
+                        <div className="mt-5 grid gap-4 sm:gap-6">
                           <div><p className="mb-3 font-bold">Horario</p><div className="flex flex-wrap gap-3">{["Manana", "Tarde", "Full Day"].map((value) => <Button key={value} variant={booking.schedule === value ? "gold" : "default"} onClick={() => setBooking((c) => ({ ...c, schedule: value }))}>{value}</Button>)}</div></div>
                           <div><p className="mb-3 font-bold">Tipo de servicio</p><div className="flex flex-wrap gap-3">{["Compartido", "Privado"].map((value) => <Button key={value} variant={booking.service === value ? "gold" : "default"} onClick={() => setBooking((c) => ({ ...c, service: value }))}>{value}</Button>)}</div></div>
                           <Textarea placeholder="Mensaje adicional" value={booking.message} onChange={(e) => setBooking((c) => ({ ...c, message: e.target.value }))} />
-                          <label className="flex items-center gap-3 rounded-lg border border-black/10 p-4 font-semibold"><input type="checkbox" checked={booking.policies} onChange={(e) => setBooking((c) => ({ ...c, policies: e.target.checked }))} /> Acepto politicas de reserva y contacto por WhatsApp</label>
+                          <label className="flex items-start gap-3 rounded-lg border border-black/10 p-3 text-sm font-semibold leading-6 sm:p-4"><input className="mt-1" type="checkbox" checked={booking.policies} onChange={(e) => setBooking((c) => ({ ...c, policies: e.target.checked }))} /> Acepto politicas de reserva y contacto por WhatsApp</label>
                         </div>
                       </div>
                     )}
                     {bookingStep === 5 && (
                       <div>
-                        <h3 className="text-2xl font-semibold leading-snug text-obsidian">Resumen</h3>
-                        <div className="mt-8 grid gap-3 rounded-lg bg-[#F8F6F0] p-6">
+                        <h3 className="text-xl font-semibold leading-snug text-obsidian sm:text-2xl">Resumen</h3>
+                        <div className="mt-5 grid gap-2 rounded-lg bg-[#F8F6F0] p-4 text-sm sm:gap-3 sm:p-6">
                           {[
                             ["Tour", booking.tour],
                             ["Fecha", booking.date],
@@ -903,13 +962,13 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                             ["WhatsApp", booking.phone],
                             ["Correo", booking.email],
                             ["Mensaje", booking.message || "Sin mensaje adicional"]
-                          ].map(([label, value]) => <div key={label} className="flex justify-between gap-4 border-b border-black/8 py-2"><span className="font-bold text-charcoal/70">{label}</span><span className="text-right text-obsidian">{value}</span></div>)}
+                          ].map(([label, value]) => <div key={label} className="flex justify-between gap-4 border-b border-black/8 py-2"><span className="shrink-0 font-bold text-charcoal/70">{label}</span><span className="text-right text-obsidian">{value}</span></div>)}
                         </div>
                         <Button className="luxury-button mt-6 w-full" size="lg" variant="gold" onClick={sendReservation}><MessageCircle className="size-5" />Enviar Reserva</Button>
                       </div>
                     )}
                   </motion.div>
-                  <div className="mt-10 flex justify-between">
+                  <div className="fixed inset-x-0 bottom-0 z-20 flex justify-between border-t border-black/10 bg-white/95 px-4 py-3 backdrop-blur-xl lg:static lg:mt-10 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-0">
                     <Button variant="ghost" disabled={bookingStep === 0} onClick={() => setBookingStep((step) => Math.max(0, step - 1))}>Volver</Button>
                     {bookingStep < 5 && <Button variant="gold" disabled={!canContinue} onClick={() => setBookingStep((step) => Math.min(5, step + 1))}>Continuar</Button>}
                   </div>
@@ -985,15 +1044,6 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
               </div>
             </div>
           </motion.div>
-        </div>
-      )}
-
-      {lightbox !== null && (
-        <div className="fixed inset-0 z-[70] grid place-items-center bg-black/88 p-4" onClick={() => setLightbox(null)}>
-          <button aria-label="Cerrar galeria" className="absolute right-5 top-5 grid size-11 place-items-center rounded-full bg-white text-obsidian"><X className="size-5" /></button>
-          <div className="relative h-[78vh] w-full max-w-6xl overflow-hidden rounded-lg" onClick={(event) => event.stopPropagation()}>
-            <Image src={gallery[lightbox].src} alt={gallery[lightbox].alt} fill className="object-cover" sizes="100vw" />
-          </div>
         </div>
       )}
 
