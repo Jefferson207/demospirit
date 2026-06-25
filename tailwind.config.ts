@@ -14,8 +14,8 @@ const config: Config = {
         ivory: "#FFFDF6"
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
-        display: ["var(--font-playfair)", "Georgia", "serif"]
+        sans: ["var(--font-manrope)", "Manrope", "system-ui", "sans-serif"],
+        display: ["var(--font-dm-serif)", "Georgia", "serif"]
       },
       boxShadow: {
         premium: "0 24px 80px rgba(8, 8, 6, 0.14)",

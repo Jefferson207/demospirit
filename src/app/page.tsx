@@ -13,7 +13,6 @@ import {
   Clock,
   Compass,
   Facebook,
-  Flag,
   Gauge,
   Globe2,
   HeartHandshake,
@@ -290,12 +289,12 @@ function sectionId(item: string) {
 
 function Counter({ value, suffix, label }: { value: string; suffix?: string; label: string }) {
   return (
-    <motion.div variants={fadeUp} className="rounded-lg border border-white/16 bg-white/10 p-4 backdrop-blur-md">
-      <div className="font-display text-3xl font-bold text-gold-soft md:text-4xl">
+    <motion.div variants={fadeUp} className="border-l border-white/20 pl-5">
+      <div className="font-display text-xl font-normal leading-relaxed text-white md:text-2xl">
         {value}
         {suffix}
       </div>
-      <p className="mt-1 text-sm font-semibold text-white/72">{label}</p>
+      <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-white/58">{label}</p>
     </motion.div>
   );
 }
@@ -398,26 +397,26 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
   };
 
   return (
-    <main className="overflow-hidden bg-[#F8F6F0]">
+    <main className="overflow-hidden bg-[#F4F0E8]">
       <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 md:px-5">
         <nav
           className={cn(
-            "mx-auto flex max-w-7xl items-center justify-between rounded-full border px-4 py-2 transition-all duration-500 md:px-5",
+            "mx-auto flex max-w-7xl items-center justify-between rounded-full border px-4 py-1.5 transition-all duration-500 md:px-5",
             scrolled
-              ? "border-black/8 bg-white/92 shadow-premium backdrop-blur-2xl"
-              : "border-white/20 bg-black/20 text-white backdrop-blur-xl"
+              ? "border-black/8 bg-white/90 shadow-sm backdrop-blur-2xl"
+              : "border-white/12 bg-obsidian/42 text-white backdrop-blur-2xl"
           )}
         >
           <a href="#inicio" aria-label="Spirit Qosqo Travel">
             <BrandLogo inverse={!scrolled} />
           </a>
-          <div className="hidden items-center gap-1 lg:flex">
+          <div className="hidden items-center gap-4 lg:flex">
             {navItems.map((item) => (
               <a
                 key={item}
                 href={`#${sectionId(item)}`}
                 className={cn(
-                  "rounded-full px-4 py-2 text-sm font-semibold transition",
+                  "rounded-full px-3 py-1.5 text-sm font-medium transition",
                   scrolled ? "text-charcoal/78 hover:bg-gold/12 hover:text-obsidian" : "text-white/78 hover:bg-white/14 hover:text-white"
                 )}
               >
@@ -434,7 +433,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
           </Button>
         </nav>
         {menuOpen && (
-          <div className="mx-auto mt-2 max-w-7xl rounded-3xl border border-white/50 bg-white/92 p-4 shadow-premium backdrop-blur-2xl lg:hidden">
+          <div className="mx-auto mt-2 max-w-7xl rounded-3xl border border-white/50 bg-white/92 p-4 shadow-sm backdrop-blur-2xl lg:hidden">
             {navItems.map((item) => (
               <a key={item} href={`#${sectionId(item)}`} className="block rounded-2xl px-4 py-3 font-semibold text-charcoal" onClick={() => setMenuOpen(false)}>
                 {item}
@@ -444,7 +443,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         )}
       </header>
 
-      <section id="inicio" className="relative min-h-screen overflow-hidden bg-obsidian pt-32 text-white">
+      <section id="inicio" className="relative min-h-screen overflow-hidden bg-obsidian pt-28 text-white">
         <motion.div style={{ y: heroY, scale: heroScale }} className="absolute inset-0">
           <video
             className="absolute inset-0 size-full object-cover"
@@ -457,25 +456,26 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
           >
             <source src={heroVideo} type="video/webm" />
           </video>
-          <div className="absolute inset-0 bg-gradient-to-r from-obsidian via-obsidian/62 to-obsidian/10" />
-          <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-transparent to-black/42" />
+          <div className="absolute inset-0 bg-gradient-to-r from-obsidian/90 via-obsidian/58 to-obsidian/12" />
+          <div className="absolute inset-0 bg-gradient-to-t from-obsidian/82 via-obsidian/12 to-obsidian/46" />
+          <div className="absolute inset-0 bg-black/16" />
         </motion.div>
-        <div className="gold-particles pointer-events-none absolute inset-0 overflow-hidden opacity-60" />
-        <div className="fog-layer pointer-events-none absolute bottom-4 left-[-10%] h-44 w-[120%] opacity-50" />
-        <motion.div style={{ y: mountainY }} className="pointer-events-none absolute bottom-0 left-0 right-0 h-40 bg-[linear-gradient(135deg,transparent_0_18%,rgba(201,154,58,.42)_18%_20%,transparent_20%_38%,rgba(34,199,200,.32)_38%_40%,transparent_40%)] opacity-70" />
-        <div className="relative mx-auto grid min-h-[calc(100vh-8rem)] max-w-7xl items-center px-4 pb-16">
-          <motion.div initial="hidden" animate="visible" transition={{ staggerChildren: 0.12 }} className="max-w-5xl">
-            <motion.div variants={fadeUp} className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/24 bg-white/12 px-4 py-2 text-sm font-semibold backdrop-blur-md">
+        <div className="gold-particles pointer-events-none absolute inset-0 overflow-hidden opacity-16" />
+        <div className="fog-layer pointer-events-none absolute bottom-4 left-[-10%] h-44 w-[120%] opacity-16" />
+        <motion.div style={{ y: mountainY }} className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-[linear-gradient(135deg,transparent_0_18%,rgba(201,154,58,.22)_18%_20%,transparent_20%_38%,rgba(255,255,255,.12)_38%_40%,transparent_40%)] opacity-50" />
+        <div className="relative mx-auto grid min-h-[calc(100vh-7rem)] max-w-7xl items-center px-4 pb-20">
+          <motion.div initial="hidden" animate="visible" transition={{ staggerChildren: 0.12 }} className="max-w-3xl">
+            <motion.div variants={fadeUp} className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] backdrop-blur-md">
               <Compass className="size-4 text-gold-soft" />
-              Experiencias premium en Cusco
+              Cusco premium
             </motion.div>
-            <motion.h1 variants={fadeUp} className="text-balance font-display text-5xl font-bold leading-[1.02] md:text-7xl lg:text-8xl">
-              Descubre la magia del Imperio Inca con Spirit Qosqo Travel
+            <motion.h1 variants={fadeUp} className="text-balance max-w-2xl font-display text-3xl font-normal leading-[1.18] md:text-4xl lg:text-5xl">
+              Descubre Cusco con una experiencia hecha a tu medida
             </motion.h1>
-            <motion.p variants={fadeUp} className="mt-6 max-w-2xl text-lg leading-8 text-white/84 md:text-xl">
-              Vive experiencias inolvidables en Cusco junto a guias profesionales y recorridos disenados para toda la familia.
+            <motion.p variants={fadeUp} className="mt-10 max-w-xl text-sm leading-8 text-white/76 md:text-base">
+              Tours privados y familiares con guias expertos, rutas cuidadas y asistencia directa.
             </motion.p>
-            <motion.div variants={fadeUp} className="mt-9 flex flex-col gap-4 sm:flex-row">
+            <motion.div variants={fadeUp} className="mt-12 flex flex-col gap-4 sm:flex-row">
               <button onClick={() => openBooking()} className={cn(buttonVariants({ variant: "gold", size: "lg" }), "luxury-button")}>
                 <MessageCircle className="size-5" />
                 Reservar experiencia
@@ -485,7 +485,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                 Explorar tours
               </a>
             </motion.div>
-            <motion.div variants={fadeUp} className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <motion.div variants={fadeUp} className="mt-16 grid max-w-3xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
               <Counter value="1500" suffix="+" label="Viajeros felices" />
               <Counter value="15" suffix="+" label="Anos" />
               <Counter value="98" suffix="%" label="Satisfaccion" />
@@ -495,17 +495,17 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         </div>
       </section>
 
-      <section className="relative bg-[#F8F6F0] px-4 py-24">
+      <section className="relative bg-[#F4F0E8] px-4 py-32">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-12 max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-[0.28em] text-emerald">
+          <div className="mb-16 max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">
               Vive Cusco como nunca antes
             </p>
-            <h2 className="mt-4 font-display text-4xl font-bold text-obsidian md:text-6xl">
+            <h2 className="mt-5 max-w-xl font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">
               El viaje empieza antes de reservar.
             </h2>
           </div>
-          <div className="grid gap-5 lg:grid-cols-3">
+          <div className="grid gap-8 lg:grid-cols-3">
             {experiencePillars.map(({ title, text, image, icon: Icon }, index) => (
               <motion.article
                 key={title}
@@ -513,7 +513,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.25 }}
                 transition={{ delay: index * 0.08 }}
-                className="group relative min-h-[520px] overflow-hidden rounded-lg shadow-premium"
+                className="group relative min-h-[520px] overflow-hidden rounded-lg"
               >
                 <Image
                   src={image}
@@ -528,7 +528,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                   <div className="mb-5 grid size-14 place-items-center rounded-full bg-white/14 text-gold-soft backdrop-blur-md">
                     <Icon className="size-7" />
                   </div>
-                  <h3 className="font-display text-4xl font-bold">{title}</h3>
+                  <h3 className="font-display text-3xl font-normal leading-tight">{title}</h3>
                   <p className="mt-3 max-w-sm leading-7 text-white/76">{text}</p>
                   <a href="#tours" className={cn(buttonVariants({ variant: "outline" }), "mt-6")}>
                     Explorar
@@ -540,21 +540,20 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         </div>
       </section>
 
-      <section id="nosotros" className="relative px-4 py-24">
-        <div className="absolute inset-x-0 top-0 h-32 bg-andean-pattern bg-[length:44px_44px] opacity-20" />
-        <div className="relative mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+      <section id="nosotros" className="relative bg-white px-4 py-32">
+        <div className="relative mx-auto grid max-w-7xl gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} variants={fadeUp}>
-            <p className="text-sm font-bold uppercase tracking-[0.28em] text-emerald">Nosotros</p>
-            <h2 className="mt-4 font-display text-4xl font-bold text-obsidian md:text-6xl">Lujo sereno, cultura viva y aventura andina.</h2>
-            <p className="mt-6 text-lg leading-8 text-charcoal/72">
-              Spirit Qosqo Travel nace en Cusco para conectar a viajeros nacionales e internacionales con experiencias autenticas, seguras y memorables. Disenamos rutas con guias certificados, atencion personalizada y respeto por los paisajes que hacen unico al antiguo Qosqo.
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Nosotros</p>
+            <h2 className="mt-5 max-w-xl font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">Viajar con calma, cultura y precision.</h2>
+            <p className="mt-8 max-w-2xl text-sm leading-8 text-charcoal/68 md:text-base">
+              Creamos experiencias en Cusco con guias certificados, atencion personalizada y rutas pensadas para disfrutar sin prisa.
             </p>
-            <div className="relative mt-8 aspect-[4/3] overflow-hidden rounded-lg shadow-premium">
+            <div className="relative mt-12 aspect-[4/3] overflow-hidden rounded-lg">
               <div className="image-skeleton absolute inset-0" />
               <Image src={images.guide} alt="Guia turistico con viajeros en Cusco" fill loading="lazy" sizes="(min-width: 1024px) 45vw, 100vw" className="object-cover" />
             </div>
           </motion.div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-x-10 gap-y-12 sm:grid-cols-2">
             {[
               ["Guias certificados", "Interpretacion cultural clara y trato cercano.", BadgeCheck],
               ["Atencion personalizada", "Tours familiares, privados y grupos pequenos.", HeartHandshake],
@@ -563,8 +562,8 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
             ].map(([title, text, Icon], index) => {
               const CardIcon = Icon as typeof BadgeCheck;
               return (
-                <motion.div key={title as string} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} whileHover={{ y: -6 }} viewport={{ once: true }} transition={{ delay: index * 0.08 }} className="glass rounded-lg p-6 shadow-premium">
-                  <div className="mb-5 grid size-12 place-items-center rounded-full bg-obsidian text-gold-soft">
+                <motion.div key={title as string} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} whileHover={{ y: -3 }} viewport={{ once: true }} transition={{ delay: index * 0.06 }} className="border-t border-black/10 pt-6">
+                  <div className="mb-5 grid size-11 place-items-center rounded-full bg-obsidian text-gold-soft">
                     <CardIcon className="size-5" />
                   </div>
                   <h3 className="text-xl font-bold text-obsidian">{title as string}</h3>
@@ -576,12 +575,12 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         </div>
       </section>
 
-      <section id="tours" className="bg-white px-4 py-24">
+      <section id="tours" className="bg-[#F8F6F0] px-4 py-32">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-12 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+          <div className="mb-16 flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.28em] text-emerald">Tours destacados</p>
-              <h2 className="mt-4 font-display text-4xl font-bold text-obsidian md:text-6xl">Rutas para sentir Cusco desde adentro.</h2>
+              <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Tours destacados</p>
+              <h2 className="mt-5 max-w-2xl font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">Experiencias esenciales en Cusco.</h2>
             </div>
             <button onClick={() => openBooking()} className={cn(buttonVariants({ variant: "default", size: "lg" }), "luxury-button")}>
               <CalendarDays className="size-5" />
@@ -591,31 +590,32 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {tours.map((tour, index) => (
               <motion.article key={tour.title} initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ delay: index * 0.04 }}>
-                <Card className="group h-full overflow-hidden border-black/5 transition duration-300 hover:-translate-y-2 hover:shadow-glow">
-                  <div className="relative aspect-[4/3] overflow-hidden">
+                <Card className="group h-full overflow-hidden border-black/5 bg-white transition duration-300 hover:-translate-y-1 hover:shadow-sm">
+                  <div className="relative aspect-[16/10] overflow-hidden">
                     <div className="image-skeleton absolute inset-0" />
                     <Image src={tour.image} alt={tour.title} fill loading={index < 2 ? "eager" : "lazy"} sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw" className="object-cover transition duration-700 group-hover:scale-105" />
-                    <div className="absolute left-4 top-4 rounded-full bg-obsidian/84 px-4 py-2 text-sm font-bold text-gold-soft backdrop-blur-md">{tour.badge}</div>
-                    <div className="absolute right-4 top-4 rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-obsidian backdrop-blur-md">{tour.price}</div>
+                    <div className="absolute left-4 top-4 rounded-full bg-white/86 px-3 py-1.5 text-xs font-bold text-obsidian backdrop-blur-md">{tour.badge}</div>
                   </div>
-                  <div className="p-6">
-                    <div className="mb-3 flex items-center gap-1 text-gold">
-                      {Array.from({ length: 5 }).map((_, star) => <Star key={star} className="size-4 fill-current" />)}
+                  <div className="p-5">
+                    <div className="mb-3 flex items-center justify-between gap-3 text-xs font-semibold text-charcoal/60">
+                      <span className="flex items-center gap-1 text-gold">
+                        {Array.from({ length: 5 }).map((_, star) => <Star key={star} className="size-3.5 fill-current" />)}
+                      </span>
+                      <span>{120 + index * 37} reservas</span>
                     </div>
-                    <h3 className="min-h-14 text-2xl font-bold leading-tight text-obsidian">{tour.title}</h3>
-                    <div className="mt-4 flex flex-wrap gap-3 text-sm font-semibold text-charcoal/72">
-                      <span className="inline-flex items-center gap-2 rounded-full bg-turquoise/10 px-3 py-2"><Clock className="size-4 text-turquoise" />{tour.duration}</span>
-                      <span className="inline-flex items-center gap-2 rounded-full bg-emerald/10 px-3 py-2"><Gauge className="size-4 text-emerald" />{tour.difficulty}</span>
-                      <span className="inline-flex items-center gap-2 rounded-full bg-gold/10 px-3 py-2"><Flag className="size-4 text-gold" />{120 + index * 37} reservas</span>
+                    <h3 className="min-h-12 text-lg font-semibold leading-snug text-obsidian">{tour.title}</h3>
+                    <div className="mt-4 flex items-center gap-4 text-sm text-charcoal/62">
+                      <span className="inline-flex items-center gap-1.5"><Clock className="size-4 text-gold" />{tour.duration}</span>
+                      <span className="inline-flex items-center gap-1.5"><Gauge className="size-4 text-charcoal/46" />{tour.difficulty}</span>
                     </div>
-                    <ul className="mt-5 space-y-2">
-                      {tour.includes.slice(0, 4).map((item) => (
-                        <li key={item} className="flex gap-2 text-sm leading-6 text-charcoal/72"><Check className="mt-0.5 size-4 shrink-0 text-gold" />{item}</li>
-                      ))}
-                    </ul>
-                    <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                      <Button variant="default" onClick={() => setSelectedTour(tour)}>Ver experiencia</Button>
-                      <Button variant="gold" className="luxury-button" onClick={() => openBooking(tour.title)}>Reservar</Button>
+                    <div className="mt-4 flex items-center justify-between border-t border-black/8 pt-4">
+                      <span className="text-sm font-bold text-obsidian">{tour.price}</span>
+                      <button className="text-sm font-bold text-obsidian underline-offset-4 hover:underline" onClick={() => setSelectedTour(tour)}>
+                        Ver experiencia
+                      </button>
+                    </div>
+                    <div className="mt-4">
+                      <Button variant="gold" size="sm" className="luxury-button w-full" onClick={() => openBooking(tour.title)}>Reservar</Button>
                     </div>
                   </div>
                 </Card>
@@ -625,30 +625,30 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         </div>
       </section>
 
-      <section className="px-4 py-24">
+      <section className="bg-white px-4 py-32">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-12 max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-[0.28em] text-emerald">Por que elegirnos</p>
-            <h2 className="mt-4 font-display text-4xl font-bold text-obsidian md:text-6xl">Confianza para viajar con libertad.</h2>
+          <div className="mb-16 max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Por que elegirnos</p>
+            <h2 className="mt-5 font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">Confianza sin exceso.</h2>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-x-12 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {reasons.map(({ icon: Icon, title, text }) => (
-              <motion.div key={title} whileHover={{ y: -6 }} className="inca-border rounded-lg bg-white p-6 shadow-premium">
-                <Icon className="size-10 text-gold" />
+              <motion.div key={title} whileHover={{ y: -3 }} className="border-t border-black/10 pt-6">
+                <Icon className="size-8 text-gold" />
                 <h3 className="mt-5 text-xl font-bold text-obsidian">{title}</h3>
                 <p className="mt-3 leading-7 text-charcoal/68">{text}</p>
               </motion.div>
             ))}
           </div>
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
+          <div className="mt-20 grid gap-4 md:grid-cols-3">
             {[
               ["Condor", "Vision amplia para disenar rutas memorables."],
               ["Puma", "Fuerza logistica y atencion precisa."],
               ["Serpiente", "Sabiduria andina en cada experiencia."]
             ].map(([animal, text]) => (
-              <motion.div key={animal} whileHover={{ y: -6 }} className="relative overflow-hidden rounded-lg bg-obsidian p-7 text-white shadow-premium">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(201,154,58,.28),transparent_32%)]" />
-                <p className="relative font-display text-3xl font-bold text-gold-soft">{animal}</p>
+              <motion.div key={animal} whileHover={{ y: -3 }} className="relative overflow-hidden rounded-lg bg-obsidian p-8 text-white">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(201,154,58,.18),transparent_32%)]" />
+                <p className="relative font-display text-2xl font-normal leading-tight text-gold-soft">{animal}</p>
                 <p className="relative mt-3 text-white/72">{text}</p>
               </motion.div>
             ))}
@@ -656,13 +656,13 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         </div>
       </section>
 
-      <section id="galeria" className="bg-obsidian px-4 py-24 text-white">
+      <section id="galeria" className="bg-obsidian px-4 py-32 text-white">
         <div className="mx-auto max-w-7xl">
-          <p className="text-sm font-bold uppercase tracking-[0.28em] text-turquoise">Galeria</p>
-          <h2 className="mt-4 font-display text-4xl font-bold md:text-6xl">Paisajes que se quedan contigo.</h2>
-          <div className="mt-12 columns-1 gap-4 sm:columns-2 lg:columns-3">
+          <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold-soft">Galeria</p>
+          <h2 className="mt-5 max-w-xl font-display text-3xl font-normal leading-[1.2] md:text-4xl">Paisajes que se quedan contigo.</h2>
+          <div className="mt-16 columns-1 gap-5 sm:columns-2 lg:columns-3">
             {gallery.map((item, index) => (
-              <button key={item.alt} className="group relative mb-4 block w-full overflow-hidden rounded-lg text-left shadow-premium" onClick={() => setLightbox(index)}>
+              <button key={item.alt} className="group relative mb-5 block w-full overflow-hidden rounded-lg text-left" onClick={() => setLightbox(index)}>
                 <div className={cn("relative", index % 3 === 0 ? "h-[430px]" : "h-[300px]")}>
                   <div className="image-skeleton absolute inset-0" />
                   <Image src={item.src} alt={item.alt} fill loading="lazy" sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover transition duration-700 group-hover:scale-110" />
@@ -675,15 +675,15 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         </div>
       </section>
 
-      <section id="testimonios" className="px-4 py-24">
+      <section id="testimonios" className="bg-white px-4 py-32">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.28em] text-emerald">Testimonios</p>
-            <h2 className="mt-4 font-display text-4xl font-bold text-obsidian md:text-6xl">Viajeros felices, recuerdos reales.</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Testimonios</p>
+            <h2 className="mt-5 font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">Recuerdos reales.</h2>
           </div>
-          <Card className="glass p-8">
+          <Card className="border-black/10 bg-[#F8F6F0] p-8 shadow-none">
             <div className="flex items-center gap-1 text-gold">{Array.from({ length: 5 }).map((_, index) => <Star key={index} className="size-5 fill-current" />)}</div>
-            <p className="mt-6 text-2xl font-semibold leading-10 text-obsidian">&ldquo;{activeTestimonial.text}&rdquo;</p>
+            <p className="mt-6 text-xl font-medium leading-9 text-obsidian">&ldquo;{activeTestimonial.text}&rdquo;</p>
             <div className="mt-8 flex items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <Image src={activeTestimonial.image} alt={activeTestimonial.name} width={64} height={64} className="rounded-full object-cover" />
@@ -698,12 +698,12 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         </div>
       </section>
 
-      <section id="contacto" className="bg-white px-4 py-24">
+      <section id="contacto" className="bg-[#F8F6F0] px-4 py-32">
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.28em] text-emerald">Como funciona</p>
-            <h2 className="mt-4 font-display text-4xl font-bold text-obsidian md:text-6xl">
-              Reservar se siente simple porque la ruta esta guiada.
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Como funciona</p>
+            <h2 className="mt-5 max-w-xl font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">
+              Reserva simple. Viaje claro.
             </h2>
             <div className="mt-10 space-y-5">
               {[
@@ -737,28 +737,28 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
             </Button>
           </div>
           <div className="space-y-6">
-            <Card className="p-6">
-              <h3 className="font-display text-3xl font-bold text-obsidian">Contacto directo</h3>
+            <Card className="border-black/10 bg-white p-6 shadow-none">
+              <h3 className="font-display text-2xl font-normal leading-tight text-obsidian">Contacto directo</h3>
               <div className="mt-6 space-y-4 text-charcoal/72">
                 <p className="flex gap-3"><MapPin className="mt-1 size-5 shrink-0 text-gold" />Cusco, Urb. Kennedy A, Calle Los Brillantes B-41</p>
                 <p className="flex gap-3"><MessageCircle className="mt-1 size-5 shrink-0 text-gold" />+51 982 214 529</p>
                 <p className="flex gap-3"><Globe2 className="mt-1 size-5 shrink-0 text-gold" />reservas@spiritqosqotravel.com</p>
               </div>
             </Card>
-            <div className="map-frame overflow-hidden rounded-lg shadow-premium">
+            <div className="map-frame overflow-hidden rounded-lg">
               <iframe title="Ubicacion de Spirit Qosqo Travel" src="https://www.google.com/maps?q=Urb.%20Kennedy%20A%20Calle%20Los%20Brillantes%20B-41%20Cusco%20Peru&output=embed" width="100%" height="360" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
             </div>
           </div>
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-obsidian px-4 py-28 text-white">
-        <Image src={images.sacred} alt="Valle Sagrado" fill loading="lazy" sizes="100vw" className="object-cover opacity-36" />
-        <div className="absolute inset-0 bg-gradient-to-r from-obsidian via-obsidian/74 to-obsidian/20" />
+      <section className="relative overflow-hidden bg-obsidian px-4 py-36 text-white">
+        <Image src={images.sacred} alt="Valle Sagrado" fill loading="lazy" sizes="100vw" className="object-cover opacity-48" />
+        <div className="absolute inset-0 bg-gradient-to-r from-obsidian/88 via-obsidian/52 to-obsidian/10" />
         <div className="relative mx-auto max-w-7xl">
-          <h2 className="max-w-3xl font-display text-4xl font-bold md:text-6xl">Listo para descubrir la magia del Imperio Inca?</h2>
-          <p className="mt-5 max-w-2xl text-xl leading-8 text-white/72">Miles de viajeros ya vivieron esta experiencia. Ahora es tu turno.</p>
-          <Button onClick={() => openBooking()} variant="gold" size="lg" className="luxury-button mt-8">
+          <h2 className="max-w-xl font-display text-3xl font-normal leading-[1.2] md:text-4xl">Listo para descubrir el Imperio Inca?</h2>
+          <p className="mt-8 max-w-xl text-base leading-8 text-white/72">Cusco se disfruta mejor cuando cada detalle esta resuelto.</p>
+          <Button onClick={() => openBooking()} variant="gold" size="lg" className="luxury-button mt-10">
             Reservar ahora
           </Button>
         </div>
@@ -800,7 +800,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
               <div className="grid min-h-[680px] lg:grid-cols-[0.34fr_0.66fr]">
                 <aside className="bg-obsidian p-6 text-white md:p-8">
                   <p className="text-sm font-bold uppercase tracking-[0.28em] text-gold-soft">Spirit Qosqo Travel</p>
-                  <h2 className="mt-4 font-display text-4xl font-bold">Reserva tu experiencia</h2>
+                  <h2 className="mt-4 font-display text-3xl font-normal leading-tight">Reserva tu experiencia</h2>
                   <div className="mt-10 space-y-3">
                     {["Tour", "Fecha", "Viajeros", "Datos", "Preferencias", "Resumen"].map((step, index) => (
                       <button key={step} onClick={() => setBookingStep(index)} className={cn("flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition", bookingStep === index ? "bg-white text-obsidian" : "bg-white/8 text-white/72 hover:bg-white/12")}>
@@ -814,7 +814,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                   <motion.div key={bookingStep} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="min-h-[500px]">
                     {bookingStep === 0 && (
                       <div>
-                        <h3 className="text-3xl font-bold text-obsidian">Selecciona tu tour</h3>
+                        <h3 className="text-2xl font-semibold leading-snug text-obsidian">Selecciona tu tour</h3>
                         <div className="mt-6 grid gap-4 md:grid-cols-2">
                           {tours.map((tour) => (
                             <button key={tour.title} onClick={() => setBooking((current) => ({ ...current, tour: tour.title }))} className={cn("relative overflow-hidden rounded-lg border p-3 text-left transition hover:-translate-y-1", booking.tour === tour.title ? "border-gold bg-gold/10" : "border-black/10 bg-white")}>
@@ -828,7 +828,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                     )}
                     {bookingStep === 1 && (
                       <div>
-                        <h3 className="text-3xl font-bold text-obsidian">Selecciona fecha</h3>
+                        <h3 className="text-2xl font-semibold leading-snug text-obsidian">Selecciona fecha</h3>
                         <p className="mt-3 text-charcoal/68">Elige una fecha tentativa. Confirmaremos disponibilidad por WhatsApp.</p>
                         <Input className="mt-8 max-w-sm" type="date" value={booking.date} onChange={(event) => setBooking((current) => ({ ...current, date: event.target.value }))} />
                         <div className="mt-6 flex flex-wrap gap-3">
@@ -841,7 +841,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                     )}
                     {bookingStep === 2 && (
                       <div>
-                        <h3 className="text-3xl font-bold text-obsidian">Viajeros</h3>
+                        <h3 className="text-2xl font-semibold leading-snug text-obsidian">Viajeros</h3>
                         <div className="mt-8 max-w-xl space-y-4">
                           {[
                             ["adults", "Adultos"],
@@ -858,12 +858,12 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                             </div>
                           ))}
                         </div>
-                        <div className="mt-6 rounded-lg bg-emerald/10 p-5 text-xl font-bold text-emerald">Total: {totalTravelers} viajeros</div>
+                        <div className="mt-6 rounded-lg bg-gold/10 p-5 text-xl font-bold text-obsidian">Total: {totalTravelers} viajeros</div>
                       </div>
                     )}
                     {bookingStep === 3 && (
                       <div>
-                        <h3 className="text-3xl font-bold text-obsidian">Datos personales</h3>
+                        <h3 className="text-2xl font-semibold leading-snug text-obsidian">Datos personales</h3>
                         <div className="mt-8 grid gap-5 md:grid-cols-2">
                           <Input placeholder="Nombre completo" value={booking.name} onChange={(e) => setBooking((c) => ({ ...c, name: e.target.value }))} />
                           <Input placeholder="Correo" type="email" value={booking.email} onChange={(e) => setBooking((c) => ({ ...c, email: e.target.value }))} />
@@ -876,7 +876,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                     )}
                     {bookingStep === 4 && (
                       <div>
-                        <h3 className="text-3xl font-bold text-obsidian">Preferencias</h3>
+                        <h3 className="text-2xl font-semibold leading-snug text-obsidian">Preferencias</h3>
                         <div className="mt-8 grid gap-6">
                           <div><p className="mb-3 font-bold">Horario</p><div className="flex flex-wrap gap-3">{["Manana", "Tarde", "Full Day"].map((value) => <Button key={value} variant={booking.schedule === value ? "gold" : "default"} onClick={() => setBooking((c) => ({ ...c, schedule: value }))}>{value}</Button>)}</div></div>
                           <div><p className="mb-3 font-bold">Tipo de servicio</p><div className="flex flex-wrap gap-3">{["Compartido", "Privado"].map((value) => <Button key={value} variant={booking.service === value ? "gold" : "default"} onClick={() => setBooking((c) => ({ ...c, service: value }))}>{value}</Button>)}</div></div>
@@ -887,7 +887,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                     )}
                     {bookingStep === 5 && (
                       <div>
-                        <h3 className="text-3xl font-bold text-obsidian">Resumen</h3>
+                        <h3 className="text-2xl font-semibold leading-snug text-obsidian">Resumen</h3>
                         <div className="mt-8 grid gap-3 rounded-lg bg-[#F8F6F0] p-6">
                           {[
                             ["Tour", booking.tour],
@@ -922,19 +922,19 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
 
       {selectedTour && (
         <div className="fixed inset-0 z-[80] overflow-y-auto bg-black/78 p-4 backdrop-blur-sm" onClick={() => setSelectedTour(null)}>
-          <motion.div initial={{ opacity: 0, y: 40, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="mx-auto my-8 max-w-5xl overflow-hidden rounded-lg bg-white shadow-premium" onClick={(event) => event.stopPropagation()}>
+          <motion.div initial={{ opacity: 0, y: 40, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="mx-auto my-8 max-w-5xl overflow-hidden rounded-lg bg-white shadow-sm" onClick={(event) => event.stopPropagation()}>
             <div className="relative h-80">
               <Image src={selectedTour.image} alt={selectedTour.title} fill sizes="100vw" className="object-cover" />
               <button aria-label="Cerrar detalles" className="absolute right-4 top-4 grid size-11 place-items-center rounded-full bg-white text-obsidian" onClick={() => setSelectedTour(null)}><X className="size-5" /></button>
             </div>
             <div className="grid gap-8 p-6 md:p-8 lg:grid-cols-[1.1fr_0.9fr]">
               <div>
-                <p className="text-sm font-bold uppercase tracking-[0.28em] text-emerald">{selectedTour.badge}</p>
-                <h3 className="mt-3 font-display text-4xl font-bold text-obsidian">{selectedTour.title}</h3>
-                <p className="mt-4 leading-8 text-charcoal/70">{selectedTour.description}</p>
+                <p className="text-sm font-bold uppercase tracking-[0.28em] text-gold">{selectedTour.badge}</p>
+                <h3 className="mt-3 max-w-2xl font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">{selectedTour.title}</h3>
+                <p className="mt-5 text-sm leading-8 text-charcoal/70 md:text-base">{selectedTour.description}</p>
                 <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                  <span className="rounded-lg bg-turquoise/10 p-4 font-bold"><Clock className="mb-2 size-5 text-turquoise" />{selectedTour.duration}</span>
-                  <span className="rounded-lg bg-emerald/10 p-4 font-bold"><Gauge className="mb-2 size-5 text-emerald" />{selectedTour.difficulty}</span>
+                  <span className="rounded-lg bg-gold/10 p-4 font-bold"><Clock className="mb-2 size-5 text-gold" />{selectedTour.duration}</span>
+                  <span className="rounded-lg bg-black/5 p-4 font-bold"><Gauge className="mb-2 size-5 text-charcoal/62" />{selectedTour.difficulty}</span>
                   <span className="rounded-lg bg-gold/12 p-4 font-bold"><CalendarDays className="mb-2 size-5 text-gold" />{selectedTour.schedule}</span>
                 </div>
                 <div className="mt-6 grid grid-cols-3 gap-3">
@@ -963,7 +963,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                 </div>
               </div>
               <div className="space-y-6">
-                <div className="rounded-lg bg-obsidian p-5 text-white"><p className="text-sm text-white/58">Precio</p><p className="font-display text-3xl font-bold text-gold-soft">{selectedTour.price}</p></div>
+                <div className="rounded-lg bg-obsidian p-5 text-white"><p className="text-sm text-white/58">Precio</p><p className="font-display text-2xl font-normal leading-tight text-gold-soft">{selectedTour.price}</p></div>
                 <ListBlock title="Incluye" items={selectedTour.includes} />
                 <ListBlock title="No incluye" items={selectedTour.excludes} />
                 <ListBlock title="Que llevar" items={selectedTour.bring} />
@@ -979,7 +979,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                 <div className="rounded-lg border border-gold/20 bg-gold/10 p-4">
                   <div className="flex gap-1 text-gold">{Array.from({ length: 5 }).map((_, index) => <Star key={index} className="size-4 fill-current" />)}</div>
                   <p className="mt-3 text-sm font-semibold text-charcoal/76">&ldquo;Experiencia puntual, guia atento y paisajes increibles.&rdquo;</p>
-                  <p className="mt-2 text-xs font-bold uppercase tracking-[0.18em] text-emerald">Viajero verificado</p>
+                  <p className="mt-2 text-xs font-bold uppercase tracking-[0.18em] text-gold">Viajero verificado</p>
                 </div>
                 <Button onClick={() => { openBooking(selectedTour.title); setSelectedTour(null); }} variant="gold" size="lg" className="luxury-button w-full">Reservar</Button>
               </div>
@@ -997,7 +997,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         </div>
       )}
 
-      {toast && <div className="fixed bottom-24 left-1/2 z-[90] -translate-x-1/2 rounded-full bg-obsidian px-5 py-3 text-sm font-bold text-gold-soft shadow-premium">{toast}</div>}
+      {toast && <div className="fixed bottom-24 left-1/2 z-[90] -translate-x-1/2 rounded-full bg-obsidian px-5 py-3 text-sm font-bold text-gold-soft shadow-sm">{toast}</div>}
 
       <a href={whatsappUrl} target="_blank" aria-label="WhatsApp" className="fixed bottom-5 right-5 z-50 grid size-16 place-items-center rounded-full bg-emerald text-white shadow-glow before:absolute before:inset-0 before:animate-ping before:rounded-full before:bg-emerald/40">
         <MessageCircle className="relative size-8" />
