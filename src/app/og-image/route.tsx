@@ -37,7 +37,7 @@ export function GET() {
               Agencia de Viajes en Cusco
             </div>
             <div style={{ color: "#C9F7EF", fontSize: 34, marginTop: 28 }}>
-              Machu Picchu, Valle Sagrado, Montana de Colores y experiencias premium.
+              Machu Picchu, Valle Sagrado, Montaña de Colores y experiencias premium.
             </div>
           </div>
           <div style={{ color: "#F2D487", fontSize: 30, fontWeight: 700 }}>

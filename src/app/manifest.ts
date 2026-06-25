@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Spirit Qosqo Travel",
     short_name: "Spirit Qosqo",
     description:
-      "Agencia de viajes en Cusco especializada en Machu Picchu, Valle Sagrado, Montana de Colores, Laguna Humantay y experiencias premium.",
+      "Agencia de viajes en Cusco especializada en Machu Picchu, Valle Sagrado, Montaña de Colores, Laguna Humantay y experiencias premium.",
     start_url: "/",
     scope: "/",
     display: "standalone",

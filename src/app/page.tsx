@@ -73,9 +73,9 @@ type Booking = {
 };
 
 const whatsappNumber = "51982214529";
-const whatsappText = "Hola, deseo informacion sobre sus tours en Cusco.";
+const whatsappText = "Hola, deseo información sobre sus tours en Cusco.";
 const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappText)}`;
-const navItems = ["Inicio", "Nosotros", "Tours", "Galeria", "Testimonios", "Contacto"];
+const navItems = ["Inicio", "Nosotros", "Tours", "Galería", "Testimonios", "Contacto"];
 
 const images = {
   hero: "https://upload.wikimedia.org/wikipedia/commons/4/43/Peru_Machu_Picchu_Sunrise.jpg",
@@ -94,19 +94,19 @@ const heroVideo = "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mach
 const experiencePillars = [
   {
     title: "Aventuras",
-    text: "Montanas, lagunas y rutas andinas con asistencia cercana.",
+    text: "Montañas, lagunas y rutas andinas con asistencia cercana.",
     image: images.rainbow,
     icon: Mountain
   },
   {
     title: "Cultura",
-    text: "Templos, plazas y relatos incas explicados por guias locales.",
+    text: "Templos, plazas y relatos incas explicados por guías locales.",
     image: images.cusco,
     icon: Landmark
   },
   {
     title: "Machu Picchu",
-    text: "La experiencia iconica del Cusco con coordinacion clara de inicio a fin.",
+    text: "La experiencia icónica del Cusco con coordinación clara de inicio a fin.",
     image: images.machu,
     icon: Train
   }
@@ -114,18 +114,18 @@ const experiencePillars = [
 
 const tours: Tour[] = [
   {
-    title: "City Tour Clasico + Templo de la Luna + Zona X",
+    title: "City Tour Clásico + Templo de la Luna + Zona X",
     image: images.cusco,
-    duration: "Medio dia",
-    difficulty: "Facil",
+    duration: "Medio día",
+    difficulty: "Fácil",
     price: "Consultar",
-    badge: "Mas vendido",
-    schedule: "Manana o tarde",
-    description: "Una experiencia cultural y familiar por los espacios mas representativos de Cusco, con una extension de aventura hacia el Templo de la Luna y Zona X.",
-    includes: ["Transporte turistico", "Guia profesional", "Caballos", "Templo de la Luna", "Zona X", "City Tour clasico"],
-    excludes: ["Boleto turistico", "Alimentacion", "Gastos personales"],
-    bring: ["Casaca ligera", "Agua", "Protector solar", "Camara"],
-    recommendations: ["Ideal para aclimatarse", "Apto para familias", "Reservar con 24 horas de anticipacion"],
+    badge: "Más vendido",
+    schedule: "Mañana o tarde",
+    description: "Una experiencia cultural y familiar por los espacios más representativos de Cusco, con una extensión de aventura hacia el Templo de la Luna y Zona X.",
+    includes: ["Transporte turístico", "Guía profesional", "Caballos", "Templo de la Luna", "Zona X", "City Tour clásico"],
+    excludes: ["Boleto turístico", "Alimentación", "Gastos personales"],
+    bring: ["Casaca ligera", "Agua", "Protector solar", "Cámara"],
+    recommendations: ["Ideal para aclimatarse", "Apto para familias", "Reservar con 24 horas de anticipación"],
     gallery: [images.cusco, images.machu, images.sacred]
   },
   {
@@ -136,26 +136,26 @@ const tours: Tour[] = [
     price: "Desde S/ 95",
     badge: "Popular",
     schedule: "Full Day",
-    description: "Ruta panoramica por pueblos, mercados y centros arqueologicos incas del Valle Sagrado.",
-    includes: ["Pisac", "Ollantaytambo", "Chinchero", "Transporte", "Guia bilingue"],
-    excludes: ["Boleto turistico", "Almuerzo buffet", "Propinas"],
-    bring: ["Zapatillas comodas", "Sombrero", "Efectivo", "Documento"],
-    recommendations: ["Salida temprano", "Excelente para fotografia", "Combina bien con tren a Machu Picchu"],
+    description: "Ruta panorámica por pueblos, mercados y centros arqueológicos incas del Valle Sagrado.",
+    includes: ["Pisac", "Ollantaytambo", "Chinchero", "Transporte", "Guía bilingüe"],
+    excludes: ["Boleto turístico", "Almuerzo buffet", "Propinas"],
+    bring: ["Zapatillas cómodas", "Sombrero", "Efectivo", "Documento"],
+    recommendations: ["Salida temprano", "Excelente para fotografía", "Combina bien con tren a Machu Picchu"],
     gallery: [images.sacred, images.moray, images.cusco]
   },
   {
-    title: "Montana de Colores",
+    title: "Montaña de Colores",
     image: images.rainbow,
     duration: "Full day",
     difficulty: "Exigente",
     price: "Desde S/ 120",
     badge: "Oferta",
     schedule: "Full Day",
-    description: "Aventura de altura hacia uno de los paisajes mas iconicos del Peru, con asistencia durante la caminata.",
-    includes: ["Transporte", "Desayuno", "Almuerzo", "Guia de montana"],
+    description: "Aventura de altura hacia uno de los paisajes más icónicos del Perú, con asistencia durante la caminata.",
+    includes: ["Transporte", "Desayuno", "Almuerzo", "Guía de montaña"],
     excludes: ["Entrada", "Caballo opcional", "Bebidas"],
     bring: ["Ropa abrigadora", "Guantes", "Agua", "Snacks"],
-    recommendations: ["Buena aclimatacion previa", "No recomendado para problemas cardiacos", "Usar bloqueador"],
+    recommendations: ["Buena aclimatación previa", "No recomendado para problemas cardíacos", "Usar bloqueador"],
     gallery: [images.rainbow, images.humantay, images.sacred]
   },
   {
@@ -166,10 +166,10 @@ const tours: Tour[] = [
     price: "Desde S/ 115",
     badge: "Aventura",
     schedule: "Full Day",
-    description: "Caminata hacia una laguna turquesa al pie de nevados sagrados, con paisajes de alta montana.",
+    description: "Caminata hacia una laguna turquesa al pie de nevados sagrados, con paisajes de alta montaña.",
     includes: ["Recojo", "Transporte", "Desayuno", "Almuerzo", "Asistencia"],
     excludes: ["Entrada", "Caballo opcional", "Seguro personal"],
-    bring: ["Poncho", "Baston", "Agua", "Ropa termica"],
+    bring: ["Poncho", "Bastón", "Agua", "Ropa térmica"],
     recommendations: ["Aclimatarse en Cusco", "Llevar efectivo", "Dormir bien la noche anterior"],
     gallery: [images.humantay, images.rainbow, images.machu]
   },
@@ -181,58 +181,58 @@ const tours: Tour[] = [
     price: "Editable",
     badge: "Premium",
     schedule: "Full Day",
-    description: "Visita completa a la ciudadela inca con coordinacion de tren, buses, entrada y guia certificado.",
-    includes: ["Tren turistico", "Bus Consettur", "Entrada", "Guia certificado"],
+    description: "Visita completa a la ciudadela inca con coordinación de tren, buses, entrada y guía certificado.",
+    includes: ["Tren turístico", "Bus Consettur", "Entrada", "Guía certificado"],
     excludes: ["Almuerzo", "Upgrade de tren", "Gastos personales"],
     bring: ["Pasaporte", "Impermeable", "Zapatillas", "Agua"],
-    recommendations: ["Reservar con anticipacion", "Enviar datos exactos", "Elegir circuito segun disponibilidad"],
+    recommendations: ["Reservar con anticipación", "Enviar datos exactos", "Elegir circuito según disponibilidad"],
     gallery: [images.machu, images.hero, images.sacred]
   },
   {
     title: "Maras y Moray",
     image: images.moray,
-    duration: "Medio dia",
-    difficulty: "Facil",
+    duration: "Medio día",
+    difficulty: "Fácil",
     price: "Desde S/ 70",
     badge: "Nuevo",
-    schedule: "Manana o tarde",
-    description: "Circuito cultural por terrazas circulares incas y salineras tradicionales rodeadas de montanas.",
-    includes: ["Salineras", "Centro arqueologico", "Transporte", "Guia"],
-    excludes: ["Entradas", "Alimentacion", "Compras"],
-    bring: ["Lentes de sol", "Sombrero", "Camara", "Efectivo"],
-    recommendations: ["Perfecto para medio dia", "Puede combinarse con cuatrimotos", "Apto para familias"],
+    schedule: "Mañana o tarde",
+    description: "Circuito cultural por terrazas circulares incas y salineras tradicionales rodeadas de montañas.",
+    includes: ["Salineras", "Centro arqueológico", "Transporte", "Guía"],
+    excludes: ["Entradas", "Alimentación", "Compras"],
+    bring: ["Lentes de sol", "Sombrero", "Cámara", "Efectivo"],
+    recommendations: ["Perfecto para medio día", "Puede combinarse con cuatrimotos", "Apto para familias"],
     gallery: [images.moray, images.sacred, images.atv]
   },
   {
     title: "Cuatrimotos",
     image: images.atv,
-    duration: "Medio dia",
+    duration: "Medio día",
     difficulty: "Aventura",
     price: "Desde S/ 100",
     badge: "Popular",
-    schedule: "Manana o tarde",
-    description: "Ruta de adrenalina por paisajes andinos con instructor, equipos y paradas escenicas.",
-    includes: ["ATV", "Casco", "Instructor", "Ruta escenica"],
-    excludes: ["Entradas", "Alimentacion", "Seguro personal"],
-    bring: ["Ropa comoda", "Cortaviento", "Documento", "Bloqueador"],
+    schedule: "Mañana o tarde",
+    description: "Ruta de adrenalina por paisajes andinos con instructor, equipos y paradas escénicas.",
+    includes: ["ATV", "Casco", "Instructor", "Ruta escénica"],
+    excludes: ["Entradas", "Alimentación", "Seguro personal"],
+    bring: ["Ropa cómoda", "Cortaviento", "Documento", "Bloqueador"],
     recommendations: ["Seguir indicaciones del instructor", "No requiere experiencia previa", "Ideal para grupos"],
     gallery: [images.atv, images.moray, images.sacred]
   }
 ];
 
 const reasons = [
-  { icon: Award, title: "Experiencia", text: "Rutas curadas con criterio local y logistica puntual." },
-  { icon: ShieldCheck, title: "Seguridad", text: "Operacion responsable y asistencia en cada salida." },
-  { icon: BadgeCheck, title: "Guias certificados", text: "Profesionales preparados para familias y grupos privados." },
+  { icon: Award, title: "Experiencia", text: "Rutas curadas con criterio local y logística puntual." },
+  { icon: ShieldCheck, title: "Seguridad", text: "Operación responsable y asistencia en cada salida." },
+  { icon: BadgeCheck, title: "Guías certificados", text: "Profesionales preparados para familias y grupos privados." },
   { icon: Sparkles, title: "Precios competitivos", text: "Experiencias premium con tarifas claras y flexibles." },
-  { icon: HeartHandshake, title: "Atencion personalizada", text: "Itinerarios segun ritmo, edad e intereses." },
+  { icon: HeartHandshake, title: "Atención personalizada", text: "Itinerarios según ritmo, edad e intereses." },
   { icon: Phone, title: "Asistencia permanente", text: "Soporte directo por WhatsApp antes y durante el tour." }
 ];
 
 const gallery = [
   { src: images.hero, alt: "Machu Picchu al amanecer" },
   { src: images.sacred, alt: "Valle Sagrado de los Incas" },
-  { src: images.rainbow, alt: "Montana de 7 Colores" },
+  { src: images.rainbow, alt: "Montaña de 7 Colores" },
   { src: images.humantay, alt: "Laguna Humantay" },
   { src: images.cusco, alt: "Plaza de Armas del Cusco" },
   { src: images.machu, alt: "Ciudadela de Machu Picchu" },
@@ -243,7 +243,7 @@ const testimonials = [
   {
     name: "Camila R.",
     country: "Chile",
-    text: "La organizacion fue impecable. Nos sentimos acompanados desde el primer mensaje hasta el retorno al hotel.",
+    text: "La organización fue impecable. Nos sentimos acompañados desde el primer mensaje hasta el retorno al hotel.",
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80"
   },
   {
@@ -254,8 +254,8 @@ const testimonials = [
   },
   {
     name: "Lucia M.",
-    country: "Peru",
-    text: "El City Tour con caballos fue distinto a todo. Muy seguro, puntual y con guias atentos.",
+    country: "Perú",
+    text: "El City Tour con caballos fue distinto a todo. Muy seguro, puntual y con guías atentos.",
     image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
   }
 ];
@@ -275,9 +275,9 @@ const initialBooking: Booking = {
   email: "",
   phone: "",
   country: "",
-  language: "Espanol",
+  language: "Español",
   hotel: "",
-  schedule: "Manana",
+  schedule: "Mañana",
   service: "Compartido",
   message: "",
   policies: false
@@ -369,7 +369,7 @@ export default function Home() {
 Tour: ${booking.tour}
 Fecha: ${booking.date}
 Adultos: ${booking.adults}
-Ninos: ${booking.children}
+Niños: ${booking.children}
 Adultos mayores: ${booking.seniors}
 Total de viajeros: ${totalTravelers}
 Tipo de servicio: ${booking.service}
@@ -377,11 +377,11 @@ Horario: ${booking.schedule}
 Nombre: ${booking.name}
 Correo: ${booking.email}
 WhatsApp: ${booking.phone}
-Pais: ${booking.country}
+País: ${booking.country}
 Hotel: ${booking.hotel}
 Mensaje: ${booking.message}
 
-Quedo atento a la confirmacion de disponibilidad y precio.`;
+Quedo atento a la confirmación de disponibilidad y precio.`;
 
     setToast("Reserva lista para enviar por WhatsApp");
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`, "_blank");
@@ -433,7 +433,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
             Reservar experiencia
           </button>
           <Button
-            aria-label={menuOpen ? "Cerrar menu" : "Abrir menu"}
+            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={menuOpen}
             className={cn(
               "shrink-0 lg:hidden",
@@ -518,7 +518,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
               Descubre Cusco con una experiencia hecha a tu medida
             </motion.h1>
             <motion.p variants={fadeUp} className="mt-10 max-w-xl text-sm leading-8 text-white/76 md:text-base">
-              Tours privados y familiares con guias expertos, rutas cuidadas y asistencia directa.
+              Tours privados y familiares con guías expertos, rutas cuidadas y asistencia directa.
             </motion.p>
             <motion.div variants={fadeUp} className="mt-12 flex flex-col gap-4 sm:flex-row">
               <button onClick={() => openBooking()} className={cn(buttonVariants({ variant: "gold", size: "lg" }), "luxury-button")}>
@@ -532,9 +532,9 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
             </motion.div>
             <motion.div variants={fadeUp} className="mt-16 grid max-w-3xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
               <Counter value="1500" suffix="+" label="Viajeros felices" />
-              <Counter value="15" suffix="+" label="Anos" />
-              <Counter value="98" suffix="%" label="Satisfaccion" />
-              <Counter value="★★★★★" label="Calificacion" />
+              <Counter value="15" suffix="+" label="Años" />
+              <Counter value="98" suffix="%" label="Satisfacción" />
+              <Counter value="★★★★★" label="Calificación" />
             </motion.div>
           </motion.div>
         </div>
@@ -590,13 +590,13 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         <div className="relative mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} variants={fadeUp}>
             <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Nosotros</p>
-            <h2 className="mt-5 max-w-xl font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">Viajar con calma, cultura y precision.</h2>
+            <h2 className="mt-5 max-w-xl font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">Viajar con calma, cultura y precisión.</h2>
             <p className="mt-6 max-w-xl text-sm leading-7 text-charcoal/68 md:text-base">
-              Creamos experiencias en Cusco con guias certificados, atencion personalizada y rutas pensadas para disfrutar sin prisa.
+              Creamos experiencias en Cusco con guías certificados, atención personalizada y rutas pensadas para disfrutar sin prisa.
             </p>
             <div className="mt-8 grid max-w-md grid-cols-3 border-y border-black/10 py-5">
               {[
-                ["15+", "anos"],
+                ["15+", "años"],
                 ["7", "tours"],
                 ["24/7", "soporte"]
               ].map(([value, label]) => (
@@ -608,14 +608,14 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
             </div>
             <div className="relative mt-8 aspect-[16/10] overflow-hidden rounded-lg lg:max-w-xl">
               <div className="image-skeleton absolute inset-0" />
-              <Image src={images.guide} alt="Guia turistico con viajeros en Cusco" fill loading="lazy" sizes="(min-width: 1024px) 45vw, 100vw" className="object-cover" />
+              <Image src={images.guide} alt="Guía turístico con viajeros en Cusco" fill loading="lazy" sizes="(min-width: 1024px) 45vw, 100vw" className="object-cover" />
             </div>
           </motion.div>
           <div className="grid gap-4 sm:grid-cols-2">
             {[
-              ["Guias certificados", "Interpretacion cultural clara y trato cercano.", BadgeCheck],
-              ["Atencion personalizada", "Tours familiares, privados y grupos pequenos.", HeartHandshake],
-              ["Seguridad", "Coordinacion permanente, movilidad turistica y rutas verificadas.", ShieldCheck],
+              ["Guías certificados", "Interpretación cultural clara y trato cercano.", BadgeCheck],
+              ["Atención personalizada", "Tours familiares, privados y grupos pequeños.", HeartHandshake],
+              ["Seguridad", "Coordinación permanente, movilidad turística y rutas verificadas.", ShieldCheck],
               ["Turismo responsable", "Experiencias que valoran cultura, naturaleza y comunidad.", Sparkles]
             ].map(([title, text, Icon], index) => {
               const CardIcon = Icon as typeof BadgeCheck;
@@ -686,7 +686,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
       <section className="bg-white px-4 py-24 md:py-28">
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 max-w-2xl">
-            <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Por que elegirnos</p>
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Por qué elegirnos</p>
             <h2 className="mt-5 font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">Confianza sin exceso.</h2>
           </div>
           <div className="grid gap-px overflow-hidden border border-black/8 bg-black/8 sm:grid-cols-2 lg:grid-cols-3">
@@ -703,7 +703,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
 
       <section id="galeria" className="bg-obsidian px-4 py-32 text-white">
         <div className="mx-auto max-w-7xl">
-          <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold-soft">Galeria</p>
+          <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold-soft">Galería</p>
           <h2 className="mt-5 max-w-xl font-display text-3xl font-normal leading-[1.2] md:text-4xl">Paisajes que se quedan contigo.</h2>
           <div className="mt-14 grid auto-rows-[150px] grid-cols-2 gap-3 sm:auto-rows-[180px] md:grid-cols-4 lg:auto-rows-[170px]">
             {gallery.map((item, index) => (
@@ -753,7 +753,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
       <section id="contacto" className="relative overflow-hidden bg-[#F8F6F0] px-4 py-32">
         <div className="relative z-10 mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Como funciona</p>
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Cómo funciona</p>
             <h2 className="mt-5 max-w-xl font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">
               Reserva simple. Viaje claro.
             </h2>
@@ -778,7 +778,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                   </span>
                   <div className="border-b border-black/10 pb-5">
                     <p className="text-lg font-bold text-obsidian">{step}</p>
-                    <p className="mt-1 text-charcoal/62">Te acompanamos por WhatsApp hasta tener todo confirmado.</p>
+                    <p className="mt-1 text-charcoal/62">Te acompañamos por WhatsApp hasta tener todo confirmado.</p>
                   </div>
                 </motion.div>
               ))}
@@ -798,7 +798,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
               </div>
             </Card>
             <div className="map-frame overflow-hidden rounded-lg">
-              <iframe title="Ubicacion de Spirit Qosqo Travel" src="https://www.google.com/maps?q=Urb.%20Kennedy%20A%20Calle%20Los%20Brillantes%20B-41%20Cusco%20Peru&output=embed" width="100%" height="360" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+              <iframe title="Ubicación de Spirit Qosqo Travel" src="https://www.google.com/maps?q=Urb.%20Kennedy%20A%20Calle%20Los%20Brillantes%20B-41%20Cusco%20Perú&output=embed" width="100%" height="360" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
             </div>
           </div>
         </div>
@@ -808,8 +808,8 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         <Image src={images.sacred} alt="Valle Sagrado" fill loading="lazy" sizes="100vw" className="object-cover opacity-48" />
         <div className="absolute inset-0 bg-gradient-to-r from-obsidian/88 via-obsidian/52 to-obsidian/10" />
         <div className="relative mx-auto max-w-7xl">
-          <h2 className="max-w-xl font-display text-3xl font-normal leading-[1.2] md:text-4xl">Listo para descubrir el Imperio Inca?</h2>
-          <p className="mt-8 max-w-xl text-base leading-8 text-white/72">Cusco se disfruta mejor cuando cada detalle esta resuelto.</p>
+          <h2 className="max-w-xl font-display text-3xl font-normal leading-[1.2] md:text-4xl">¿Listo para descubrir el Imperio Inca?</h2>
+          <p className="mt-8 max-w-xl text-base leading-8 text-white/72">Cusco se disfruta mejor cuando cada detalle está resuelto.</p>
           <Button onClick={() => openBooking()} variant="gold" size="lg" className="luxury-button mt-10">
             Reservar ahora
           </Button>
@@ -820,7 +820,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.1fr_0.7fr_0.7fr_0.9fr]">
           <div>
             <BrandLogo inverse />
-            <p className="mt-5 max-w-md leading-7 text-white/68">Agencia de turismo en Cusco para viajeros que buscan cultura, naturaleza, aventura y atencion exclusiva.</p>
+            <p className="mt-5 max-w-md leading-7 text-white/68">Agencia de turismo en Cusco para viajeros que buscan cultura, naturaleza, aventura y atención exclusiva.</p>
             <div className="mt-5 flex gap-3">
               <a aria-label="Facebook" href="#" className="grid size-11 place-items-center rounded-full bg-white/10 hover:bg-white/18"><Facebook className="size-5" /></a>
               <a aria-label="Instagram" href="#" className="grid size-11 place-items-center rounded-full bg-white/10 hover:bg-white/18"><Instagram className="size-5" /></a>
@@ -828,7 +828,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
           </div>
           <div><h3 className="font-bold text-gold-soft">Enlaces</h3><div className="mt-4 grid gap-2">{navItems.map((item) => <a key={item} href={`#${sectionId(item)}`} className="text-white/68 hover:text-white">{item}</a>)}</div></div>
           <div><h3 className="font-bold text-gold-soft">Tours</h3><div className="mt-4 grid gap-2">{tours.slice(0, 5).map((tour) => <a key={tour.title} href="#tours" className="text-white/68 hover:text-white">{tour.title}</a>)}</div></div>
-          <div><h3 className="font-bold text-gold-soft">Contacto</h3><p className="mt-4 text-white/68">Cusco, Urb. Kennedy A, Calle Los Brillantes B-41</p><p className="mt-2 text-white/68">+51 982 214 529</p><p className="mt-2 text-white/68">reservas@spiritqosqotravel.com</p><p className="mt-4 text-white/44">Politicas de reserva · Privacidad · Terminos</p></div>
+          <div><h3 className="font-bold text-gold-soft">Contacto</h3><p className="mt-4 text-white/68">Cusco, Urb. Kennedy A, Calle Los Brillantes B-41</p><p className="mt-2 text-white/68">+51 982 214 529</p><p className="mt-2 text-white/68">reservas@spiritqosqotravel.com</p><p className="mt-4 text-white/44">Políticas de reserva · Privacidad · Términos</p></div>
         </div>
         <div className="mx-auto mt-10 max-w-7xl border-t border-white/10 pt-6 text-sm text-white/54">© {new Date().getFullYear()} Spirit Qosqo Travel. Todos los derechos reservados.</div>
       </footer>
@@ -904,7 +904,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                         <div className="mt-5 max-w-xl space-y-3">
                           {[
                             ["adults", "Adultos"],
-                            ["children", "Ninos"],
+                            ["children", "Niños"],
                             ["seniors", "Adultos mayores"]
                           ].map(([key, label]) => (
                             <div key={key} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-black/10 bg-white p-3 sm:gap-3 sm:p-5">
@@ -927,7 +927,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                           <Input placeholder="Nombre completo" value={booking.name} onChange={(e) => setBooking((c) => ({ ...c, name: e.target.value }))} />
                           <Input placeholder="Correo" type="email" value={booking.email} onChange={(e) => setBooking((c) => ({ ...c, email: e.target.value }))} />
                           <Input placeholder="WhatsApp" value={booking.phone} onChange={(e) => setBooking((c) => ({ ...c, phone: e.target.value }))} />
-                          <Input placeholder="Pais de origen" value={booking.country} onChange={(e) => setBooking((c) => ({ ...c, country: e.target.value }))} />
+                          <Input placeholder="País de origen" value={booking.country} onChange={(e) => setBooking((c) => ({ ...c, country: e.target.value }))} />
                           <Input placeholder="Idioma" value={booking.language} onChange={(e) => setBooking((c) => ({ ...c, language: e.target.value }))} />
                           <Input placeholder="Hotel o punto de recojo" value={booking.hotel} onChange={(e) => setBooking((c) => ({ ...c, hotel: e.target.value }))} />
                         </div>
@@ -937,10 +937,10 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                       <div>
                         <h3 className="text-xl font-semibold leading-snug text-obsidian sm:text-2xl">Preferencias</h3>
                         <div className="mt-5 grid gap-4 sm:gap-6">
-                          <div><p className="mb-3 font-bold">Horario</p><div className="flex flex-wrap gap-3">{["Manana", "Tarde", "Full Day"].map((value) => <Button key={value} variant={booking.schedule === value ? "gold" : "default"} onClick={() => setBooking((c) => ({ ...c, schedule: value }))}>{value}</Button>)}</div></div>
+                          <div><p className="mb-3 font-bold">Horario</p><div className="flex flex-wrap gap-3">{["Mañana", "Tarde", "Full Day"].map((value) => <Button key={value} variant={booking.schedule === value ? "gold" : "default"} onClick={() => setBooking((c) => ({ ...c, schedule: value }))}>{value}</Button>)}</div></div>
                           <div><p className="mb-3 font-bold">Tipo de servicio</p><div className="flex flex-wrap gap-3">{["Compartido", "Privado"].map((value) => <Button key={value} variant={booking.service === value ? "gold" : "default"} onClick={() => setBooking((c) => ({ ...c, service: value }))}>{value}</Button>)}</div></div>
                           <Textarea placeholder="Mensaje adicional" value={booking.message} onChange={(e) => setBooking((c) => ({ ...c, message: e.target.value }))} />
-                          <label className="flex items-start gap-3 rounded-lg border border-black/10 p-3 text-sm font-semibold leading-6 sm:p-4"><input className="mt-1" type="checkbox" checked={booking.policies} onChange={(e) => setBooking((c) => ({ ...c, policies: e.target.checked }))} /> Acepto politicas de reserva y contacto por WhatsApp</label>
+                          <label className="flex items-start gap-3 rounded-lg border border-black/10 p-3 text-sm font-semibold leading-6 sm:p-4"><input className="mt-1" type="checkbox" checked={booking.policies} onChange={(e) => setBooking((c) => ({ ...c, policies: e.target.checked }))} /> Acepto políticas de reserva y contacto por WhatsApp</label>
                         </div>
                       </div>
                     )}
@@ -952,7 +952,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                             ["Tour", booking.tour],
                             ["Fecha", booking.date],
                             ["Adultos", booking.adults],
-                            ["Ninos", booking.children],
+                            ["Niños", booking.children],
                             ["Adultos mayores", booking.seniors],
                             ["Total", `${totalTravelers} viajeros`],
                             ["Servicio", booking.service],
@@ -1002,7 +1002,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                 <div className="map-frame mt-6 overflow-hidden rounded-lg border border-black/10">
                   <iframe
                     title={`Mapa de ${selectedTour.title}`}
-                    src={`https://www.google.com/maps?q=${encodeURIComponent(`${selectedTour.title} Cusco Peru`)}&output=embed`}
+                    src={`https://www.google.com/maps?q=${encodeURIComponent(`${selectedTour.title} Cusco Perú`)}&output=embed`}
                     width="100%"
                     height="260"
                     loading="lazy"
@@ -1012,7 +1012,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                 <div className="mt-6">
                   <h4 className="font-bold text-obsidian">Itinerario</h4>
                   <div className="mt-3 grid gap-3">
-                    {["Recojo y bienvenida", "Ruta guiada con paradas escenicas", "Tiempo para fotografias", "Retorno coordinado"].map((item, index) => (
+                    {["Recojo y bienvenida", "Ruta guiada con paradas escénicas", "Tiempo para fotografías", "Retorno coordinado"].map((item, index) => (
                       <div key={item} className="flex gap-3 rounded-lg bg-[#F8F6F0] p-3">
                         <span className="grid size-8 shrink-0 place-items-center rounded-full bg-obsidian text-xs font-bold text-gold-soft">{index + 1}</span>
                         <span className="font-semibold text-charcoal/76">{item}</span>
@@ -1025,7 +1025,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                 <div className="rounded-lg bg-obsidian p-5 text-white"><p className="text-sm text-white/58">Precio</p><p className="font-display text-2xl font-normal leading-tight text-gold-soft">{selectedTour.price}</p></div>
                 <ListBlock title="Incluye" items={selectedTour.includes} />
                 <ListBlock title="No incluye" items={selectedTour.excludes} />
-                <ListBlock title="Que llevar" items={selectedTour.bring} />
+                <ListBlock title="Qué llevar" items={selectedTour.bring} />
                 <ListBlock title="Recomendaciones" items={selectedTour.recommendations} />
                 <div>
                   <h4 className="font-bold text-obsidian">Preguntas frecuentes</h4>
@@ -1037,7 +1037,7 @@ Quedo atento a la confirmacion de disponibilidad y precio.`;
                 </div>
                 <div className="rounded-lg border border-gold/20 bg-gold/10 p-4">
                   <div className="flex gap-1 text-gold">{Array.from({ length: 5 }).map((_, index) => <Star key={index} className="size-4 fill-current" />)}</div>
-                  <p className="mt-3 text-sm font-semibold text-charcoal/76">&ldquo;Experiencia puntual, guia atento y paisajes increibles.&rdquo;</p>
+                  <p className="mt-3 text-sm font-semibold text-charcoal/76">&ldquo;Experiencia puntual, guía atento y paisajes increíbles.&rdquo;</p>
                   <p className="mt-2 text-xs font-bold uppercase tracking-[0.18em] text-gold">Viajero verificado</p>
                 </div>
                 <Button onClick={() => { openBooking(selectedTour.title); setSelectedTour(null); }} variant="gold" size="lg" className="luxury-button w-full">Reservar</Button>
