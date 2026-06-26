@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Serif_Display, Manrope } from "next/font/google";
+import { CookieConsent } from "@/components/cookie-consent";
+import { SiteFooter } from "@/components/site-footer";
+import { company, siteUrl } from "@/lib/company";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -15,10 +18,9 @@ const dmSerif = DM_Serif_Display({
   display: "swap"
 });
 
-const siteUrl = "https://spiritqosqotravel.com";
-const siteName = "Spirit Qosqo Travel";
+const siteName = company.tradeName;
 const businessDescription =
-  "Descubre Cusco con Spirit Qosqo Travel. City Tour, Machu Picchu, Valle Sagrado, Montaña de Colores, Laguna Humantay y experiencias premium con guías profesionales.";
+  "Descubre Cusco con Spirit Qosqo Travel. City Tour, Machu Picchu, Valle Sagrado, Montana de Colores, Laguna Humantay y experiencias premium con guias profesionales.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -34,15 +36,15 @@ export const metadata: Metadata = {
     "tours en Cusco",
     "Machu Picchu full day",
     "Valle Sagrado",
-    "Montaña de Colores",
+    "Montana de Colores",
     "Laguna Humantay",
     "City Tour Cusco",
     "tours privados Cusco",
     "agencia turismo Cusco"
   ],
-  authors: [{ name: "Spirit Qosqo Travel" }],
-  creator: "Spirit Qosqo Travel",
-  publisher: "Spirit Qosqo Travel",
+  authors: [{ name: company.tradeName }],
+  creator: company.tradeName,
+  publisher: company.legalName,
   category: "travel",
   classification: "Travel Agency",
   referrer: "origin-when-cross-origin",
@@ -116,26 +118,30 @@ export const viewport: Viewport = {
 const travelAgencySchema = {
   "@context": "https://schema.org",
   "@type": "TravelAgency",
-  name: "Spirit Qosqo Travel",
+  name: company.tradeName,
+  legalName: company.legalName,
+  alternateName: company.tradeName,
+  taxID: company.ruc,
   description: businessDescription,
   url: siteUrl,
   logo: `${siteUrl}/logo-spirit-qosqo.png`,
   image: `${siteUrl}/og-image`,
-  telephone: "+51982214529",
-  email: "reservas@spiritqosqotravel.com",
+  telephone: company.phone,
+  email: company.email,
   address: {
     "@type": "PostalAddress",
-    addressLocality: "Cusco",
-    streetAddress: "Urb. Kennedy A, Calle Los Brillantes B-41",
-    addressCountry: "PE"
+    addressLocality: company.city,
+    streetAddress: company.contactAddress,
+    addressCountry: company.country
   },
   geo: {
     "@type": "GeoCoordinates",
-    address: "Urb. Kennedy A, Calle Los Brillantes B-41, Cusco, Perú"
+    address: company.contactAddress
   },
-  areaServed: ["Cusco", "Machu Picchu", "Valle Sagrado", "Montaña de Colores", "Laguna Humantay"],
+  areaServed: ["Cusco", "Machu Picchu", "Valle Sagrado", "Montana de Colores", "Laguna Humantay"],
+  openingHours: "Mo-Su 08:00-20:00",
   priceRange: "$$",
-  sameAs: ["https://wa.me/51982214529"]
+  sameAs: [company.facebook, company.instagram, `https://wa.me/${company.whatsappNumber}`]
 };
 
 const websiteSchema = {
@@ -159,9 +165,9 @@ const tourCatalogSchema = {
   "@type": "ItemList",
   name: "Tours destacados en Cusco",
   itemListElement: [
-    "City Tour Clásico + Templo de la Luna + Zona X",
+    "City Tour Clasico + Templo de la Luna + Zona X",
     "Valle Sagrado",
-    "Montaña de Colores",
+    "Montana de Colores",
     "Laguna Humantay",
     "Machu Picchu Full Day",
     "Maras y Moray",
@@ -189,6 +195,8 @@ export default function RootLayout({
           }}
         />
         {children}
+        <SiteFooter />
+        <CookieConsent />
       </body>
     </html>
   );

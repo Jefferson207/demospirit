@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
   Award,
@@ -12,13 +13,12 @@ import {
   ChevronRight,
   Clock,
   Compass,
-  Facebook,
+  ExternalLink,
   Gauge,
-  Globe2,
   HeartHandshake,
-  Instagram,
   Landmark,
   MapPin,
+  Mail,
   Menu,
   MessageCircle,
   Minus,
@@ -32,10 +32,12 @@ import {
   X
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
+import { LegalConsent, consentText } from "@/components/legal-consent";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { company, whatsappReservationUrl } from "@/lib/company";
 import { cn } from "@/lib/utils";
 
 type Tour = {
@@ -70,11 +72,11 @@ type Booking = {
   service: string;
   message: string;
   policies: boolean;
+  dataConsent: boolean;
 };
 
-const whatsappNumber = "51982214529";
-const whatsappText = "Hola, deseo información sobre sus tours en Cusco.";
-const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappText)}`;
+const whatsappNumber = company.whatsappNumber;
+const whatsappUrl = whatsappReservationUrl;
 const navItems = ["Inicio", "Nosotros", "Tours", "Galería", "Testimonios", "Contacto"];
 
 const images = {
@@ -280,7 +282,8 @@ const initialBooking: Booking = {
   schedule: "Mañana",
   service: "Compartido",
   message: "",
-  policies: false
+  policies: false,
+  dataConsent: false
 };
 
 function sectionId(item: string) {
@@ -323,6 +326,9 @@ export default function Home() {
   const [bookingOpen, setBookingOpen] = useState(false);
   const [bookingStep, setBookingStep] = useState(0);
   const [toast, setToast] = useState("");
+  const [bookingConsentError, setBookingConsentError] = useState("");
+  const [contactConsent, setContactConsent] = useState(false);
+  const [contactConsentError, setContactConsentError] = useState("");
   const [booking, setBooking] = useState<Booking>(initialBooking);
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 800], [0, 140]);
@@ -352,7 +358,7 @@ export default function Home() {
     if (bookingStep === 1) return Boolean(booking.date);
     if (bookingStep === 2) return totalTravelers > 0;
     if (bookingStep === 3) return Boolean(booking.name && booking.email && booking.phone);
-    if (bookingStep === 4) return booking.policies;
+    if (bookingStep === 4) return booking.policies && booking.dataConsent;
     return true;
   }, [booking, bookingStep, totalTravelers]);
 
@@ -364,6 +370,12 @@ export default function Home() {
   };
 
   const sendReservation = () => {
+    if (!booking.policies || !booking.dataConsent) {
+      setBookingConsentError(consentText);
+      setBookingStep(4);
+      return;
+    }
+
     const text = `Hola, deseo reservar un tour con Spirit Qosqo Travel.
 
 Tour: ${booking.tour}
@@ -613,6 +625,16 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
           </motion.div>
           <div className="grid gap-4 sm:grid-cols-2">
             {[
+              ["Mision", "Diseñar experiencias seguras y claras que conecten al viajero con la cultura viva del Cusco."],
+              ["Vision", "Ser una agencia digital confiable para viajeros que buscan servicio responsable y atencion cercana."],
+              ["Experiencia", "Operacion local, coordinacion por canales digitales y acompañamiento antes, durante y despues del tour."]
+            ].map(([title, text]) => (
+              <motion.div key={title} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="border border-gold/18 bg-gold/8 p-5 sm:col-span-2 lg:col-span-1">
+                <h3 className="text-base font-bold text-obsidian">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-charcoal/64">{text}</p>
+              </motion.div>
+            ))}
+            {[
               ["Guías certificados", "Interpretación cultural clara y trato cercano.", BadgeCheck],
               ["Atención personalizada", "Tours familiares, privados y grupos pequeños.", HeartHandshake],
               ["Seguridad", "Coordinación permanente, movilidad turística y rutas verificadas.", ShieldCheck],
@@ -698,6 +720,22 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="bg-[#F8F6F0] px-4 py-16">
+        <div className="mx-auto grid max-w-7xl gap-6 rounded-lg border border-gold/24 bg-white p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">ESNNA - MINCETUR</p>
+            <h2 className="mt-3 font-display text-3xl font-normal leading-tight text-obsidian">Prevenimos la explotacion sexual de niñas, niños y adolescentes.</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-charcoal/68">
+              En {company.tradeName} rechazamos y denunciamos toda forma de explotacion sexual de niñas, niños y adolescentes en viajes y turismo. Cumplimos con difundir el afiche oficial y promover turismo responsable.
+            </p>
+          </div>
+          <a href={company.esnnaPosterUrl} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full md:w-auto")}>
+            <ExternalLink className="size-5" />
+            Ver afiche oficial
+          </a>
         </div>
       </section>
 
@@ -787,18 +825,57 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
               <CalendarDays className="size-5" />
               Reservar experiencia
             </Button>
+            <Link href="/medios-de-pago" className={cn(buttonVariants({ variant: "default", size: "lg" }), "mt-3 w-full sm:w-fit")}>
+              <ShieldCheck className="size-5" />
+              Ver medios de pago
+            </Link>
           </div>
           <div className="space-y-6">
             <Card className="border-black/10 bg-white p-6 shadow-none">
               <h3 className="font-display text-2xl font-normal leading-tight text-obsidian">Contacto directo</h3>
               <div className="mt-6 space-y-4 text-charcoal/72">
-                <p className="flex gap-3"><MapPin className="mt-1 size-5 shrink-0 text-gold" />Cusco, Urb. Kennedy A, Calle Los Brillantes B-41</p>
-                <p className="flex gap-3"><MessageCircle className="mt-1 size-5 shrink-0 text-gold" />+51 982 214 529</p>
-                <p className="flex gap-3"><Globe2 className="mt-1 size-5 shrink-0 text-gold" />reservas@spiritqosqotravel.com</p>
+                <p className="flex gap-3"><MapPin className="mt-1 size-5 shrink-0 text-gold" />{company.contactAddress}</p>
+                <p className="flex gap-3"><Phone className="mt-1 size-5 shrink-0 text-gold" />{company.phone}</p>
+                <p className="flex gap-3"><MessageCircle className="mt-1 size-5 shrink-0 text-gold" />WhatsApp: {company.whatsapp}</p>
+                <p className="flex gap-3"><Mail className="mt-1 size-5 shrink-0 text-gold" />{company.email}</p>
+                <p className="flex gap-3"><Clock className="mt-1 size-5 shrink-0 text-gold" />{company.openingHours}</p>
+                <p className="rounded-lg bg-gold/10 p-3 text-sm font-semibold text-obsidian">{company.legalName} · {company.ruc}</p>
               </div>
             </Card>
+            <Card className="border-black/10 bg-white p-6 shadow-none">
+              <h3 className="font-display text-2xl font-normal leading-tight text-obsidian">Escríbenos</h3>
+              <form
+                className="mt-5 grid gap-3"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  if (!contactConsent) {
+                    setContactConsentError(consentText);
+                    return;
+                  }
+                  const form = new FormData(event.currentTarget);
+                  const body = Array.from(form.entries()).map(([key, value]) => `${key}: ${value}`).join("%0A");
+                  window.location.href = `mailto:${company.email}?subject=Consulta web - ${company.tradeName}&body=${body}`;
+                }}
+              >
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Input required name="Nombre" placeholder="Nombre completo" />
+                  <Input required name="Correo" type="email" placeholder="Correo" />
+                </div>
+                <Input required name="WhatsApp" placeholder="WhatsApp" />
+                <Textarea required name="Mensaje" placeholder="Cuéntanos qué tour o fecha te interesa" className="min-h-28" />
+                <LegalConsent
+                  checked={contactConsent}
+                  error={contactConsentError}
+                  onChange={(checked) => {
+                    setContactConsent(checked);
+                    setContactConsentError("");
+                  }}
+                />
+                <Button type="submit" variant="gold" className="w-full">Enviar consulta</Button>
+              </form>
+            </Card>
             <div className="map-frame overflow-hidden rounded-lg">
-              <iframe title="Ubicación de Spirit Qosqo Travel" src="https://www.google.com/maps?q=Urb.%20Kennedy%20A%20Calle%20Los%20Brillantes%20B-41%20Cusco%20Perú&output=embed" width="100%" height="360" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+              <iframe title="Ubicacion de Spirit Qosqo Travel" src={`https://www.google.com/maps?q=${encodeURIComponent(company.contactAddress)}&output=embed`} width="100%" height="360" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
             </div>
           </div>
         </div>
@@ -815,23 +892,6 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
           </Button>
         </div>
       </section>
-
-      <footer className="bg-obsidian px-4 py-14 text-white">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.1fr_0.7fr_0.7fr_0.9fr]">
-          <div>
-            <BrandLogo inverse />
-            <p className="mt-5 max-w-md leading-7 text-white/68">Agencia de turismo en Cusco para viajeros que buscan cultura, naturaleza, aventura y atención exclusiva.</p>
-            <div className="mt-5 flex gap-3">
-              <a aria-label="Facebook" href="#" className="grid size-11 place-items-center rounded-full bg-white/10 hover:bg-white/18"><Facebook className="size-5" /></a>
-              <a aria-label="Instagram" href="#" className="grid size-11 place-items-center rounded-full bg-white/10 hover:bg-white/18"><Instagram className="size-5" /></a>
-            </div>
-          </div>
-          <div><h3 className="font-bold text-gold-soft">Enlaces</h3><div className="mt-4 grid gap-2">{navItems.map((item) => <a key={item} href={`#${sectionId(item)}`} className="text-white/68 hover:text-white">{item}</a>)}</div></div>
-          <div><h3 className="font-bold text-gold-soft">Tours</h3><div className="mt-4 grid gap-2">{tours.slice(0, 5).map((tour) => <a key={tour.title} href="#tours" className="text-white/68 hover:text-white">{tour.title}</a>)}</div></div>
-          <div><h3 className="font-bold text-gold-soft">Contacto</h3><p className="mt-4 text-white/68">Cusco, Urb. Kennedy A, Calle Los Brillantes B-41</p><p className="mt-2 text-white/68">+51 982 214 529</p><p className="mt-2 text-white/68">reservas@spiritqosqotravel.com</p><p className="mt-4 text-white/44">Políticas de reserva · Privacidad · Términos</p></div>
-        </div>
-        <div className="mx-auto mt-10 max-w-7xl border-t border-white/10 pt-6 text-sm text-white/54">© {new Date().getFullYear()} Spirit Qosqo Travel. Todos los derechos reservados.</div>
-      </footer>
 
       {bookingOpen && (
         <div className="fixed inset-0 z-[85] flex h-dvh flex-col overflow-hidden bg-[#F8F6F0]">
@@ -940,7 +1000,14 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
                           <div><p className="mb-3 font-bold">Horario</p><div className="flex flex-wrap gap-3">{["Mañana", "Tarde", "Full Day"].map((value) => <Button key={value} variant={booking.schedule === value ? "gold" : "default"} onClick={() => setBooking((c) => ({ ...c, schedule: value }))}>{value}</Button>)}</div></div>
                           <div><p className="mb-3 font-bold">Tipo de servicio</p><div className="flex flex-wrap gap-3">{["Compartido", "Privado"].map((value) => <Button key={value} variant={booking.service === value ? "gold" : "default"} onClick={() => setBooking((c) => ({ ...c, service: value }))}>{value}</Button>)}</div></div>
                           <Textarea placeholder="Mensaje adicional" value={booking.message} onChange={(e) => setBooking((c) => ({ ...c, message: e.target.value }))} />
-                          <label className="flex items-start gap-3 rounded-lg border border-black/10 p-3 text-sm font-semibold leading-6 sm:p-4"><input className="mt-1" type="checkbox" checked={booking.policies} onChange={(e) => setBooking((c) => ({ ...c, policies: e.target.checked }))} /> Acepto políticas de reserva y contacto por WhatsApp</label>
+                          <LegalConsent
+                            checked={booking.policies && booking.dataConsent}
+                            error={bookingConsentError}
+                            onChange={(checked) => {
+                              setBookingConsentError("");
+                              setBooking((c) => ({ ...c, policies: checked, dataConsent: checked }));
+                            }}
+                          />
                         </div>
                       </div>
                     )}
@@ -964,7 +1031,7 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
                             ["Mensaje", booking.message || "Sin mensaje adicional"]
                           ].map(([label, value]) => <div key={label} className="flex justify-between gap-4 border-b border-black/8 py-2"><span className="shrink-0 font-bold text-charcoal/70">{label}</span><span className="text-right text-obsidian">{value}</span></div>)}
                         </div>
-                        <Button className="luxury-button mt-6 w-full" size="lg" variant="gold" onClick={sendReservation}><MessageCircle className="size-5" />Enviar Reserva</Button>
+                        <Button className="luxury-button mt-6 w-full" size="lg" variant="gold" onClick={sendReservation}><MessageCircle className="size-5" />Confirmar solicitud de reserva</Button>
                       </div>
                     )}
                   </motion.div>
