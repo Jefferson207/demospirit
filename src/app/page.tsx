@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Award,
   BadgeCheck,
@@ -13,7 +13,6 @@ import {
   ChevronRight,
   Clock,
   Compass,
-  ExternalLink,
   Gauge,
   HeartHandshake,
   Landmark,
@@ -32,6 +31,7 @@ import {
   X
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
+import { EsnnaPosterModal } from "@/components/esnna-poster-modal";
 import { LegalConsent, consentText } from "@/components/legal-consent";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -330,10 +330,6 @@ export default function Home() {
   const [contactConsent, setContactConsent] = useState(false);
   const [contactConsentError, setContactConsentError] = useState("");
   const [booking, setBooking] = useState<Booking>(initialBooking);
-  const { scrollY } = useScroll();
-  const heroY = useTransform(scrollY, [0, 800], [0, 140]);
-  const heroScale = useTransform(scrollY, [0, 800], [1.06, 1.16]);
-  const mountainY = useTransform(scrollY, [0, 800], [0, -86]);
   const totalTravelers = booking.adults + booking.children + booking.seniors;
   const activeTestimonial = testimonials[testimonialIndex];
 
@@ -501,17 +497,25 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
       </header>
 
       <section id="inicio" className="relative min-h-screen overflow-hidden bg-obsidian pt-28 text-white">
-        <motion.div style={{ y: heroY, scale: heroScale }} className="absolute inset-0">
+        <motion.div className="absolute inset-0">
+          <Image
+            src={images.hero}
+            alt="Machu Picchu al amanecer"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover md:hidden"
+          />
           <video
-            className="absolute inset-0 size-full object-cover"
+            className="absolute inset-0 hidden size-full object-cover md:block"
             poster={images.hero}
             autoPlay
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="none"
           >
-            <source src={heroVideo} type="video/webm" />
+            <source src={heroVideo} type="video/webm" media="(min-width: 768px)" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-r from-obsidian/90 via-obsidian/58 to-obsidian/12" />
           <div className="absolute inset-0 bg-gradient-to-t from-obsidian/82 via-obsidian/12 to-obsidian/46" />
@@ -519,7 +523,7 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
         </motion.div>
         <div className="gold-particles pointer-events-none absolute inset-0 overflow-hidden opacity-16" />
         <div className="fog-layer pointer-events-none absolute bottom-4 left-[-10%] h-44 w-[120%] opacity-16" />
-        <motion.div style={{ y: mountainY }} className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-[linear-gradient(135deg,transparent_0_18%,rgba(201,154,58,.22)_18%_20%,transparent_20%_38%,rgba(255,255,255,.12)_38%_40%,transparent_40%)] opacity-50" />
+        <motion.div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-[linear-gradient(135deg,transparent_0_18%,rgba(201,154,58,.22)_18%_20%,transparent_20%_38%,rgba(255,255,255,.12)_38%_40%,transparent_40%)] opacity-50" />
         <div className="relative mx-auto grid min-h-[calc(100vh-7rem)] max-w-7xl items-center px-4 pb-20">
           <motion.div initial="hidden" animate="visible" transition={{ staggerChildren: 0.12 }} className="max-w-3xl">
             <motion.div variants={fadeUp} className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] backdrop-blur-md">
@@ -732,10 +736,9 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
               En {company.tradeName} rechazamos y denunciamos toda forma de explotacion sexual de niñas, niños y adolescentes en viajes y turismo. Cumplimos con difundir el afiche oficial y promover turismo responsable.
             </p>
           </div>
-          <a href={company.esnnaPosterUrl} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full md:w-auto")}>
-            <ExternalLink className="size-5" />
-            Ver afiche oficial
-          </a>
+          <div className="w-full md:w-auto">
+            <EsnnaPosterModal variant="button" />
+          </div>
         </div>
       </section>
 

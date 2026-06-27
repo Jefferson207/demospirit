@@ -13,14 +13,6 @@ const mainNav = [
   ["Contacto", "/#contacto"]
 ];
 
-const legalNav = [
-  ["Tarifario", "/tarifario"],
-  ["Medios de Pago", "/medios-de-pago"],
-  ["Terminos", "/terminos-y-condiciones"],
-  ["Datos Personales", "/politica-proteccion-datos-personales"],
-  ["Reclamaciones", "/libro-de-reclamaciones"]
-];
-
 export function LegalPage({
   eyebrow,
   title,
@@ -61,18 +53,6 @@ export function LegalPage({
               </a>
             </div>
           </div>
-          <nav aria-label="Navegacion legal" className="mt-3 flex gap-2 overflow-x-auto pb-1 lg:justify-end">
-            {[...mainNav, ...legalNav].map(([label, href]) => (
-              <Link key={`${label}-${href}`} href={href} className="shrink-0 rounded-full border border-black/10 bg-[#F8F6F0] px-3 py-2 text-xs font-bold text-charcoal/70 transition hover:border-gold/30 hover:bg-gold/10 hover:text-obsidian lg:hidden">
-                {label}
-              </Link>
-            ))}
-            {legalNav.map(([label, href]) => (
-              <Link key={`${label}-${href}-desktop`} href={href} className="hidden shrink-0 rounded-full border border-black/10 bg-[#F8F6F0] px-3 py-2 text-xs font-bold text-charcoal/70 transition hover:border-gold/30 hover:bg-gold/10 hover:text-obsidian lg:inline-flex">
-                {label}
-              </Link>
-            ))}
-          </nav>
         </div>
       </header>
 

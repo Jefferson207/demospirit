@@ -1,5 +1,6 @@
 import { Facebook, Instagram, Mail, MapPin, MessageCircle, Phone, ShieldCheck } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
+import { EsnnaPosterModal } from "@/components/esnna-poster-modal";
 import { company, whatsappReservationUrl } from "@/lib/company";
 
 const quickLinks = [
@@ -17,8 +18,7 @@ const legalLinks = [
   ["Politica de Proteccion de Datos Personales", "/politica-proteccion-datos-personales"],
   ["Terminos y Condiciones", "/terminos-y-condiciones"],
   ["Medios de Pago", "/medios-de-pago"],
-  ["Politica de Cookies", "/politica-cookies"],
-  ["Afiche ESNNA MINCETUR", company.esnnaPosterUrl]
+  ["Politica de Cookies", "/politica-cookies"]
 ];
 
 export function SiteFooter() {
@@ -66,6 +66,7 @@ export function SiteFooter() {
                 {label}
               </a>
             ))}
+            <EsnnaPosterModal />
           </div>
           <div className="mt-5 rounded-lg border border-gold/24 bg-white/5 p-4 text-sm leading-6 text-white/70">
             <ShieldCheck className="mb-2 size-5 text-gold-soft" />
