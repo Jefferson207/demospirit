@@ -6,6 +6,8 @@ export type Tariff = {
     duration: string;
     includes: string;
     netPrice: string;
+    active?: boolean;
+    order?: number;
   }>;
   packages: Array<{
     name: string;
@@ -15,21 +17,42 @@ export type Tariff = {
     commission15: string;
     commission20: string;
     suggestedPrice: string;
+    active?: boolean;
+    order?: number;
   }>;
   hotels: Array<{
     category: string;
     hotels: string[];
     priceRange: string;
+    active?: boolean;
+    order?: number;
   }>;
   feed: Array<{
     service: string;
     includes: string;
+    active?: boolean;
+    order?: number;
   }>;
-  reservationPolicies: string[];
+  reservationPolicies: Array<string | { text: string; active?: boolean; order?: number }>;
   cancellationPolicies: Array<{
     period: string;
     charge: string;
+    active?: boolean;
+    order?: number;
   }>;
+  legalInfo?: {
+    active?: boolean;
+    items: string[];
+  };
+  contactInfo?: {
+    active?: boolean;
+    address: string;
+    phone: string;
+    whatsapp: string;
+    email: string;
+    website: string;
+    socials: string[];
+  };
 };
 
 export const tariffStorageKey = "spirit-qosqo-tariff-data";

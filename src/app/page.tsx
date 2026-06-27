@@ -38,9 +38,10 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { company, whatsappReservationUrl } from "@/lib/company";
+import { travelServices, type TravelService } from "@/lib/travel-services";
 import { cn } from "@/lib/utils";
 
-type Tour = {
+type DisplayService = TravelService & {
   title: string;
   image: string;
   duration: string;
@@ -93,6 +94,23 @@ const images = {
 
 const heroVideo = "https://commons.wikimedia.org/wiki/Special:Redirect/file/Machu-Pichu_%28video_2011%29.webm";
 
+const tours: DisplayService[] = travelServices.map((service) => ({
+  ...service,
+  title: service.nombre,
+  image: service.imagenPrincipal,
+  duration: service.duracion,
+  difficulty: service.dificultad,
+  price: service.precioTexto,
+  badge: service.etiqueta,
+  schedule: service.horariosDisponibles.join(", "),
+  description: service.descripcionCompleta,
+  includes: service.incluye,
+  excludes: service.noIncluye,
+  bring: service.queLlevar,
+  recommendations: service.recomendaciones,
+  gallery: service.galeria
+}));
+
 const experiencePillars = [
   {
     title: "Aventuras",
@@ -114,7 +132,8 @@ const experiencePillars = [
   }
 ];
 
-const tours: Tour[] = [
+/*
+const legacyTours = [
   {
     title: "City Tour Clásico + Templo de la Luna + Zona X",
     image: images.cusco,
@@ -222,6 +241,7 @@ const tours: Tour[] = [
   }
 ];
 
+*/
 const reasons = [
   { icon: Award, title: "Experiencia", text: "Rutas curadas con criterio local y logística puntual." },
   { icon: ShieldCheck, title: "Seguridad", text: "Operación responsable y asistencia en cada salida." },
@@ -268,7 +288,7 @@ const fadeUp = {
 };
 
 const initialBooking: Booking = {
-  tour: tours[0].title,
+  tour: tours[0].nombre,
   date: new Date(Date.now() + 86400000 * 3).toISOString().slice(0, 10),
   adults: 2,
   children: 0,
@@ -321,7 +341,7 @@ function ListBlock({ title, items }: { title: string; items: string[] }) {
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [selectedTour, setSelectedTour] = useState<Tour | null>(null);
+  const [selectedTour, setSelectedTour] = useState<DisplayService | null>(null);
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [bookingStep, setBookingStep] = useState(0);
@@ -673,33 +693,52 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
           </div>
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {tours.map((tour, index) => (
-              <motion.article key={tour.title} initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ delay: index * 0.04 }}>
+              <motion.article
+                key={tour.slug}
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelectedTour(tour)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") setSelectedTour(tour);
+                }}
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ delay: index * 0.04 }}
+              >
                 <Card className="group h-full overflow-hidden border-black/5 bg-white transition duration-300 hover:-translate-y-1 hover:shadow-sm">
                   <div className="relative aspect-[16/10] overflow-hidden">
                     <div className="image-skeleton absolute inset-0" />
-                    <Image src={tour.image} alt={tour.title} fill loading={index < 2 ? "eager" : "lazy"} sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw" className="object-cover transition duration-700 group-hover:scale-105" />
-                    <div className="absolute left-4 top-4 rounded-full bg-white/86 px-3 py-1.5 text-xs font-bold text-obsidian backdrop-blur-md">{tour.badge}</div>
+                    <Image src={tour.imagenPrincipal} alt={tour.nombre} fill loading={index < 2 ? "eager" : "lazy"} sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw" className="object-cover transition duration-700 group-hover:scale-105" />
+                    <div className="absolute left-4 top-4 rounded-full bg-white/86 px-3 py-1.5 text-xs font-bold text-obsidian backdrop-blur-md">{tour.etiqueta}</div>
                   </div>
                   <div className="p-5">
                     <div className="mb-3 flex items-center justify-between gap-3 text-xs font-semibold text-charcoal/60">
                       <span className="flex items-center gap-1 text-gold">
-                        {Array.from({ length: 5 }).map((_, star) => <Star key={star} className="size-3.5 fill-current" />)}
+                        {Array.from({ length: Math.round(tour.rating) }).map((_, star) => <Star key={star} className="size-3.5 fill-current" />)}
                       </span>
-                      <span>{120 + index * 37} reservas</span>
+                      <span>{tour.reservas} reservas</span>
                     </div>
-                    <h3 className="min-h-12 text-lg font-semibold leading-snug text-obsidian">{tour.title}</h3>
+                    <h3 className="min-h-12 text-lg font-semibold leading-snug text-obsidian">{tour.nombre}</h3>
                     <div className="mt-4 flex items-center gap-4 text-sm text-charcoal/62">
-                      <span className="inline-flex items-center gap-1.5"><Clock className="size-4 text-gold" />{tour.duration}</span>
-                      <span className="inline-flex items-center gap-1.5"><Gauge className="size-4 text-charcoal/46" />{tour.difficulty}</span>
+                      <span className="inline-flex items-center gap-1.5"><Clock className="size-4 text-gold" />{tour.duracion}</span>
+                      <span className="inline-flex items-center gap-1.5"><Gauge className="size-4 text-charcoal/46" />{tour.dificultad}</span>
                     </div>
                     <div className="mt-4 flex items-center justify-between border-t border-black/8 pt-4">
-                      <span className="text-sm font-bold text-obsidian">{tour.price}</span>
-                      <button className="text-sm font-bold text-obsidian underline-offset-4 hover:underline" onClick={() => setSelectedTour(tour)}>
-                        Ver experiencia
-                      </button>
+                      <span className="text-sm font-bold text-obsidian">{tour.precioTexto}</span>
                     </div>
                     <div className="mt-4">
-                      <Button variant="gold" size="sm" className="luxury-button w-full" onClick={() => openBooking(tour.title)}>Reservar</Button>
+                      <Button
+                        variant="gold"
+                        size="sm"
+                        className="luxury-button w-full"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          openBooking(tour.nombre);
+                        }}
+                      >
+                        Reservar
+                      </Button>
                     </div>
                   </div>
                 </Card>
@@ -939,10 +978,10 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
                         <h3 className="text-xl font-semibold leading-snug text-obsidian sm:text-2xl">Selecciona tu tour</h3>
                         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:mt-6">
                           {tours.map((tour) => (
-                            <button key={tour.title} onClick={() => setBooking((current) => ({ ...current, tour: tour.title }))} className={cn("relative grid grid-cols-[72px_1fr] items-center gap-3 overflow-hidden rounded-lg border p-2 text-left transition hover:-translate-y-1 sm:block sm:p-3", booking.tour === tour.title ? "border-gold bg-gold/10" : "border-black/10 bg-white")}>
-                              <div className="relative h-16 overflow-hidden rounded-md sm:h-28"><Image src={tour.image} alt={tour.title} fill sizes="(min-width: 640px) 50vw, 72px" className="object-cover" /></div>
-                              <p className="pr-8 text-sm font-bold leading-snug text-obsidian sm:mt-3 sm:pr-0 sm:text-base">{tour.title}</p>
-                              {booking.tour === tour.title && <span className="absolute right-3 top-3 grid size-7 place-items-center rounded-full bg-emerald text-white"><Check className="size-4" /></span>}
+                            <button key={tour.slug} onClick={() => setBooking((current) => ({ ...current, tour: tour.nombre }))} className={cn("relative grid grid-cols-[72px_1fr] items-center gap-3 overflow-hidden rounded-lg border p-2 text-left transition hover:-translate-y-1 sm:block sm:p-3", booking.tour === tour.nombre ? "border-gold bg-gold/10" : "border-black/10 bg-white")}>
+                              <div className="relative h-16 overflow-hidden rounded-md sm:h-28"><Image src={tour.imagenPrincipal} alt={tour.nombre} fill sizes="(min-width: 640px) 50vw, 72px" className="object-cover" /></div>
+                              <p className="pr-8 text-sm font-bold leading-snug text-obsidian sm:mt-3 sm:pr-0 sm:text-base">{tour.nombre}</p>
+                              {booking.tour === tour.nombre && <span className="absolute right-3 top-3 grid size-7 place-items-center rounded-full bg-emerald text-white"><Check className="size-4" /></span>}
                             </button>
                           ))}
                         </div>
@@ -1072,7 +1111,7 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
                 <div className="map-frame mt-6 overflow-hidden rounded-lg border border-black/10">
                   <iframe
                     title={`Mapa de ${selectedTour.title}`}
-                    src={`https://www.google.com/maps?q=${encodeURIComponent(`${selectedTour.title} Cusco Perú`)}&output=embed`}
+                    src={selectedTour.mapaUrl}
                     width="100%"
                     height="260"
                     loading="lazy"
@@ -1082,10 +1121,10 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
                 <div className="mt-6">
                   <h4 className="font-bold text-obsidian">Itinerario</h4>
                   <div className="mt-3 grid gap-3">
-                    {["Recojo y bienvenida", "Ruta guiada con paradas escénicas", "Tiempo para fotografías", "Retorno coordinado"].map((item, index) => (
-                      <div key={item} className="flex gap-3 rounded-lg bg-[#F8F6F0] p-3">
+                    {selectedTour.itinerario.map((item, index) => (
+                      <div key={`${item.titulo}-${index}`} className="flex gap-3 rounded-lg bg-[#F8F6F0] p-3">
                         <span className="grid size-8 shrink-0 place-items-center rounded-full bg-obsidian text-xs font-bold text-gold-soft">{index + 1}</span>
-                        <span className="font-semibold text-charcoal/76">{item}</span>
+                        <span className="font-semibold text-charcoal/76"><strong className="text-obsidian">{item.titulo}:</strong> {item.descripcion}</span>
                       </div>
                     ))}
                   </div>
@@ -1093,6 +1132,26 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
               </div>
               <div className="space-y-6">
                 <div className="rounded-lg bg-obsidian p-5 text-white"><p className="text-sm text-white/58">Precio</p><p className="font-display text-2xl font-normal leading-tight text-gold-soft">{selectedTour.price}</p></div>
+                {selectedTour.tipoServicio === "paquete" && (
+                  <div className="rounded-lg border border-gold/20 bg-gold/10 p-4">
+                    <h4 className="font-bold text-obsidian">Datos del paquete</h4>
+                    <div className="mt-3 grid gap-2 text-sm text-charcoal/76">
+                      {[
+                        ["Noches de hotel", selectedTour.nochesHotel],
+                        ["Categoria hotel", selectedTour.categoriaHotel],
+                        ["Precio neto", selectedTour.precioNeto ? `${selectedTour.moneda} ${selectedTour.precioNeto}` : "Consultar"],
+                        ["Comision agencia", selectedTour.comisionAgencia],
+                        ["Tarifa venta sugerida", selectedTour.tarifaVentaSugerida]
+                      ].map(([label, value]) => (
+                        <div key={label} className="flex justify-between gap-3 border-b border-black/8 py-1">
+                          <span className="font-bold">{label}</span>
+                          <span className="text-right">{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {selectedTour.serviciosIncluidos && <ListBlock title="Servicios incluidos" items={selectedTour.serviciosIncluidos} />}
+                  </div>
+                )}
                 <ListBlock title="Incluye" items={selectedTour.includes} />
                 <ListBlock title="No incluye" items={selectedTour.excludes} />
                 <ListBlock title="Qué llevar" items={selectedTour.bring} />
@@ -1100,7 +1159,7 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
                 <div>
                   <h4 className="font-bold text-obsidian">Preguntas frecuentes</h4>
                   <div className="mt-3 space-y-2">
-                    {["Confirmamos disponibilidad antes del pago.", "Podemos adaptar horarios para servicio privado.", "La dificultad se explica antes de confirmar."].map((item) => (
+                    {selectedTour.preguntasFrecuentes.map((item) => (
                       <p key={item} className="rounded-lg bg-black/5 p-3 text-sm text-charcoal/70">{item}</p>
                     ))}
                   </div>

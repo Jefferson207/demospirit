@@ -4,18 +4,39 @@ import { useEffect, useState } from "react";
 import { CalendarDays, Hotel, ShieldCheck, Soup, TableProperties } from "lucide-react";
 import { defaultTariff, tariffStorageKey, type Tariff } from "@/lib/tariff";
 
+function policyText(item: Tariff["reservationPolicies"][number]) {
+  return typeof item === "string" ? item : item.text;
+}
+
+function policyIsActive(item: Tariff["reservationPolicies"][number]) {
+  return typeof item === "string" ? true : item.active !== false;
+}
+
 function useTariff(initialData: Tariff) {
   const [tariff, setTariff] = useState(initialData);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(tariffStorageKey);
-    if (!saved) return;
+    const load = async () => {
+      try {
+        const response = await fetch("/api/tariff", { cache: "no-store" });
+        const payload = (await response.json()) as { tariff?: Tariff };
+        if (payload.tariff) {
+          setTariff(payload.tariff);
+          return;
+        }
+      } catch {
+        const saved = window.localStorage.getItem(tariffStorageKey);
+        if (!saved) return;
 
-    try {
-      setTariff(JSON.parse(saved) as Tariff);
-    } catch {
-      setTariff(initialData);
-    }
+        try {
+          setTariff(JSON.parse(saved) as Tariff);
+        } catch {
+          setTariff(initialData);
+        }
+      }
+    };
+
+    load();
   }, [initialData]);
 
   return tariff;
@@ -141,8 +162,8 @@ export function TariffView({ initialData = defaultTariff }: { initialData?: Tari
         <div className="rounded-lg border border-black/10 bg-white p-5 shadow-sm sm:p-6">
           <SectionTitle icon={ShieldCheck} title="Politicas de reserva" subtitle="Condiciones operativas para confirmar servicios." />
           <ul className="grid gap-3">
-            {tariff.reservationPolicies.map((item) => (
-              <li key={item} className="rounded-lg bg-[#F8F6F0] p-3 text-sm leading-6 text-charcoal/72">{item}</li>
+            {tariff.reservationPolicies.filter(policyIsActive).map((item) => (
+              <li key={policyText(item)} className="rounded-lg bg-[#F8F6F0] p-3 text-sm leading-6 text-charcoal/72">{policyText(item)}</li>
             ))}
           </ul>
         </div>
