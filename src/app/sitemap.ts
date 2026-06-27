@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/politica-proteccion-datos-personales",
     "/politica-proteccion-datos",
     "/terminos-y-condiciones",
+    "/tarifario",
     "/medios-de-pago",
     "/libro-de-reclamaciones",
     "/preguntas-frecuentes",

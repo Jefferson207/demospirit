@@ -31,6 +31,37 @@ const sections = [
   }
 ];
 
+const policyBlocks = [
+  {
+    title: "Introduccion",
+    text: `La privacidad del viajero es prioritaria. Esta politica se aplica a toda persona que entregue datos personales a ${company.tradeName} mediante formularios web, WhatsApp, correo electronico, redes sociales, llamadas o cualquier canal digital administrado por la agencia.`
+  },
+  {
+    title: "Finalidad del tratamiento",
+    text: "Usamos los datos para atender consultas, verificar disponibilidad, elaborar cotizaciones, gestionar reservas, emitir vouchers, coordinar recojos, operar tours, procesar pagos, cumplir obligaciones administrativas, tributarias y de atencion al consumidor, responder reclamos y brindar soporte antes, durante y despues del servicio."
+  },
+  {
+    title: "Conservacion de los datos",
+    text: "Conservamos los datos solo durante el tiempo necesario para cumplir las finalidades indicadas, atender responsabilidades contractuales, reclamos, requerimientos de autoridades y obligaciones legales aplicables. Luego los eliminamos, bloqueamos o anonimizamos de acuerdo con criterios internos de seguridad."
+  },
+  {
+    title: "Transferencia de datos",
+    text: "Cuando sea necesario para prestar el servicio, podremos compartir datos estrictamente indispensables con hoteles, operadores turisticos, guias, transportistas, proveedores de tickets, empresas ferroviarias, entidades financieras o autoridades competentes. Estas transferencias se realizan bajo criterios de necesidad, proporcionalidad y confidencialidad."
+  },
+  {
+    title: "Derechos ARCO",
+    text: "El titular de los datos puede ejercer sus derechos de Acceso, Rectificacion, Cancelacion y Oposicion. Tambien puede solicitar informacion sobre el uso de sus datos, actualizar informacion inexacta, pedir la supresion cuando corresponda u oponerse al tratamiento para finalidades no necesarias."
+  },
+  {
+    title: "Procedimiento para ejercer derechos ARCO",
+    text: `Para ejercer estos derechos, envia una solicitud al correo ${company.email} con el asunto "Derechos ARCO". La solicitud debe incluir nombres completos, documento de identidad, derecho que desea ejercer, descripcion clara del pedido y un medio de contacto para la respuesta. Atenderemos la solicitud dentro del plazo legal aplicable.`
+  },
+  {
+    title: "Correo de contacto",
+    text: `Para consultas sobre privacidad, tratamiento de datos personales o derechos ARCO, escribe a ${company.email} o comunicate al ${company.phone}.`
+  }
+];
+
 export default function PersonalDataProtectionPage() {
   return (
     <LegalPage
@@ -50,26 +81,21 @@ export default function PersonalDataProtectionPage() {
         ))}
       </div>
 
-      <h2>Introduccion</h2>
-      <p>La privacidad del viajero es prioritaria. Esta politica se aplica a toda persona que entregue datos personales a {company.tradeName} mediante formularios web, WhatsApp, correo electronico, redes sociales, llamadas o cualquier canal digital administrado por la agencia.</p>
-
-      <h2>Finalidad del tratamiento</h2>
-      <p>Usamos los datos para atender consultas, verificar disponibilidad, elaborar cotizaciones, gestionar reservas, emitir vouchers, coordinar recojos, operar tours, procesar pagos, cumplir obligaciones administrativas, tributarias y de atencion al consumidor, responder reclamos y brindar soporte antes, durante y despues del servicio.</p>
-
-      <h2>Conservacion de los datos</h2>
-      <p>Conservamos los datos solo durante el tiempo necesario para cumplir las finalidades indicadas, atender responsabilidades contractuales, reclamos, requerimientos de autoridades y obligaciones legales aplicables. Luego los eliminamos, bloqueamos o anonimizamos de acuerdo con criterios internos de seguridad.</p>
-
-      <h2>Transferencia de datos</h2>
-      <p>Cuando sea necesario para prestar el servicio, podremos compartir datos estrictamente indispensables con hoteles, operadores turisticos, guias, transportistas, proveedores de tickets, empresas ferroviarias, entidades financieras o autoridades competentes. Estas transferencias se realizan bajo criterios de necesidad, proporcionalidad y confidencialidad.</p>
-
-      <h2>Derechos ARCO</h2>
-      <p>El titular de los datos puede ejercer sus derechos de Acceso, Rectificacion, Cancelacion y Oposicion. Tambien puede solicitar informacion sobre el uso de sus datos, actualizar informacion inexacta, pedir la supresion cuando corresponda u oponerse al tratamiento para finalidades no necesarias.</p>
-
-      <h2>Procedimiento para ejercer derechos ARCO</h2>
-      <p>Para ejercer estos derechos, envia una solicitud al correo {company.email} con el asunto &quot;Derechos ARCO&quot;. La solicitud debe incluir nombres completos, documento de identidad, derecho que desea ejercer, descripcion clara del pedido y un medio de contacto para la respuesta. Atenderemos la solicitud dentro del plazo legal aplicable.</p>
-
-      <h2>Correo de contacto</h2>
-      <p>Para consultas sobre privacidad, tratamiento de datos personales o derechos ARCO, escribe a {company.email} o comunicate al {company.phone}.</p>
+      <div className="not-prose mt-6 grid gap-4">
+        {policyBlocks.map((block, index) => (
+          <article key={block.title} className="rounded-lg border border-black/10 bg-white p-5 shadow-sm transition hover:border-gold/30 sm:p-6">
+            <div className="flex gap-4">
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-gold/12 text-sm font-bold text-gold">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <div>
+                <h2 className="text-lg font-extrabold leading-snug text-obsidian sm:text-xl">{block.title}</h2>
+                <p className="mt-3 text-[15px] font-medium leading-8 text-charcoal/72">{block.text}</p>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
 
       <div className="not-prose mt-8 grid gap-4 rounded-lg border border-gold/20 bg-gold/10 p-5 md:grid-cols-[auto_1fr] md:items-center">
         <CalendarDays className="size-8 text-gold" />

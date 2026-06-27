@@ -1,7 +1,7 @@
 export const siteUrl = "https://spiritqosqotravel.com";
 
 export const company = {
-  legalName: "SPIRIT QOSQO TRAVEL S.A.C.",
+  legalName: "SPIRIT QOSQO E.I.R.L",
   tradeName: "Spirit Qosqo Travel",
   ruc: "20615956997",
   contactAddress: "Urb. Kennedy A, Calle Los Brillantes B-41, Cusco, Peru",

@@ -14,6 +14,7 @@ const mainNav = [
 ];
 
 const legalNav = [
+  ["Tarifario", "/tarifario"],
   ["Medios de Pago", "/medios-de-pago"],
   ["Terminos", "/terminos-y-condiciones"],
   ["Datos Personales", "/politica-proteccion-datos-personales"],

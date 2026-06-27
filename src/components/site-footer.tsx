@@ -7,6 +7,7 @@ const quickLinks = [
   ["Nosotros", "/#nosotros"],
   ["Tours", "/#tours"],
   ["Contacto", "/#contacto"],
+  ["Tarifario", "/tarifario"],
   ["Preguntas frecuentes", "/preguntas-frecuentes"],
   ["Libro de Reclamaciones", "/libro-de-reclamaciones"]
 ];
