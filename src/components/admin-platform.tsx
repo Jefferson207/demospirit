@@ -166,10 +166,14 @@ export function AdminPlatform() {
   };
 
   return (
-    <div className="not-prose grid gap-6 lg:grid-cols-[250px_1fr]">
-      <aside className="rounded-lg border border-black/10 bg-white p-3 shadow-sm lg:sticky lg:top-24 lg:self-start">
-        <div className="mb-3 flex items-center justify-between px-2">
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-gold">Admin</p>
+    <div className="not-prose min-h-screen bg-[#F8F6F0] px-3 py-4 text-obsidian sm:px-5 lg:px-6">
+      <div className="mx-auto grid max-w-[1600px] gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
+      <aside className="rounded-lg border border-black/10 bg-white p-3 shadow-sm lg:sticky lg:top-4 lg:self-start">
+        <div className="mb-4 flex items-center justify-between gap-3 border-b border-black/8 px-2 pb-3">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-gold">Admin</p>
+            <p className="mt-1 text-sm font-black text-obsidian">Panel web</p>
+          </div>
           <AdminLogoutButton />
         </div>
         <nav className="grid gap-1">
@@ -177,7 +181,10 @@ export function AdminPlatform() {
             <button
               key={item.key}
               onClick={() => { setModule(item.key); setQuery(""); setStatusFilter("Todos"); }}
-              className={cn("rounded-lg px-4 py-3 text-left text-sm font-black transition", module === item.key ? "bg-obsidian text-gold-soft" : "text-charcoal/70 hover:bg-gold/12")}
+              className={cn(
+                "flex min-h-11 items-center rounded-lg px-4 text-left text-sm font-black transition",
+                module === item.key ? "bg-obsidian text-gold-soft" : "text-charcoal/70 hover:bg-gold/12 hover:text-obsidian"
+              )}
             >
               {item.label}
             </button>
@@ -186,13 +193,13 @@ export function AdminPlatform() {
       </aside>
 
       <main className="min-w-0">
-        <div className="mb-5 flex flex-col justify-between gap-3 rounded-lg border border-black/10 bg-white p-5 shadow-sm md:flex-row md:items-center">
+        <div className="mb-4 flex flex-col justify-between gap-4 rounded-lg border border-black/10 bg-white p-4 shadow-sm md:flex-row md:items-center md:p-5">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.22em] text-gold">Spirit Qosqo Travel</p>
-            <h1 className="mt-2 text-2xl font-black text-obsidian">{modules.find((item) => item.key === module)?.label}</h1>
+            <h1 className="mt-1 text-2xl font-black leading-tight text-obsidian">{modules.find((item) => item.key === module)?.label}</h1>
           </div>
           {module !== "dashboard" && module !== "reservations" && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 md:justify-end">
               <Button variant="default" onClick={() => saveContent()} disabled={saving}><Save className="size-4" />{saving ? "Guardando..." : "Guardar"}</Button>
               {module !== "settings" && <Button variant="gold" onClick={() => setEditing(emptyRecord(module))}><Plus className="size-4" />Nuevo</Button>}
             </div>
@@ -205,7 +212,7 @@ export function AdminPlatform() {
         {module === "settings" && <SettingsEditor content={content} setContent={setContent} saveContent={saveContent} />}
         {!["dashboard", "settings"].includes(module) && (
           <>
-            <div className="mb-5 grid gap-3 rounded-lg border border-black/10 bg-white p-4 shadow-sm md:grid-cols-[1fr_180px]">
+            <div className="mb-4 grid gap-3 rounded-lg border border-black/10 bg-white p-3 shadow-sm md:grid-cols-[1fr_190px] md:p-4">
               <label className="relative">
                 <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-charcoal/45" />
                 <Input value={query} onChange={(event) => setQuery(event.target.value)} className="pl-11" placeholder="Buscar" />
@@ -223,6 +230,7 @@ export function AdminPlatform() {
 
       {editing && <EditModal module={module} record={editing} onChange={setEditing} onClose={() => setEditing(null)} onSave={upsertRecord} />}
       {reservationDetail && <ReservationModal reservation={reservationDetail} onClose={() => setReservationDetail(null)} onStatus={updateReservation} />}
+      </div>
     </div>
   );
 }
@@ -283,23 +291,30 @@ function RecordsGrid({
   onToggle: (record: Record<string, unknown>) => void;
 }) {
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
       {records.map((record, index) => (
-        <article key={String(record.id ?? index)} className="rounded-lg border border-black/10 bg-white p-5 shadow-sm">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <span className="rounded-full bg-gold/12 px-3 py-1 text-xs font-black text-obsidian">{String(record.status ?? "Activo")}</span>
-              <h2 className="mt-3 text-lg font-black text-obsidian">{String(record.name ?? record.title ?? record.code ?? "Registro")}</h2>
-              <p className="mt-2 line-clamp-3 text-sm leading-6 text-charcoal/65">{String(record.description ?? record.shortDescription ?? record.email ?? record.category ?? "")}</p>
-            </div>
+        <article key={String(record.id ?? index)} className="flex min-h-[230px] flex-col rounded-lg border border-black/10 bg-white p-5 shadow-sm transition hover:border-gold/35 hover:shadow-md">
+          <div className="flex items-start justify-between gap-4">
+            <span className={cn(
+              "rounded-full px-3 py-1 text-xs font-black",
+              record.status === "Inactivo" ? "bg-black/6 text-charcoal/60" : "bg-gold/12 text-obsidian"
+            )}>
+              {String(record.status ?? "Activo")}
+            </span>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-charcoal/35">{module}</p>
           </div>
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Button size="sm" variant="default" onClick={() => onEdit(record)}><Pencil className="size-4" />Editar</Button>
-            <Button size="sm" variant="ghost" onClick={() => onDuplicate(record)}>Duplicar</Button>
-            <Button size="sm" variant="ghost" onClick={() => onToggle(record)}>{record.status === "Inactivo" ? "Activar" : "Desactivar"}</Button>
-            <Button size="sm" variant="ghost" onClick={() => onDelete(record)}><Trash2 className="size-4 text-red-600" />Eliminar</Button>
+
+          <div className="mt-4 flex-1">
+            <h2 className="line-clamp-2 text-lg font-black leading-snug text-obsidian">{String(record.name ?? record.title ?? record.code ?? "Registro")}</h2>
+            <p className="mt-3 line-clamp-3 text-sm leading-6 text-charcoal/65">{String(record.description ?? record.shortDescription ?? record.email ?? record.category ?? "")}</p>
           </div>
-          <p className="mt-4 text-xs font-bold uppercase tracking-[0.16em] text-charcoal/40">{module}</p>
+
+          <div className="mt-5 grid gap-2 border-t border-black/8 pt-4 sm:grid-cols-2">
+            <Button size="sm" variant="default" className="justify-center" onClick={() => onEdit(record)}><Pencil className="size-4" />Editar</Button>
+            <Button size="sm" variant="ghost" className="justify-center" onClick={() => onDuplicate(record)}>Duplicar</Button>
+            <Button size="sm" variant="ghost" className="justify-center" onClick={() => onToggle(record)}>{record.status === "Inactivo" ? "Activar" : "Desactivar"}</Button>
+            <Button size="sm" variant="ghost" className="justify-center text-red-600 hover:text-red-700" onClick={() => onDelete(record)}><Trash2 className="size-4" />Eliminar</Button>
+          </div>
         </article>
       ))}
     </div>
@@ -310,27 +325,27 @@ function ReservationsView({ reservations, onOpen, onEdit, onDelete }: { reservat
   return (
     <div className="grid gap-3">
       {reservations.map((item) => (
-        <article key={item.id} className="grid gap-4 rounded-lg border border-black/10 bg-white p-4 shadow-sm xl:grid-cols-[1fr_180px]">
-          <div className="grid gap-2 md:grid-cols-4">
-            <div><p className="text-xs font-bold text-charcoal/45">CÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³digo</p><p className="font-black text-obsidian">{item.code}</p></div>
-            <div><p className="text-xs font-bold text-charcoal/45">Cliente</p><p className="font-black text-obsidian">{item.clientName} {item.clientLastName}</p></div>
-            <div><p className="text-xs font-bold text-charcoal/45">Tour</p><p className="font-black text-obsidian">{item.tour}</p></div>
-            <div><p className="text-xs font-bold text-charcoal/45">Total</p><p className="font-black text-obsidian">USD {item.total}</p></div>
-            <div><p className="text-xs font-bold text-charcoal/45">Fecha</p><p>{item.date}</p></div>
-            <div><p className="text-xs font-bold text-charcoal/45">Estado</p><p>{item.status}</p></div>
-            <div><p className="text-xs font-bold text-charcoal/45">Metodo</p><p>{item.method}</p></div>
-            <div><p className="text-xs font-bold text-charcoal/45">Hotel</p><p>{item.hotel || "No aplica"}</p></div>
+        <article key={item.id} className="grid gap-4 rounded-lg border border-black/10 bg-white p-4 shadow-sm transition hover:border-gold/35 hover:shadow-md xl:grid-cols-[1fr_auto]">
+          <div className="grid gap-3 md:grid-cols-4">
+            <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-charcoal/45">Codigo</p><p className="font-black text-obsidian">{item.code}</p></div>
+            <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-charcoal/45">Cliente</p><p className="font-black text-obsidian">{item.clientName} {item.clientLastName}</p></div>
+            <div className="md:col-span-2"><p className="text-xs font-bold uppercase tracking-[0.12em] text-charcoal/45">Tour</p><p className="font-black text-obsidian">{item.tour}</p></div>
+            <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-charcoal/45">Fecha</p><p className="text-sm font-semibold text-charcoal/75">{item.date}</p></div>
+            <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-charcoal/45">Estado</p><p className="text-sm font-black text-gold">{item.status}</p></div>
+            <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-charcoal/45">Total</p><p className="font-black text-obsidian">USD {item.total}</p></div>
+            <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-charcoal/45">Hotel</p><p className="text-sm font-semibold text-charcoal/75">{item.hotel || "No aplica"}</p></div>
           </div>
-          <div className="flex flex-wrap content-start gap-2">
-            <Button size="sm" variant="default" onClick={() => onOpen(item)}><Eye className="size-4" />Ver</Button>
-            <Button size="sm" variant="ghost" onClick={() => onEdit(item)}><Pencil className="size-4" />Editar</Button>
-            <Button size="sm" variant="ghost" onClick={() => onDelete(item)}><Trash2 className="size-4 text-red-600" />Eliminar</Button>
+          <div className="grid content-start gap-2 sm:grid-cols-3 xl:w-[260px] xl:grid-cols-1">
+            <Button size="sm" variant="default" className="justify-center" onClick={() => onOpen(item)}><Eye className="size-4" />Ver</Button>
+            <Button size="sm" variant="ghost" className="justify-center" onClick={() => onEdit(item)}><Pencil className="size-4" />Editar</Button>
+            <Button size="sm" variant="ghost" className="justify-center text-red-600 hover:text-red-700" onClick={() => onDelete(item)}><Trash2 className="size-4" />Eliminar</Button>
           </div>
         </article>
       ))}
     </div>
   );
 }
+
 
 function SettingsEditor({ content, setContent, saveContent }: { content: AdminContent; setContent: (content: AdminContent) => void; saveContent: (content: AdminContent) => void }) {
   const settings = content.settings;
@@ -344,7 +359,7 @@ function SettingsEditor({ content, setContent, saveContent }: { content: AdminCo
           </label>
         ))}
       </div>
-      <Button className="mt-5" variant="gold" onClick={() => saveContent(content)}><Save className="size-4" />Guardar configuraciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n</Button>
+      <Button className="mt-5" variant="gold" onClick={() => saveContent(content)}><Save className="size-4" />Guardar configuraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n</Button>
     </div>
   );
 }
@@ -381,7 +396,7 @@ function EditModal({ module, record, onChange, onClose, onSave }: { module: Modu
           {["mainImage", "gallery"].some((field) => fields.includes(field)) && (
             <label className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-obsidian px-6 text-sm font-semibold text-ivory shadow-sm">
               <Upload className="size-4" />Subir imagen
-              <input type="file" className="sr-only" onChange={() => window.alert("La subida de imÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡genes esta disponible desde el editor de tarifario conectado al hosting.")} />
+              <input type="file" className="sr-only" onChange={() => window.alert("La subida de imÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡genes esta disponible desde el editor de tarifario conectado al hosting.")} />
             </label>
           )}
         </div>
