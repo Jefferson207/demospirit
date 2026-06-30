@@ -5,7 +5,7 @@ export const adminCookieName = "spirit_qosqo_admin";
 const sessionHours = 8;
 
 function getAdminUsername() {
-  return process.env.ADMIN_USERNAME ?? "admin";
+  return process.env.ADMIN_USERNAME || "admin";
 }
 
 function getAdminPassword() {
@@ -13,7 +13,7 @@ function getAdminPassword() {
 }
 
 function getSessionSecret() {
-  return `${getAdminPassword()}:${process.env.UPSTASH_REDIS_REST_TOKEN ?? "local-session"}`;
+  return process.env.ADMIN_SESSION_SECRET || getAdminPassword() || "local-session";
 }
 
 function sign(value: string) {
@@ -36,7 +36,7 @@ export function validateAdminCredentials(username: string, password: string) {
   return secureCompare(username, configuredUser) && secureCompare(password, configuredPassword);
 }
 
-export function createAdminToken(username: string) {
+export function createAdminToken(username = getAdminUsername()) {
   const expiresAt = Date.now() + sessionHours * 60 * 60 * 1000;
   const payload = `${username}.${expiresAt}`;
   return `${payload}.${sign(payload)}`;

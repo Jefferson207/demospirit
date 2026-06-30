@@ -12,7 +12,7 @@ export function AdminLogoutButton() {
   return (
     <Button type="button" variant="ghost" onClick={logout}>
       <LogOut className="size-4" />
-      Cerrar sesion
+      Cerrar sesión
     </Button>
   );
 }

@@ -1,4 +1,4 @@
-export const siteUrl = "https://spiritqosqotravel.com";
+export const siteUrl = "https://www.spiritqosqotravel.com";
 
 export const company = {
   legalName: "SPIRIT QOSQO E.I.R.L",
@@ -17,11 +17,11 @@ export const company = {
   instagram: "https://www.instagram.com/spiritqosqotravel",
   classification: "Agencia de Viajes y Turismo - Operador de Turismo",
   digitalChannelOwner: "Canal digital administrado por Spirit Qosqo Travel",
-  minceturDirectoryStatus: "Constancia de inscripcion en el Directorio Nacional de Prestadores de Servicios Turisticos Calificados pendiente de publicar",
+  minceturDirectoryStatus: "Constancia de inscripcion en el Directorio Nacional de Prestadores de Servicios Turísticos Calificados pendiente de publicar",
   esnnaPosterUrl: "https://www.gob.pe/institucion/mincetur/normas-legales/736982-108-2020-mincetur",
-  paymentProvider: "Medios de pago disponibles previa confirmacion de disponibilidad: Yape, Plin, transferencia bancaria y transferencia interbancaria a cuentas verificadas de la empresa."
+  paymentProvider: "Medios de pago disponibles previa confirmación de disponibilidad: Yape, Plin, transferencia bancaria y transferencia interbancaria a cuentas verificadas de la empresa."
 };
 
 export const whatsappReservationUrl = `https://wa.me/${company.whatsappNumber}?text=${encodeURIComponent(
-  "Hola, deseo informacion sobre sus tours en Cusco."
+  "Hola, deseo información sobre sus tours en Cusco."
 )}`;

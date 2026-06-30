@@ -70,7 +70,7 @@ export function TariffView({ initialData = defaultTariff }: { initialData?: Tari
       </div>
 
       <section className="rounded-lg border border-black/10 bg-white p-5 shadow-sm sm:p-6">
-        <SectionTitle icon={TableProperties} title="Tours clasicos" subtitle="Servicios compartidos y precios netos referenciales." />
+        <SectionTitle icon={TableProperties} title="Tours clásicos" subtitle="Servicios compartidos y precios netos referenciales." />
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] border-collapse text-sm">
             <thead>
@@ -96,13 +96,13 @@ export function TariffView({ initialData = defaultTariff }: { initialData?: Tari
       </section>
 
       <section className="rounded-lg border border-black/10 bg-white p-5 shadow-sm sm:p-6">
-        <SectionTitle icon={CalendarDays} title="Paquetes turisticos" subtitle="Precios netos, comisiones y tarifa de venta sugerida." />
+        <SectionTitle icon={CalendarDays} title="Paquetes turísticos" subtitle="Precios netos, comisiones y tarifa de venta sugerida." />
         <div className="overflow-x-auto">
           <table className="w-full min-w-[860px] border-collapse text-sm">
             <thead>
               <tr className="bg-obsidian text-left text-white">
                 <th className="p-3">Programa</th>
-                <th className="p-3">Categoria</th>
+                <th className="p-3">Categoría</th>
                 <th className="p-3 text-right">Neto</th>
                 <th className="p-3 text-right">10%</th>
                 <th className="p-3 text-right">15%</th>
@@ -146,7 +146,7 @@ export function TariffView({ initialData = defaultTariff }: { initialData?: Tari
         </div>
 
         <div className="rounded-lg border border-black/10 bg-white p-5 shadow-sm sm:p-6">
-          <SectionTitle icon={Soup} title="Feed / Alimentacion" subtitle="Detalle de alimentacion incluida o no incluida." />
+          <SectionTitle icon={Soup} title="Feed / Alimentación" subtitle="Detalle de alimentación incluida o no incluida." />
           <div className="grid gap-3">
             {tariff.feed.map((item) => (
               <div key={item.service} className="rounded-lg border border-black/8 bg-[#F8F6F0] p-4">
@@ -160,7 +160,7 @@ export function TariffView({ initialData = defaultTariff }: { initialData?: Tari
 
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-lg border border-black/10 bg-white p-5 shadow-sm sm:p-6">
-          <SectionTitle icon={ShieldCheck} title="Politicas de reserva" subtitle="Condiciones operativas para confirmar servicios." />
+          <SectionTitle icon={ShieldCheck} title="Políticas de reserva" subtitle="Condiciones operativas para confirmar servicios." />
           <ul className="grid gap-3">
             {tariff.reservationPolicies.filter(policyIsActive).map((item) => (
               <li key={policyText(item)} className="rounded-lg bg-[#F8F6F0] p-3 text-sm leading-6 text-charcoal/72">{policyText(item)}</li>
@@ -169,7 +169,7 @@ export function TariffView({ initialData = defaultTariff }: { initialData?: Tari
         </div>
 
         <div className="rounded-lg border border-black/10 bg-white p-5 shadow-sm sm:p-6">
-          <SectionTitle icon={ShieldCheck} title="Cancelaciones y reembolsos" subtitle="Cargos segun anticipacion de cancelacion." />
+          <SectionTitle icon={ShieldCheck} title="Cancelaciónes y reembolsos" subtitle="Cargos segun anticipacion de cancelacion." />
           <div className="grid gap-3">
             {tariff.cancellationPolicies.map((item) => (
               <div key={item.period} className="grid gap-2 rounded-lg bg-[#F8F6F0] p-3 sm:grid-cols-[150px_1fr]">

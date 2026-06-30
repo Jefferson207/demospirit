@@ -13,7 +13,7 @@ const paymentMethods = [
     title: "Yape",
     icon: Smartphone,
     logo: "yape",
-    details: ["Pago movil previa confirmacion de disponibilidad.", "Enviar captura o constancia para validar la reserva."],
+    details: ["Pago movil previa confirmación de disponibilidad.", "Enviar captura o constancia para validar la reserva."],
     fields: [
       ["Numero Yape", "Por completar"],
       ["Titular", company.legalName],
@@ -47,7 +47,7 @@ const paymentMethods = [
     title: "Transferencia interbancaria",
     icon: Building2,
     logo: "cci",
-    details: ["Disponible mediante codigo de cuenta interbancario (CCI).", "Considera los tiempos de validacion del banco."],
+    details: ["Disponible mediante código de cuenta interbancario (CCI).", "Considera los tiempos de validación del banco."],
     fields: [
       ["Banco", "Por completar"],
       ["CCI", "Por completar"],
@@ -112,7 +112,7 @@ export default function PaymentMethodsPage() {
             <div>
               <h2 className="text-xl font-bold text-obsidian">Importante antes de pagar</h2>
               <p className="mt-2 leading-7 text-charcoal/72">
-                Verifica que los datos de pago sean enviados desde nuestros canales oficiales. No solicitamos claves, token bancario, datos completos de tarjeta ni codigos personales.
+                Verifica que los datos de pago sean enviados desde nuestros canales oficiales. No solicitamos claves, token bancario, datos completos de tarjeta ni códigos personales.
               </p>
             </div>
           </div>
@@ -156,7 +156,7 @@ export default function PaymentMethodsPage() {
         <div className="rounded-lg border border-black/10 bg-white p-5 shadow-sm sm:p-6">
           <h2 className="text-xl font-bold text-obsidian">Datos comerciales para validar pagos</h2>
           <div className="mt-4 grid gap-3 text-sm text-charcoal/72 sm:grid-cols-2">
-            <p><span className="font-bold text-obsidian">Razon social:</span> {company.legalName}</p>
+            <p><span className="font-bold text-obsidian">Razón social:</span> {company.legalName}</p>
             <p><span className="font-bold text-obsidian">Nombre comercial:</span> {company.tradeName}</p>
             <p><span className="font-bold text-obsidian">RUC:</span> {company.ruc}</p>
             <p><span className="font-bold text-obsidian">Correo:</span> {company.email}</p>

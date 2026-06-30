@@ -19,7 +19,7 @@ export default async function AdminTariffPage() {
     <LegalPage
       eyebrow="Panel privado"
       title="Administrar Tarifario"
-      description="Edita tarifas, servicios e imagenes publicados en la web. Los cambios se guardan en la base conectada al sitio."
+      description="Edita tarifas, servicios e imágenes publicados en la web. Los cambios se guardan en la base conectada al sitio."
     >
       <div className="not-prose mb-5 flex justify-end">
         <AdminLogoutButton />

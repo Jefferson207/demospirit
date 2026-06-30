@@ -28,7 +28,7 @@ export function AdminLoginForm() {
 
       if (!response.ok || !payload.ok) throw new Error(payload.error ?? "No se pudo iniciar sesion.");
 
-      router.push("/admin/tarifario");
+      router.push("/admin");
       router.refresh();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "No se pudo iniciar sesion.");
@@ -48,6 +48,7 @@ export function AdminLoginForm() {
             onChange={(event) => setUsername(event.target.value)}
             className="pl-11"
             autoComplete="username"
+            autoFocus
             required
           />
         </span>

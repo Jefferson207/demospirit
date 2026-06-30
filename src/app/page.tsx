@@ -9,7 +9,6 @@ import {
   BadgeCheck,
   CalendarDays,
   Check,
-  ChevronLeft,
   ChevronRight,
   Clock,
   Compass,
@@ -38,6 +37,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { company, whatsappReservationUrl } from "@/lib/company";
+import type { Tariff } from "@/lib/tariff";
 import { travelServices, type TravelService } from "@/lib/travel-services";
 import { cn } from "@/lib/utils";
 
@@ -62,8 +62,13 @@ type Booking = {
   date: string;
   adults: number;
   children: number;
+  babies: number;
   seniors: number;
+  hotelCategory: string;
+  selectedHotel: string;
+  extras: string[];
   name: string;
+  lastName: string;
   email: string;
   phone: string;
   country: string;
@@ -72,13 +77,21 @@ type Booking = {
   schedule: string;
   service: string;
   message: string;
+  comments: string;
+  totalEstimate: number;
   policies: boolean;
   dataConsent: boolean;
 };
 
 const whatsappNumber = company.whatsappNumber;
 const whatsappUrl = whatsappReservationUrl;
-const navItems = ["Inicio", "Nosotros", "Tours", "Galería", "Testimonios", "Contacto"];
+const navItems = [
+  ["Inicio", "#inicio"],
+  ["Nosotros", "/nosotros"],
+  ["Tours", "#tours"],
+  ["Galería", "#galeria"],
+  ["Contacto", "#contacto"]
+];
 
 const images = {
   hero: "https://upload.wikimedia.org/wikipedia/commons/4/43/Peru_Machu_Picchu_Sunrise.jpg",
@@ -94,7 +107,12 @@ const images = {
 
 const heroVideo = "https://commons.wikimedia.org/wiki/Special:Redirect/file/Machu-Pichu_%28video_2011%29.webm";
 
-const tours: DisplayService[] = travelServices.map((service) => ({
+function isServiceActive(service: TravelService) {
+  return !("activo" in service) || service.activo !== false;
+}
+
+function toDisplayService(service: TravelService): DisplayService {
+  return {
   ...service,
   title: service.nombre,
   image: service.imagenPrincipal,
@@ -109,7 +127,165 @@ const tours: DisplayService[] = travelServices.map((service) => ({
   bring: service.queLlevar,
   recommendations: service.recomendaciones,
   gallery: service.galeria
-}));
+  };
+}
+
+function packageTariffToDisplayService(item: Tariff["packages"][number], index: number): DisplayService {
+  const name = `${item.name} - ${item.hotelCategory}`;
+  const suggestedPrice = item.suggestedPrice ? `Desde USD ${item.suggestedPrice}` : "Consultar";
+
+  return toDisplayService({
+    nombre: name,
+    slug: `paquete-${slugify(name)}-${index}`,
+    categoria: "Paquete turístico",
+    etiqueta: index === 0 ? "Más vendido" : "Popular",
+    descripcionCorta: `Programa ${item.name} con hotel categoría ${item.hotelCategory}.`,
+    descripcionCompleta: `Paquete turístico ${item.name} con tarifa referencial para hotel ${item.hotelCategory}. La disponibilidad, categoría exacta de hotel, trenes, entradas y horarios se confirman antes de la reserva.`,
+    duracion: item.name.match(/\d+\s*d[ií]as?\s*\/\s*\d+\s*noches?/i)?.[0] ?? "Consultar",
+    dificultad: "Moderado",
+    precio: Number(String(item.netPrice).replace(/,/g, "")) || null,
+    moneda: "USD",
+    precioTexto: suggestedPrice,
+    reservas: 0,
+    rating: 5,
+    incluye: ["Recepción en aeropuerto", "Traslados", "Hotel", "Tren", "Bus", "Entrada", "Guía", "Desayunos"],
+    noIncluye: ["Vuelos", "Almuerzos no indicados", "Cenas", "Gastos personales", "Propinas"],
+    queLlevar: ["Documento o pasaporte", "Ropa cómoda", "Casaca ligera", "Efectivo", "Protector solar"],
+    recomendaciones: ["Reservar con anticipación", "Confirmar categoría hotelera", "Enviar datos exactos de pasajeros"],
+    itinerario: [
+      { titulo: "Coordinación", descripcion: "Confirmación de fechas, categoría hotelera y disponibilidad." },
+      { titulo: "Servicios incluidos", descripcion: "Ejecución del paquete según programa confirmado." },
+      { titulo: "Asistencia", descripcion: "Acompañamiento y soporte durante el viaje." }
+    ],
+    imagenPrincipal: images.machu,
+    galeria: [images.machu, images.cusco, images.sacred],
+    mapaUrl: `https://www.google.com/maps?q=${encodeURIComponent("Cusco Machu Picchu Peru")}&output=embed`,
+    horariosDisponibles: ["Según disponibilidad"],
+    tipoServicio: "paquete",
+    preguntasFrecuentes: ["La tarifa depende de la categoría hotelera.", "No incluye vuelos.", "La disponibilidad se confirma antes del pago."],
+    nochesHotel: Number(item.name.match(/(\d+)\s*noches?/i)?.[1]) || undefined,
+    categoriaHotel: item.hotelCategory as TravelService["categoriaHotel"],
+    precioNeto: Number(String(item.netPrice).replace(/,/g, "")) || undefined,
+    comisionAgencia: `10%: ${item.commission10} / 15%: ${item.commission15} / 20%: ${item.commission20}`,
+    tarifaVentaSugerida: `USD ${item.suggestedPrice}`,
+    serviciosIncluidos: ["Recepción", "Traslados", "Hotel", "Tren", "Bus", "Entrada", "Guía", "Desayunos"]
+  });
+}
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function mergeServicesWithPackageTariff(services: TravelService[], tariff?: Tariff) {
+  const displayServices = services.filter(isServiceActive).map(toDisplayService);
+  const packageRows = tariff?.packages
+    ?.filter((item) => item.active !== false)
+    .map(packageTariffToDisplayService) ?? [];
+  const bySlug = new Map<string, DisplayService>();
+
+  [...displayServices, ...packageRows].forEach((service) => bySlug.set(service.slug, service));
+  return Array.from(bySlug.values());
+}
+
+const fallbackTours: DisplayService[] = mergeServicesWithPackageTariff(travelServices);
+const allToursFilter = "Todos";
+const detailExtras = [
+  { id: "almuerzo-buffet", label: "Almuerzo Buffet", price: 20 },
+  { id: "caballo", label: "Caballo", price: 25 },
+  { id: "tren-vistadome", label: "Tren Vistadome", price: 75 },
+  { id: "guía-privado", label: "Guía Privado", price: 80 },
+  { id: "transporte-vip", label: "Transporte VIP", price: 35 }
+];
+const bookingExtras = [
+  { id: "transporte", label: "Transporte", price: 35 },
+  { id: "tren", label: "Tren", price: 75 },
+  { id: "guía", label: "Guía", price: 80 },
+  { id: "seguro", label: "Seguro", price: 15 },
+  { id: "almuerzo", label: "Almuerzo", price: 20 },
+  { id: "cena", label: "Cena", price: 25 }
+];
+const bookingHotelCards = {
+  "2 estrellas": [
+    { name: "Hotel Prisma Cusco", services: ["Desayuno", "WiFi", "Recepcion 24h"], price: 18, image: images.cusco },
+    { name: "Hotel Inkarri Cusco", services: ["Desayuno", "WiFi", "Centro historico"], price: 25, image: images.sacred },
+    { name: "Hospedaje El Triunfo", services: ["WiFi", "Bano privado", "Asistencia"], price: 30, image: images.moray }
+  ],
+  "3 estrellas": [
+    { name: "Hotel San Agustin Internacional", services: ["Desayuno", "WiFi", "Restaurante"], price: 35, image: images.cusco },
+    { name: "Suenos del Inka Hotel", services: ["Desayuno", "WiFi", "Ubicacion central"], price: 50, image: images.sacred },
+    { name: "Tierra Viva Cusco Centro", services: ["Desayuno", "WiFi", "Recepcion 24h"], price: 70, image: images.machu },
+    { name: "Maytaq Wasin Boutique Hotel", services: ["Desayuno", "WiFi", "Boutique"], price: 70, image: images.guide }
+  ],
+  "4 estrellas": [
+    { name: "Sonesta Hotel Cusco", services: ["Desayuno", "WiFi", "Restaurante"], price: 80, image: images.cusco },
+    { name: "Costa del Sol Wyndham Cusco", services: ["Desayuno", "WiFi", "Spa"], price: 120, image: images.sacred },
+    { name: "Novotel Cusco", services: ["Desayuno", "WiFi", "Centro historico"], price: 140, image: images.machu }
+  ],
+  "5 estrellas": [
+    { name: "JW Marriott El Convento Cusco", services: ["Desayuno", "Spa", "Lujo"], price: 180, image: images.cusco },
+    { name: "Palacio del Inka", services: ["Desayuno", "Spa", "Premium"], price: 300, image: images.sacred },
+    { name: "Belmond Hotel Monasterio", services: ["Desayuno", "Lujo", "Experiencia historica"], price: 500, image: images.machu }
+  ]
+};
+const hotelOptionsByCategory: Record<string, string[]> = {
+  "2 estrellas": ["Hotel Prisma Cusco", "Hotel Inkarri Cusco", "Hospedaje El Triunfo"],
+  "3 estrellas": ["Hotel San Agustin Internacional", "Suenos del Inka Hotel", "Tierra Viva Cusco Centro", "Maytaq Wasin Boutique Hotel"],
+  "4 estrellas": ["Sonesta Hotel Cusco", "Costa del Sol Wyndham Cusco", "Novotel Cusco"],
+  "5 estrellas": ["JW Marriott El Convento Cusco", "Palacio del Inka", "Belmond Hotel Monasterio"]
+};
+
+function getTourFilters(items: DisplayService[]) {
+  const typeFilters = [
+    items.some((item) => item.tipoServicio === "tour") ? "Tours" : "",
+    items.some((item) => item.tipoServicio === "paquete") ? "Paquetes" : ""
+  ].filter(Boolean);
+  const categoryFilters = Array.from(new Set(items.map((item) => item.categoria).filter(Boolean)));
+
+  return [allToursFilter, ...typeFilters, ...categoryFilters];
+}
+
+function matchesTourFilter(item: DisplayService, filter: string) {
+  if (filter === allToursFilter) return true;
+  if (filter === "Tours") return item.tipoServicio === "tour";
+  if (filter === "Paquetes") return item.tipoServicio === "paquete";
+  return item.categoria === filter;
+}
+
+function normalizeText(value: string) {
+  return value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function getTravelType(item: DisplayService) {
+  return item.tipoServicio === "paquete" || normalizeText(item.nombre).includes("privado") ? "Privado" : "Compartido";
+}
+
+function getNumericPrice(item: DisplayService) {
+  if (typeof item.precio === "number") return item.precio;
+  const match = item.precioTexto.match(/[\d,.]+/);
+  return match ? Number(match[0].replace(/,/g, "")) : null;
+}
+
+function formatExperiencePrice(item: DisplayService) {
+  const price = getNumericPrice(item);
+  return price ? `Desde USD ${price} por persona` : "Consultar precio";
+}
+
+function sortExperience(a: DisplayService, b: DisplayService) {
+  const score = (item: DisplayService) => {
+    const tag = normalizeText(String(item.etiqueta));
+    if (tag.includes("vendido")) return 0;
+    if (tag.includes("premium")) return 1;
+    if (tag.includes("oferta") || tag.includes("promo")) return 2;
+    return 3;
+  };
+
+  return score(a) - score(b) || b.reservas - a.reservas;
+}
 
 const experiencePillars = [
   {
@@ -218,7 +394,7 @@ const legacyTours = [
     badge: "Nuevo",
     schedule: "Mañana o tarde",
     description: "Circuito cultural por terrazas circulares incas y salineras tradicionales rodeadas de montañas.",
-    includes: ["Salineras", "Centro arqueológico", "Transporte", "Guía"],
+    includes: ["Salineras", "Centro arqueol?gico", "Transporte", "Guía"],
     excludes: ["Entradas", "Alimentación", "Compras"],
     bring: ["Lentes de sol", "Sombrero", "Cámara", "Efectivo"],
     recommendations: ["Perfecto para medio día", "Puede combinarse con cuatrimotos", "Apto para familias"],
@@ -261,39 +437,23 @@ const gallery = [
   { src: images.moray, alt: "Maras y Moray" }
 ];
 
-const testimonials = [
-  {
-    name: "Camila R.",
-    country: "Chile",
-    text: "La organización fue impecable. Nos sentimos acompañados desde el primer mensaje hasta el retorno al hotel.",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80"
-  },
-  {
-    name: "Michael T.",
-    country: "Estados Unidos",
-    text: "Great guides, premium service and a beautiful pace for our family trip through Cusco.",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80"
-  },
-  {
-    name: "Lucia M.",
-    country: "Perú",
-    text: "El City Tour con caballos fue distinto a todo. Muy seguro, puntual y con guías atentos.",
-    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
-  }
-];
-
 const fadeUp = {
   hidden: { opacity: 0, y: 34 },
   visible: { opacity: 1, y: 0 }
 };
 
 const initialBooking: Booking = {
-  tour: tours[0].nombre,
+  tour: fallbackTours[0].nombre,
   date: new Date(Date.now() + 86400000 * 3).toISOString().slice(0, 10),
   adults: 2,
   children: 0,
+  babies: 0,
   seniors: 0,
+  hotelCategory: "3 estrellas",
+  selectedHotel: "",
+  extras: [],
   name: "",
+  lastName: "",
   email: "",
   phone: "",
   country: "",
@@ -302,13 +462,11 @@ const initialBooking: Booking = {
   schedule: "Mañana",
   service: "Compartido",
   message: "",
+  comments: "",
+  totalEstimate: 0,
   policies: false,
   dataConsent: false
 };
-
-function sectionId(item: string) {
-  return item.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-}
 
 function Counter({ value, suffix, label }: { value: string; suffix?: string; label: string }) {
   return (
@@ -338,11 +496,75 @@ function ListBlock({ title, items }: { title: string; items: string[] }) {
   );
 }
 
+function TourFilterButtons({ filters, value, onChange }: { filters: string[]; value: string; onChange: (value: string) => void }) {
+  return (
+    <div className="flex max-w-full gap-2 overflow-x-auto pb-1">
+      {filters.map((filter) => (
+        <button
+          key={filter}
+          type="button"
+          onClick={() => onChange(filter)}
+          className={cn(
+            "shrink-0 rounded-full border px-4 py-2 text-sm font-bold transition",
+            value === filter
+              ? "border-obsidian bg-obsidian text-gold-soft shadow-sm"
+              : "border-black/10 bg-white text-charcoal/72 hover:border-gold/40 hover:bg-gold/12 hover:text-obsidian"
+          )}
+        >
+          {filter}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function IncludedPreview({ items }: { items: string[] }) {
+  const visible = items.slice(0, 4);
+  const remaining = Math.max(0, items.length - visible.length);
+
+  return (
+    <div className="mt-4 grid gap-2">
+      {visible.map((item) => (
+        <span key={item} className="flex items-center gap-2 text-sm font-semibold text-charcoal/68">
+          <Check className="size-4 shrink-0 text-gold" />
+          {item}
+        </span>
+      ))}
+      {remaining > 0 && <span className="text-sm font-bold text-gold">+{remaining} servicios más</span>}
+    </div>
+  );
+}
+
+function CounterInput({ label, value, min, onChange }: { label: string; value: number; min: number; onChange: (value: number) => void }) {
+  return (
+    <div className="rounded-lg border border-black/10 bg-white p-3">
+      <p className="text-sm font-bold text-obsidian">{label}</p>
+      <div className="mt-3 flex items-center justify-between gap-2">
+        <Button type="button" size="icon" variant="ghost" className="size-9" onClick={() => onChange(Math.max(min, value - 1))}>
+          <Minus className="size-4" />
+        </Button>
+        <span className="text-lg font-black text-obsidian">{value}</span>
+        <Button type="button" size="icon" variant="gold" className="size-9" onClick={() => onChange(value + 1)}>
+          <Plus className="size-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [tours, setTours] = useState<DisplayService[]>(fallbackTours);
+  const [bookingTourFilter, setBookingTourFilter] = useState(allToursFilter);
   const [selectedTour, setSelectedTour] = useState<DisplayService | null>(null);
-  const [testimonialIndex, setTestimonialIndex] = useState(0);
+  const [detailImage, setDetailImage] = useState("");
+  const [detailDate, setDetailDate] = useState(new Date(Date.now() + 86400000 * 3).toISOString().slice(0, 10));
+  const [detailAdults, setDetailAdults] = useState(2);
+  const [detailChildren, setDetailChildren] = useState(0);
+  const [detailHotelCategory, setDetailHotelCategory] = useState("3 estrellas");
+  const [detailHotel, setDetailHotel] = useState("");
+  const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [bookingStep, setBookingStep] = useState(0);
   const [toast, setToast] = useState("");
@@ -350,8 +572,29 @@ export default function Home() {
   const [contactConsent, setContactConsent] = useState(false);
   const [contactConsentError, setContactConsentError] = useState("");
   const [booking, setBooking] = useState<Booking>(initialBooking);
-  const totalTravelers = booking.adults + booking.children + booking.seniors;
-  const activeTestimonial = testimonials[testimonialIndex];
+  const paidTravelers = booking.adults + booking.children;
+  const totalTravelers = booking.adults + booking.children + booking.babies;
+  const tourFilters = useMemo(() => getTourFilters(tours), [tours]);
+  const displayedTours = useMemo(() => [...tours].sort(sortExperience), [tours]);
+  const bookingFilteredTours = useMemo(() => tours.filter((tour) => matchesTourFilter(tour, bookingTourFilter)), [bookingTourFilter, tours]);
+  const bookingSelectedTour = useMemo(() => tours.find((tour) => tour.nombre === booking.tour) ?? tours[0] ?? fallbackTours[0], [booking.tour, tours]);
+  const bookingBasePrice = bookingSelectedTour ? getNumericPrice(bookingSelectedTour) ?? 0 : 0;
+  const bookingSelectedExtras = bookingExtras.filter((extra) => booking.extras.includes(extra.id));
+  const bookingExtrasTotal = bookingSelectedExtras.reduce((sum, extra) => sum + extra.price, 0);
+  const bookingHotelOptions = (bookingHotelCards[booking.hotelCategory as keyof typeof bookingHotelCards] ?? bookingHotelCards["3 estrellas"]);
+  const bookingSubtotal = bookingBasePrice * paidTravelers + bookingExtrasTotal;
+  const bookingTaxes = 0;
+  const bookingTotal = bookingSubtotal + bookingTaxes;
+  const detailBasePrice = selectedTour ? getNumericPrice(selectedTour) ?? 0 : 0;
+  const detailTravelers = detailAdults + detailChildren;
+  const detailSelectedExtras = detailExtras.filter((extra) => selectedExtras.includes(extra.id));
+  const detailExtrasTotal = detailSelectedExtras.reduce((sum, extra) => sum + extra.price, 0);
+  const detailSubtotal = detailBasePrice * detailTravelers;
+  const detailTotal = detailSubtotal + detailExtrasTotal;
+  const detailHotelOptions = hotelOptionsByCategory[detailHotelCategory] ?? [];
+  const relatedTours = selectedTour
+    ? tours.filter((tour) => tour.slug !== selectedTour.slug && (tour.categoria === selectedTour.categoria || tour.tipoServicio === selectedTour.tipoServicio)).slice(0, 3)
+    : [];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 32);
@@ -361,34 +604,57 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const timer = window.setInterval(
-      () => setTestimonialIndex((current) => (current + 1) % testimonials.length),
-      5200
-    );
-    return () => window.clearInterval(timer);
+    const loadServices = async () => {
+      try {
+        const [servicesResponse, tariffResponse] = await Promise.all([
+          fetch("/api/travel-services", { cache: "no-store" }),
+          fetch("/api/tariff", { cache: "no-store" })
+        ]);
+        const servicesPayload = (await servicesResponse.json()) as { services?: TravelService[] };
+        const tariffPayload = (await tariffResponse.json()) as { tariff?: Tariff };
+
+        setTours(mergeServicesWithPackageTariff(servicesPayload.services ?? travelServices, tariffPayload.tariff));
+      } catch {
+        setTours(fallbackTours);
+      }
+    };
+
+    loadServices();
   }, []);
 
-  const progress = ((bookingStep + 1) / 6) * 100;
+  useEffect(() => {
+    if (!selectedTour) return;
+    setDetailImage(selectedTour.image);
+    setDetailDate(new Date(Date.now() + 86400000 * 3).toISOString().slice(0, 10));
+    setDetailAdults(2);
+    setDetailChildren(0);
+    setDetailHotelCategory(selectedTour.categoriaHotel ?? "3 estrellas");
+    setDetailHotel("");
+    setSelectedExtras([]);
+  }, [selectedTour]);
+
+  const progress = ((bookingStep + 1) / 7) * 100;
   const canContinue = useMemo(() => {
     if (bookingStep === 0) return Boolean(booking.tour);
     if (bookingStep === 1) return Boolean(booking.date);
-    if (bookingStep === 2) return totalTravelers > 0;
-    if (bookingStep === 3) return Boolean(booking.name && booking.email && booking.phone);
-    if (bookingStep === 4) return booking.policies && booking.dataConsent;
+    if (bookingStep === 2) return booking.adults + booking.children > 0;
+    if (bookingStep === 3) return bookingSelectedTour?.tipoServicio !== "paquete" || Boolean(booking.selectedHotel);
+    if (bookingStep === 5) return Boolean(booking.name && booking.lastName && booking.email && booking.phone && booking.country);
+    if (bookingStep === 6) return booking.policies && booking.dataConsent;
     return true;
-  }, [booking, bookingStep, totalTravelers]);
+  }, [booking, bookingSelectedTour?.tipoServicio, bookingStep]);
 
-  const updateTraveler = (key: "adults" | "children" | "seniors", delta: number) => {
+  const updateTraveler = (key: "adults" | "children" | "babies" | "seniors", delta: number) => {
     setBooking((current) => ({
       ...current,
       [key]: Math.max(key === "adults" ? 1 : 0, current[key] + delta)
     }));
   };
 
-  const sendReservation = () => {
+  const sendReservation = async () => {
     if (!booking.policies || !booking.dataConsent) {
       setBookingConsentError(consentText);
-      setBookingStep(4);
+      setBookingStep(6);
       return;
     }
 
@@ -398,28 +664,68 @@ Tour: ${booking.tour}
 Fecha: ${booking.date}
 Adultos: ${booking.adults}
 Niños: ${booking.children}
-Adultos mayores: ${booking.seniors}
+Bebes: ${booking.babies}
 Total de viajeros: ${totalTravelers}
-Tipo de servicio: ${booking.service}
-Horario: ${booking.schedule}
+Hotel: ${booking.selectedHotel || booking.hotel || "No aplica"}
+Categoría hotel: ${booking.hotelCategory}
+Extras: ${bookingSelectedExtras.map((extra) => `${extra.label} (+USD ${extra.price})`).join(", ") || "Sin extras"}
+Precio base: USD ${bookingBasePrice}
+Precio extras: USD ${bookingExtrasTotal}
+Subtotal: USD ${bookingSubtotal}
+Impuestos: USD ${bookingTaxes}
+Total estimado: USD ${bookingTotal}
 Nombre: ${booking.name}
+Apellido: ${booking.lastName}
 Correo: ${booking.email}
 WhatsApp: ${booking.phone}
 País: ${booking.country}
-Hotel: ${booking.hotel}
-Mensaje: ${booking.message}
+Comentarios: ${booking.comments || booking.message || "Sin comentarios"}
 
 Quedo atento a la confirmación de disponibilidad y precio.`;
 
-    setToast("Reserva lista para enviar por WhatsApp");
+    try {
+      await fetch("/api/reservations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientName: booking.name,
+          clientLastName: booking.lastName,
+          email: booking.email,
+          whatsapp: booking.phone,
+          country: booking.country,
+          tour: booking.tour,
+          packageName: bookingSelectedTour?.tipoServicio === "paquete" ? booking.tour : "",
+          date: booking.date,
+          adults: booking.adults,
+          children: booking.children,
+          babies: booking.babies,
+          hotel: booking.selectedHotel || booking.hotel || "",
+          extras: bookingSelectedExtras.map((extra) => extra.label),
+          basePrice: bookingBasePrice,
+          extrasPrice: bookingExtrasTotal,
+          subtotal: bookingSubtotal,
+          discount: 0,
+          taxes: bookingTaxes,
+          total: bookingTotal,
+          method: "WhatsApp",
+          observations: booking.comments || booking.message
+        })
+      });
+    } catch {
+      // La reserva puede continuar por WhatsApp aunque falle el registro remoto.
+    }
+
+    setToast("Reserva registrada y lista para enviar por WhatsApp");
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`, "_blank");
     window.setTimeout(() => setToast(""), 2600);
   };
 
   const openBooking = (tourTitle?: string) => {
     if (tourTitle) {
-      setBooking((current) => ({ ...current, tour: tourTitle }));
+      setBooking((current) => ({ ...current, tour: tourTitle, selectedHotel: "", hotel: "", extras: [], policies: false, dataConsent: false }));
+      setBookingTourFilter(allToursFilter);
     }
+    setBookingStep(tourTitle ? 1 : 0);
     setBookingOpen(true);
   };
 
@@ -443,16 +749,16 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
             </span>
           </a>
           <div className="hidden items-center gap-4 lg:flex">
-            {navItems.map((item) => (
+            {navItems.map(([label, href]) => (
               <a
-                key={item}
-                href={`#${sectionId(item)}`}
+                key={label}
+                href={href}
                 className={cn(
                   "rounded-full px-3 py-1.5 text-sm font-medium transition",
                   scrolled ? "text-charcoal/78 hover:bg-gold/12 hover:text-obsidian" : "text-white/78 hover:bg-white/14 hover:text-white"
                 )}
               >
-                {item}
+                {label}
               </a>
             ))}
           </div>
@@ -461,7 +767,7 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
             Reservar experiencia
           </button>
           <Button
-            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-label={menuOpen ? "Cerrar men?" : "Abrir men?"}
             aria-expanded={menuOpen}
             className={cn(
               "shrink-0 lg:hidden",
@@ -478,14 +784,14 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
           <div className="mx-auto mt-2 max-w-7xl lg:hidden">
             <div className="overflow-hidden rounded-2xl border border-white/60 bg-white/95 shadow-premium backdrop-blur-2xl">
               <div className="grid gap-1 p-2">
-                {navItems.map((item) => (
+                {navItems.map(([label, href]) => (
                   <a
-                    key={item}
-                    href={`#${sectionId(item)}`}
+                    key={label}
+                    href={href}
                     className="flex min-h-12 items-center justify-between rounded-xl px-4 text-sm font-bold text-charcoal transition hover:bg-gold/12 active:bg-gold/18"
                     onClick={() => setMenuOpen(false)}
                   >
-                    {item}
+                    {label}
                     <ChevronRight className="size-4 text-gold" />
                   </a>
                 ))}
@@ -622,124 +928,61 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
         </div>
       </section>
 
-      <section id="nosotros" className="relative bg-white px-4 py-24 md:py-28">
-        <div className="relative mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} variants={fadeUp}>
-            <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Nosotros</p>
-            <h2 className="mt-5 max-w-xl font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">Viajar con calma, cultura y precisión.</h2>
-            <p className="mt-6 max-w-xl text-sm leading-7 text-charcoal/68 md:text-base">
-              Creamos experiencias en Cusco con guías certificados, atención personalizada y rutas pensadas para disfrutar sin prisa.
-            </p>
-            <div className="mt-8 grid max-w-md grid-cols-3 border-y border-black/10 py-5">
-              {[
-                ["15+", "años"],
-                ["7", "tours"],
-                ["24/7", "soporte"]
-              ].map(([value, label]) => (
-                <div key={label}>
-                  <p className="font-display text-2xl leading-none text-obsidian">{value}</p>
-                  <p className="mt-2 text-xs font-bold uppercase tracking-[0.18em] text-charcoal/48">{label}</p>
-                </div>
-              ))}
-            </div>
-            <div className="relative mt-8 aspect-[16/10] overflow-hidden rounded-lg lg:max-w-xl">
-              <div className="image-skeleton absolute inset-0" />
-              <Image src={images.guide} alt="Guía turístico con viajeros en Cusco" fill loading="lazy" sizes="(min-width: 1024px) 45vw, 100vw" className="object-cover" />
-            </div>
-          </motion.div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              ["Mision", "Diseñar experiencias seguras y claras que conecten al viajero con la cultura viva del Cusco."],
-              ["Vision", "Ser una agencia digital confiable para viajeros que buscan servicio responsable y atencion cercana."],
-              ["Experiencia", "Operacion local, coordinacion por canales digitales y acompañamiento antes, durante y despues del tour."]
-            ].map(([title, text]) => (
-              <motion.div key={title} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="border border-gold/18 bg-gold/8 p-5 sm:col-span-2 lg:col-span-1">
-                <h3 className="text-base font-bold text-obsidian">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-charcoal/64">{text}</p>
-              </motion.div>
-            ))}
-            {[
-              ["Guías certificados", "Interpretación cultural clara y trato cercano.", BadgeCheck],
-              ["Atención personalizada", "Tours familiares, privados y grupos pequeños.", HeartHandshake],
-              ["Seguridad", "Coordinación permanente, movilidad turística y rutas verificadas.", ShieldCheck],
-              ["Turismo responsable", "Experiencias que valoran cultura, naturaleza y comunidad.", Sparkles]
-            ].map(([title, text, Icon], index) => {
-              const CardIcon = Icon as typeof BadgeCheck;
-              return (
-                <motion.div key={title as string} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.06 }} className="border border-black/8 bg-white p-5">
-                  <div className="mb-4 grid size-9 place-items-center rounded-full bg-gold/12 text-gold">
-                    <CardIcon className="size-4" />
-                  </div>
-                  <h3 className="text-base font-bold text-obsidian">{title as string}</h3>
-                  <p className="mt-2 text-sm leading-6 text-charcoal/64">{text as string}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
       <section id="tours" className="relative overflow-hidden bg-[#F8F6F0] px-4 py-32">
         <div className="relative z-10 mx-auto max-w-7xl">
-          <div className="mb-16 flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+          <div className="mb-10 flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Tours destacados</p>
-              <h2 className="mt-5 max-w-2xl font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">Experiencias esenciales en Cusco.</h2>
+              <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Experiencias</p>
+              <h2 className="mt-5 max-w-2xl font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">Tours y paquetes para descubrir Cusco.</h2>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-charcoal/66 md:text-base">
+                Compara duración, dificultad, servicios incluidos y precio antes de elegir la experiencia ideal.
+              </p>
             </div>
-            <button onClick={() => openBooking()} className={cn(buttonVariants({ variant: "default", size: "lg" }), "luxury-button")}>
-              <CalendarDays className="size-5" />
-              Reservar experiencia
-            </button>
           </div>
+
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {tours.map((tour, index) => (
+            {displayedTours.map((tour, index) => (
               <motion.article
                 key={tour.slug}
-                role="button"
-                tabIndex={0}
-                onClick={() => setSelectedTour(tour)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") setSelectedTour(tour);
-                }}
                 initial={{ opacity: 0, y: 28 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ delay: index * 0.04 }}
               >
-                <Card className="group h-full overflow-hidden border-black/5 bg-white transition duration-300 hover:-translate-y-1 hover:shadow-sm">
+                <Card className="group h-full overflow-hidden border-black/5 bg-white transition duration-200 hover:-translate-y-1 hover:shadow-md">
                   <div className="relative aspect-[16/10] overflow-hidden">
                     <div className="image-skeleton absolute inset-0" />
-                    <Image src={tour.imagenPrincipal} alt={tour.nombre} fill loading={index < 2 ? "eager" : "lazy"} sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw" className="object-cover transition duration-700 group-hover:scale-105" />
-                    <div className="absolute left-4 top-4 rounded-full bg-white/86 px-3 py-1.5 text-xs font-bold text-obsidian backdrop-blur-md">{tour.etiqueta}</div>
+                    <Image src={tour.imagenPrincipal} alt={tour.nombre} fill loading={index < 2 ? "eager" : "lazy"} sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw" className="object-cover transition duration-200 group-hover:scale-105" />
+                    <div className="absolute left-4 top-4 rounded-full bg-white/88 px-3 py-1.5 text-xs font-bold text-obsidian backdrop-blur-md">{tour.etiqueta}</div>
                   </div>
-                  <div className="p-5">
+                  <div className="flex flex-col p-5">
                     <div className="mb-3 flex items-center justify-between gap-3 text-xs font-semibold text-charcoal/60">
                       <span className="flex items-center gap-1 text-gold">
-                        {Array.from({ length: Math.round(tour.rating) }).map((_, star) => <Star key={star} className="size-3.5 fill-current" />)}
+                        {Array.from({ length: Math.max(1, Math.round(tour.rating)) }).map((_, star) => <Star key={star} className="size-3.5 fill-current" />)}
                       </span>
                       <span>{tour.reservas} reservas</span>
                     </div>
-                    <h3 className="min-h-12 text-lg font-semibold leading-snug text-obsidian">{tour.nombre}</h3>
-                    <div className="mt-4 flex items-center gap-4 text-sm text-charcoal/62">
+                    <h3 className="min-h-14 text-lg font-semibold leading-snug text-obsidian">{tour.nombre}</h3>
+                    <div className="mt-4 grid gap-2 text-sm text-charcoal/62 sm:grid-cols-2">
                       <span className="inline-flex items-center gap-1.5"><Clock className="size-4 text-gold" />{tour.duracion}</span>
                       <span className="inline-flex items-center gap-1.5"><Gauge className="size-4 text-charcoal/46" />{tour.dificultad}</span>
+                      <span className="inline-flex items-center gap-1.5"><Compass className="size-4 text-gold" />{getTravelType(tour)}</span>
+                      <span className="inline-flex items-center gap-1.5"><Landmark className="size-4 text-charcoal/46" />{tour.categoria}</span>
                     </div>
-                    <div className="mt-4 flex items-center justify-between border-t border-black/8 pt-4">
-                      <span className="text-sm font-bold text-obsidian">{tour.precioTexto}</span>
+                    <div className="mt-4 rounded-lg bg-obsidian p-4 text-white">
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/48">Precio</p>
+                      <p className="mt-1 text-xl font-black text-gold-soft">{formatExperiencePrice(tour)}</p>
                     </div>
-                    <div className="mt-4">
-                      <Button
-                        variant="gold"
-                        size="sm"
-                        className="luxury-button w-full"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          openBooking(tour.nombre);
-                        }}
-                      >
-                        Reservar
-                      </Button>
-                    </div>
+                    <IncludedPreview items={tour.incluye} />
+                    <Button
+                      type="button"
+                      variant="gold"
+                      size="lg"
+                      className="luxury-button mt-5 w-full"
+                      onClick={() => setSelectedTour(tour)}
+                    >
+                      Ver experiencia
+                    </Button>
                   </div>
                 </Card>
               </motion.article>
@@ -747,7 +990,6 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
           </div>
         </div>
       </section>
-
       <section className="bg-white px-4 py-24 md:py-28">
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 max-w-2xl">
@@ -807,29 +1049,6 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
         </div>
       </section>
 
-      <section id="testimonios" className="bg-white px-4 py-32">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.28em] text-gold">Testimonios</p>
-            <h2 className="mt-5 font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">Recuerdos reales.</h2>
-          </div>
-          <Card className="border-black/10 bg-[#F8F6F0] p-8 shadow-none">
-            <div className="flex items-center gap-1 text-gold">{Array.from({ length: 5 }).map((_, index) => <Star key={index} className="size-5 fill-current" />)}</div>
-            <p className="mt-6 text-xl font-medium leading-9 text-obsidian">&ldquo;{activeTestimonial.text}&rdquo;</p>
-            <div className="mt-8 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <Image src={activeTestimonial.image} alt={activeTestimonial.name} width={64} height={64} className="rounded-full object-cover" />
-                <div><p className="font-bold text-obsidian">{activeTestimonial.name}</p><p className="text-sm text-charcoal/64">{activeTestimonial.country}</p></div>
-              </div>
-              <div className="flex gap-2">
-                <Button aria-label="Testimonio anterior" size="icon" variant="ghost" onClick={() => setTestimonialIndex((testimonialIndex - 1 + testimonials.length) % testimonials.length)}><ChevronLeft className="size-5" /></Button>
-                <Button aria-label="Testimonio siguiente" size="icon" variant="ghost" onClick={() => setTestimonialIndex((testimonialIndex + 1) % testimonials.length)}><ChevronRight className="size-5" /></Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </section>
-
       <section id="contacto" className="relative overflow-hidden bg-[#F8F6F0] px-4 py-32">
         <div className="relative z-10 mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <div>
@@ -881,7 +1100,7 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
                 <p className="flex gap-3"><MessageCircle className="mt-1 size-5 shrink-0 text-gold" />WhatsApp: {company.whatsapp}</p>
                 <p className="flex gap-3"><Mail className="mt-1 size-5 shrink-0 text-gold" />{company.email}</p>
                 <p className="flex gap-3"><Clock className="mt-1 size-5 shrink-0 text-gold" />{company.openingHours}</p>
-                <p className="rounded-lg bg-gold/10 p-3 text-sm font-semibold text-obsidian">{company.legalName} · {company.ruc}</p>
+                <p className="rounded-lg bg-gold/10 p-3 text-sm font-semibold text-obsidian">{company.legalName} ? {company.ruc}</p>
               </div>
             </Card>
             <Card className="border-black/10 bg-white p-6 shadow-none">
@@ -941,241 +1160,401 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
             <div className="mx-auto flex max-w-7xl items-center justify-between">
               <BrandLogo compact />
               <div className="flex items-center gap-3">
-                <span className="hidden text-sm font-bold text-charcoal/60 sm:block">Reserva guiada</span>
+                <span className="hidden text-sm font-bold text-charcoal/60 sm:block">Reserva guíada</span>
                 <Button aria-label="Cerrar reserva" size="icon" variant="ghost" onClick={() => setBookingOpen(false)}>
                   <X className="size-5" />
                 </Button>
               </div>
             </div>
           </div>
+
           <div className="mx-auto w-full max-w-7xl flex-1 overflow-y-auto px-0 py-0 sm:px-4 sm:py-4 md:py-8">
             <Card className="min-h-full overflow-hidden rounded-none border-x-0 border-y border-black/5 sm:min-h-0 sm:rounded-lg sm:border">
               <div className="h-2 bg-black/5"><motion.div className="h-full bg-gold" animate={{ width: `${progress}%` }} /></div>
-              <div className="grid min-w-0 lg:min-h-[680px] lg:grid-cols-[0.34fr_0.66fr]">
-                <aside className="min-w-0 bg-obsidian p-3 text-white sm:p-6 md:p-8">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold-soft sm:text-sm sm:tracking-[0.28em]">Spirit Qosqo Travel</p>
-                  <h2 className="mt-2 font-display text-xl font-normal leading-tight sm:mt-4 sm:text-3xl">Reserva tu experiencia</h2>
-                  <div className="mt-4 flex max-w-full gap-2 overflow-x-auto pb-1 lg:mt-10 lg:block lg:space-y-3 lg:overflow-visible lg:pb-0">
-                    {["Tour", "Fecha", "Viajeros", "Datos", "Preferencias", "Resumen"].map((step, index) => (
-                      <button
-                        key={step}
-                        onClick={() => setBookingStep(index)}
-                        className={cn(
-                          "flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-bold transition lg:w-full lg:shrink lg:gap-3 lg:px-4 lg:py-3",
-                          bookingStep === index ? "bg-white text-obsidian" : "bg-white/8 text-white/72 hover:bg-white/12"
-                        )}
-                      >
-                        <span className={cn("grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold", index < bookingStep ? "bg-emerald text-white" : "bg-gold text-obsidian")}>{index < bookingStep ? <Check className="size-4" /> : index + 1}</span>
-                        <span className={cn(index === bookingStep ? "inline" : "hidden sm:inline lg:inline")}>{step}</span>
-                      </button>
-                    ))}
-                  </div>
-                </aside>
-                <div className="min-w-0 p-4 pb-24 sm:p-6 sm:pb-24 md:p-10 lg:pb-10">
-                  <motion.div key={bookingStep} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }} className="lg:min-h-[500px]">
+              <div className="border-b border-black/10 bg-white p-3 sm:p-4">
+                <div className="flex max-w-full items-center gap-2 overflow-x-auto text-xs font-black uppercase tracking-[0.12em] text-charcoal/52">
+                  {["Experiencia", "Fecha", "Viajeros", "Hotel", "Extras", "Resumen", "Confirmación"].map((step, index) => (
+                    <button key={step} type="button" onClick={() => setBookingStep(index)} className={cn("flex shrink-0 items-center gap-2 rounded-full px-3 py-2 transition", bookingStep === index ? "bg-obsidian text-gold-soft" : "bg-[#F8F6F0] hover:bg-gold/12")}>
+                      <span className={cn("grid size-6 place-items-center rounded-full text-[11px]", index < bookingStep ? "bg-emerald text-white" : "bg-gold text-obsidian")}>{index < bookingStep ? <Check className="size-3.5" /> : index + 1}</span>
+                      {step}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid min-w-0 lg:min-h-[680px] lg:grid-cols-[minmax(0,1fr)_360px]">
+                <div className="min-w-0 p-4 pb-24 sm:p-6 sm:pb-24 md:p-8 lg:pb-8">
+                  <motion.div key={bookingStep} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.25 }} className="lg:min-h-[520px]">
                     {bookingStep === 0 && (
                       <div>
-                        <h3 className="text-xl font-semibold leading-snug text-obsidian sm:text-2xl">Selecciona tu tour</h3>
-                        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:mt-6">
-                          {tours.map((tour) => (
-                            <button key={tour.slug} onClick={() => setBooking((current) => ({ ...current, tour: tour.nombre }))} className={cn("relative grid grid-cols-[72px_1fr] items-center gap-3 overflow-hidden rounded-lg border p-2 text-left transition hover:-translate-y-1 sm:block sm:p-3", booking.tour === tour.nombre ? "border-gold bg-gold/10" : "border-black/10 bg-white")}>
-                              <div className="relative h-16 overflow-hidden rounded-md sm:h-28"><Image src={tour.imagenPrincipal} alt={tour.nombre} fill sizes="(min-width: 640px) 50vw, 72px" className="object-cover" /></div>
-                              <p className="pr-8 text-sm font-bold leading-snug text-obsidian sm:mt-3 sm:pr-0 sm:text-base">{tour.nombre}</p>
-                              {booking.tour === tour.nombre && <span className="absolute right-3 top-3 grid size-7 place-items-center rounded-full bg-emerald text-white"><Check className="size-4" /></span>}
+                        <p className="text-xs font-bold uppercase tracking-[0.24em] text-gold">Experiencia</p>
+                        <h3 className="mt-2 text-2xl font-black text-obsidian">Elige tu tour o paquete</h3>
+                        <div className="mt-4">
+                          <TourFilterButtons filters={tourFilters} value={bookingTourFilter} onChange={setBookingTourFilter} />
+                        </div>
+                        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                          {bookingFilteredTours.map((tour) => (
+                            <button key={tour.slug} type="button" onClick={() => setBooking((current) => ({ ...current, tour: tour.nombre }))} className={cn("relative overflow-hidden rounded-lg border bg-white p-3 text-left transition hover:-translate-y-1", booking.tour === tour.nombre ? "border-gold bg-gold/10" : "border-black/10")}>
+                              <div className="relative h-32 overflow-hidden rounded-md"><Image src={tour.imagenPrincipal} alt={tour.nombre} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover" /></div>
+                              <p className="mt-3 text-sm font-black leading-snug text-obsidian">{tour.nombre}</p>
+                              <p className="mt-1 text-xs font-semibold text-charcoal/52">{tour.categoria} · {formatExperiencePrice(tour)}</p>
+                              {booking.tour === tour.nombre && <span className="absolute right-4 top-4 grid size-7 place-items-center rounded-full bg-emerald text-white"><Check className="size-4" /></span>}
                             </button>
                           ))}
                         </div>
                       </div>
                     )}
+
                     {bookingStep === 1 && (
                       <div>
-                        <h3 className="text-xl font-semibold leading-snug text-obsidian sm:text-2xl">Selecciona fecha</h3>
-                        <p className="mt-2 text-sm text-charcoal/68">Elige una fecha tentativa. Confirmaremos disponibilidad por WhatsApp.</p>
-                        <Input className="mt-5 max-w-sm" type="date" value={booking.date} onChange={(event) => setBooking((current) => ({ ...current, date: event.target.value }))} />
+                        <p className="text-xs font-bold uppercase tracking-[0.24em] text-gold">Fecha</p>
+                        <h3 className="mt-2 text-2xl font-black text-obsidian">Selecciona fecha</h3>
+                        <p className="mt-2 text-sm text-charcoal/68">Validaremos disponibilidad antes de confirmar la reserva.</p>
+                        <Input className="mt-5 max-w-sm" type="date" min={new Date().toISOString().slice(0, 10)} value={booking.date} onChange={(event) => setBooking((current) => ({ ...current, date: event.target.value }))} />
                         <div className="mt-4 flex flex-wrap gap-2 sm:gap-3">
                           {[3, 5, 7, 10].map((days) => {
                             const date = new Date(Date.now() + 86400000 * days).toISOString().slice(0, 10);
                             return <Button key={date} variant={booking.date === date ? "gold" : "default"} onClick={() => setBooking((current) => ({ ...current, date }))}>{date}</Button>;
                           })}
                         </div>
+                        <p className="mt-5 rounded-lg bg-emerald/10 p-4 text-sm font-bold text-emerald">Disponible para validación. La confirmación final se realiza con el asesor.</p>
                       </div>
                     )}
+
                     {bookingStep === 2 && (
                       <div>
-                        <h3 className="text-xl font-semibold leading-snug text-obsidian sm:text-2xl">Viajeros</h3>
-                        <div className="mt-5 max-w-xl space-y-3">
+                        <p className="text-xs font-bold uppercase tracking-[0.24em] text-gold">Viajeros</p>
+                        <h3 className="mt-2 text-2xl font-black text-obsidian">Selecciona viajeros</h3>
+                        <div className="mt-5 max-w-2xl space-y-3">
                           {[
-                            ["adults", "Adultos"],
-                            ["children", "Niños"],
-                            ["seniors", "Adultos mayores"]
-                          ].map(([key, label]) => (
-                            <div key={key} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-black/10 bg-white p-3 sm:gap-3 sm:p-5">
-                              <span className="min-w-0 text-sm font-bold leading-snug text-obsidian sm:text-base">{label}</span>
-                              <div className="flex shrink-0 items-center gap-1.5 sm:gap-4">
-                                <Button className="size-9 sm:size-11" size="icon" variant="ghost" onClick={() => updateTraveler(key as "adults" | "children" | "seniors", -1)}><Minus className="size-4" /></Button>
-                                <span className="w-6 text-center text-lg font-bold sm:w-8 sm:text-xl">{booking[key as "adults" | "children" | "seniors"]}</span>
-                                <Button className="size-9 sm:size-11" size="icon" variant="gold" onClick={() => updateTraveler(key as "adults" | "children" | "seniors", 1)}><Plus className="size-4" /></Button>
+                            ["adults", "Adultos", "Precio completo"],
+                            ["children", "Niños", "Precio completo"],
+                            ["babies", "Bebes", "Sin costo"]
+                          ].map(([key, label, helper]) => (
+                            <div key={key} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-black/10 bg-white p-4">
+                              <span><strong className="block text-obsidian">{label}</strong><span className="text-sm text-charcoal/58">{helper}</span></span>
+                              <div className="flex items-center gap-3">
+                                <Button className="size-10" size="icon" variant="ghost" onClick={() => updateTraveler(key as "adults" | "children" | "babies", -1)}><Minus className="size-4" /></Button>
+                                <span className="w-8 text-center text-xl font-black">{booking[key as "adults" | "children" | "babies"]}</span>
+                                <Button className="size-10" size="icon" variant="gold" onClick={() => updateTraveler(key as "adults" | "children" | "babies", 1)}><Plus className="size-4" /></Button>
                               </div>
                             </div>
                           ))}
                         </div>
-                        <div className="mt-4 rounded-lg bg-gold/10 p-4 text-lg font-bold text-obsidian sm:p-5 sm:text-xl">Total: {totalTravelers} viajeros</div>
+                        <div className="mt-5 rounded-lg bg-gold/10 p-4 text-lg font-black text-obsidian">Subtotal actualizado: USD {bookingBasePrice * paidTravelers}</div>
                       </div>
                     )}
+
                     {bookingStep === 3 && (
                       <div>
-                        <h3 className="text-xl font-semibold leading-snug text-obsidian sm:text-2xl">Datos personales</h3>
-                        <div className="mt-5 grid gap-3 md:grid-cols-2">
-                          <Input placeholder="Nombre completo" value={booking.name} onChange={(e) => setBooking((c) => ({ ...c, name: e.target.value }))} />
-                          <Input placeholder="Correo" type="email" value={booking.email} onChange={(e) => setBooking((c) => ({ ...c, email: e.target.value }))} />
-                          <Input placeholder="WhatsApp" value={booking.phone} onChange={(e) => setBooking((c) => ({ ...c, phone: e.target.value }))} />
-                          <Input placeholder="País de origen" value={booking.country} onChange={(e) => setBooking((c) => ({ ...c, country: e.target.value }))} />
-                          <Input placeholder="Idioma" value={booking.language} onChange={(e) => setBooking((c) => ({ ...c, language: e.target.value }))} />
-                          <Input placeholder="Hotel o punto de recojo" value={booking.hotel} onChange={(e) => setBooking((c) => ({ ...c, hotel: e.target.value }))} />
-                        </div>
+                        <p className="text-xs font-bold uppercase tracking-[0.24em] text-gold">Hotel</p>
+                        <h3 className="mt-2 text-2xl font-black text-obsidian">Selecciona hotel</h3>
+                        {bookingSelectedTour?.tipoServicio !== "paquete" ? (
+                          <div className="mt-5 rounded-lg border border-black/10 bg-white p-6 text-charcoal/70">Este tour no requiere hotel. Puedes continuar al siguiente paso.</div>
+                        ) : (
+                          <>
+                            <div className="mt-5 flex flex-wrap gap-2">
+                              {Object.keys(bookingHotelCards).map((category) => <Button key={category} variant={booking.hotelCategory === category ? "gold" : "default"} onClick={() => setBooking((current) => ({ ...current, hotelCategory: category, selectedHotel: "" }))}>{category.replace(" estrellas", "★")}</Button>)}
+                            </div>
+                            <div className="mt-5 grid gap-4 md:grid-cols-2">
+                              {bookingHotelOptions.map((hotel) => (
+                                <article key={hotel.name} className={cn("overflow-hidden rounded-lg border bg-white", booking.selectedHotel === hotel.name ? "border-gold" : "border-black/10")}>
+                                  <div className="relative h-36"><Image src={hotel.image} alt={hotel.name} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" /></div>
+                                  <div className="p-4">
+                                    <div className="flex items-start justify-between gap-3"><h4 className="font-black text-obsidian">{hotel.name}</h4><span className="rounded-full bg-gold/12 px-3 py-1 text-sm font-black text-obsidian">USD {hotel.price}/noche</span></div>
+                                    <div className="mt-3 flex flex-wrap gap-2">{hotel.services.map((service) => <span key={service} className="rounded-full bg-[#F8F6F0] px-3 py-1 text-xs font-bold text-charcoal/64">{service}</span>)}</div>
+                                    <Button className="mt-4 w-full" variant={booking.selectedHotel === hotel.name ? "gold" : "default"} onClick={() => setBooking((current) => ({ ...current, selectedHotel: hotel.name, hotel: hotel.name }))}>Seleccionar</Button>
+                                  </div>
+                                </article>
+                              ))}
+                            </div>
+                          </>
+                        )}
                       </div>
                     )}
+
                     {bookingStep === 4 && (
                       <div>
-                        <h3 className="text-xl font-semibold leading-snug text-obsidian sm:text-2xl">Preferencias</h3>
-                        <div className="mt-5 grid gap-4 sm:gap-6">
-                          <div><p className="mb-3 font-bold">Horario</p><div className="flex flex-wrap gap-3">{["Mañana", "Tarde", "Full Day"].map((value) => <Button key={value} variant={booking.schedule === value ? "gold" : "default"} onClick={() => setBooking((c) => ({ ...c, schedule: value }))}>{value}</Button>)}</div></div>
-                          <div><p className="mb-3 font-bold">Tipo de servicio</p><div className="flex flex-wrap gap-3">{["Compartido", "Privado"].map((value) => <Button key={value} variant={booking.service === value ? "gold" : "default"} onClick={() => setBooking((c) => ({ ...c, service: value }))}>{value}</Button>)}</div></div>
-                          <Textarea placeholder="Mensaje adicional" value={booking.message} onChange={(e) => setBooking((c) => ({ ...c, message: e.target.value }))} />
-                          <LegalConsent
-                            checked={booking.policies && booking.dataConsent}
-                            error={bookingConsentError}
-                            onChange={(checked) => {
-                              setBookingConsentError("");
-                              setBooking((c) => ({ ...c, policies: checked, dataConsent: checked }));
-                            }}
-                          />
+                        <p className="text-xs font-bold uppercase tracking-[0.24em] text-gold">Extras</p>
+                        <h3 className="mt-2 text-2xl font-black text-obsidian">Personaliza tu viaje</h3>
+                        <div className="mt-5 grid gap-3 md:grid-cols-2">
+                          {bookingExtras.map((extra) => (
+                            <label key={extra.id} className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-black/10 bg-white p-4 text-sm font-bold text-charcoal/76 transition hover:border-gold/40">
+                              <span className="flex items-center gap-3"><input type="checkbox" checked={booking.extras.includes(extra.id)} onChange={(event) => setBooking((current) => ({ ...current, extras: event.target.checked ? [...current.extras, extra.id] : current.extras.filter((id) => id !== extra.id) }))} />{extra.label}</span>
+                              <span>+USD {extra.price}</span>
+                            </label>
+                          ))}
+                        </div>
+                        <div className="mt-5 rounded-lg bg-gold/10 p-4 text-lg font-black text-obsidian">Total actualizado: USD {bookingTotal}</div>
+                      </div>
+                    )}
+
+                    {bookingStep === 5 && (
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-[0.24em] text-gold">Resumen</p>
+                        <h3 className="mt-2 text-2xl font-black text-obsidian">Resumen de compra y datos</h3>
+                        <div className="mt-5 grid gap-5 lg:grid-cols-2">
+                          <div className="rounded-lg bg-[#F8F6F0] p-5 text-sm">
+                            {[
+                              ["Tour", booking.tour],
+                              ["Fecha", booking.date],
+                              ["Personas", `${totalTravelers} (${booking.adults} adultos, ${booking.children} niños, ${booking.babies} bebés)`],
+                              ["Hotel", booking.selectedHotel || "No aplica"],
+                              ["Extras", bookingSelectedExtras.map((extra) => extra.label).join(", ") || "Sin extras"],
+                              ["Precio base", `USD ${bookingBasePrice}`],
+                              ["Precio extras", `USD ${bookingExtrasTotal}`],
+                              ["Subtotal", `USD ${bookingSubtotal}`],
+                              ["Impuestos", `USD ${bookingTaxes}`],
+                              ["Total", `USD ${bookingTotal}`]
+                            ].map(([label, value]) => <div key={label} className="flex justify-between gap-4 border-b border-black/8 py-2"><span className="font-bold text-charcoal/70">{label}</span><span className="text-right font-semibold text-obsidian">{value}</span></div>)}
+                          </div>
+                          <div className="grid gap-3">
+                            <div className="grid gap-3 sm:grid-cols-2"><Input placeholder="Nombre" value={booking.name} onChange={(event) => setBooking((current) => ({ ...current, name: event.target.value }))} /><Input placeholder="Apellido" value={booking.lastName} onChange={(event) => setBooking((current) => ({ ...current, lastName: event.target.value }))} /></div>
+                            <Input placeholder="Correo" type="email" value={booking.email} onChange={(event) => setBooking((current) => ({ ...current, email: event.target.value }))} />
+                            <Input placeholder="WhatsApp" value={booking.phone} onChange={(event) => setBooking((current) => ({ ...current, phone: event.target.value }))} />
+                            <Input placeholder="Pais" value={booking.country} onChange={(event) => setBooking((current) => ({ ...current, country: event.target.value }))} />
+                            <Textarea placeholder="Comentarios" value={booking.comments} onChange={(event) => setBooking((current) => ({ ...current, comments: event.target.value, message: event.target.value }))} />
+                          </div>
                         </div>
                       </div>
                     )}
-                    {bookingStep === 5 && (
+
+                    {bookingStep === 6 && (
                       <div>
-                        <h3 className="text-xl font-semibold leading-snug text-obsidian sm:text-2xl">Resumen</h3>
-                        <div className="mt-5 grid gap-2 rounded-lg bg-[#F8F6F0] p-4 text-sm sm:gap-3 sm:p-6">
-                          {[
-                            ["Tour", booking.tour],
-                            ["Fecha", booking.date],
-                            ["Adultos", booking.adults],
-                            ["Niños", booking.children],
-                            ["Adultos mayores", booking.seniors],
-                            ["Total", `${totalTravelers} viajeros`],
-                            ["Servicio", booking.service],
-                            ["Horario", booking.schedule],
-                            ["Hotel", booking.hotel],
-                            ["Nombre", booking.name],
-                            ["WhatsApp", booking.phone],
-                            ["Correo", booking.email],
-                            ["Mensaje", booking.message || "Sin mensaje adicional"]
-                          ].map(([label, value]) => <div key={label} className="flex justify-between gap-4 border-b border-black/8 py-2"><span className="shrink-0 font-bold text-charcoal/70">{label}</span><span className="text-right text-obsidian">{value}</span></div>)}
+                        <p className="text-xs font-bold uppercase tracking-[0.24em] text-gold">Confirmación</p>
+                        <h3 className="mt-2 text-2xl font-black text-obsidian">Confirma tu reserva</h3>
+                        <div className="mt-5 rounded-lg bg-[#F8F6F0] p-5">
+                          <p className="text-sm leading-7 text-charcoal/70">Revisa los datos antes de continuar. WhatsApp se abrirá solo cuando presiones Reservar por WhatsApp.</p>
+                          <p className="mt-4 text-3xl font-black text-obsidian">USD {bookingTotal}</p>
                         </div>
-                        <Button className="luxury-button mt-6 w-full" size="lg" variant="gold" onClick={sendReservation}><MessageCircle className="size-5" />Confirmar solicitud de reserva</Button>
+                        <div className="mt-5"><LegalConsent checked={booking.policies && booking.dataConsent} error={bookingConsentError} onChange={(checked) => { setBookingConsentError(""); setBooking((current) => ({ ...current, policies: checked, dataConsent: checked })); }} /></div>
+                        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                          <Button className="luxury-button w-full" size="lg" variant="gold" onClick={sendReservation}><MessageCircle className="size-5" />Reservar por WhatsApp</Button>
+                          <Link href="/medios-de-pago" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full")}>Pagar ahora</Link>
+                        </div>
                       </div>
                     )}
                   </motion.div>
+
                   <div className="fixed inset-x-0 bottom-0 z-20 flex justify-between border-t border-black/10 bg-white/95 px-4 py-3 backdrop-blur-xl lg:static lg:mt-10 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-0">
                     <Button variant="ghost" disabled={bookingStep === 0} onClick={() => setBookingStep((step) => Math.max(0, step - 1))}>Volver</Button>
-                    {bookingStep < 5 && <Button variant="gold" disabled={!canContinue} onClick={() => setBookingStep((step) => Math.min(5, step + 1))}>Continuar</Button>}
+                    {bookingStep < 6 && <Button variant="gold" disabled={!canContinue} onClick={() => setBookingStep((step) => Math.min(6, step + 1))}>Continuar</Button>}
                   </div>
                 </div>
+
+                <aside className="border-t border-black/10 bg-white p-5 lg:border-l lg:border-t-0">
+                  <div className="lg:sticky lg:top-6">
+                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-gold">Tu viaje</p>
+                    <h3 className="mt-2 text-lg font-black text-obsidian">{booking.tour}</h3>
+                    <div className="mt-4 grid gap-2 text-sm text-charcoal/70">
+                      <div className="flex justify-between"><span>Fecha</span><strong>{booking.date}</strong></div>
+                      <div className="flex justify-between"><span>Personas</span><strong>{totalTravelers}</strong></div>
+                      <div className="flex justify-between"><span>Hotel</span><strong className="text-right">{booking.selectedHotel || "No aplica"}</strong></div>
+                      <div className="flex justify-between"><span>Extras</span><strong>USD {bookingExtrasTotal}</strong></div>
+                      <div className="flex justify-between border-t border-black/10 pt-3 text-lg text-obsidian"><span>Total</span><strong>USD {bookingTotal}</strong></div>
+                    </div>
+                  </div>
+                </aside>
               </div>
             </Card>
           </div>
         </div>
       )}
-
       {selectedTour && (
-        <div className="fixed inset-0 z-[80] overflow-y-auto bg-black/78 p-4 backdrop-blur-sm" onClick={() => setSelectedTour(null)}>
-          <motion.div initial={{ opacity: 0, y: 40, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="mx-auto my-8 max-w-5xl overflow-hidden rounded-lg bg-white shadow-sm" onClick={(event) => event.stopPropagation()}>
-            <div className="relative h-80">
-              <Image src={selectedTour.image} alt={selectedTour.title} fill sizes="100vw" className="object-cover" />
-              <button aria-label="Cerrar detalles" className="absolute right-4 top-4 grid size-11 place-items-center rounded-full bg-white text-obsidian" onClick={() => setSelectedTour(null)}><X className="size-5" /></button>
+        <div className="fixed inset-0 z-[80] overflow-y-auto bg-black/78 p-3 backdrop-blur-sm sm:p-4" onClick={() => setSelectedTour(null)}>
+          <motion.div initial={{ opacity: 0, y: 40, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="mx-auto my-6 max-w-7xl overflow-hidden rounded-lg bg-white shadow-sm" onClick={(event) => event.stopPropagation()}>
+            <div className="relative border-b border-black/8 bg-[#F8F6F0] p-4 sm:p-5 md:p-6">
+              <button aria-label="Cerrar detalles" className="absolute right-4 top-4 z-20 grid size-11 place-items-center rounded-full bg-white text-obsidian shadow-sm" onClick={() => setSelectedTour(null)}><X className="size-5" /></button>
+              <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+                <div>
+                  <div className="relative aspect-[16/9] overflow-hidden rounded-lg bg-black/5">
+                    <Image src={detailImage || selectedTour.image} alt={selectedTour.title} fill sizes="(min-width: 1024px) 60vw, 100vw" className="object-cover" />
+                    <div className="absolute left-4 top-4 rounded-full bg-white/88 px-3 py-1.5 text-xs font-black text-obsidian backdrop-blur-md">{selectedTour.badge}</div>
+                  </div>
+                  <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-5">
+                    {[selectedTour.image, ...selectedTour.gallery].filter(Boolean).slice(0, 5).map((src) => (
+                      <button key={src} type="button" onClick={() => setDetailImage(src)} className={cn("relative aspect-[4/3] overflow-hidden rounded-lg border", (detailImage || selectedTour.image) === src ? "border-gold" : "border-transparent")}>
+                        <Image src={src} alt={selectedTour.title} fill sizes="120px" className="object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="self-end pr-12 lg:pr-0">
+                  <p className="text-xs font-bold uppercase tracking-[0.24em] text-gold">{selectedTour.categoria}</p>
+                  <h3 className="mt-3 font-display text-3xl font-normal leading-[1.15] text-obsidian md:text-4xl">{selectedTour.title}</h3>
+                  <div className="mt-4 flex flex-wrap items-center gap-3 text-sm font-semibold text-charcoal/62">
+                    <span className="flex items-center gap-1 text-gold">{Array.from({ length: Math.max(1, Math.round(selectedTour.rating)) }).map((_, index) => <Star key={index} className="size-4 fill-current" />)}</span>
+                    <span>{selectedTour.rating}/5</span>
+                    <span>{selectedTour.reservas} reservas</span>
+                  </div>
+                  <p className="mt-5 rounded-lg bg-obsidian p-5 text-2xl font-black text-gold-soft">{formatExperiencePrice(selectedTour)}</p>
+                </div>
+              </div>
             </div>
-            <div className="grid gap-8 p-6 md:p-8 lg:grid-cols-[1.1fr_0.9fr]">
-              <div>
-                <p className="text-sm font-bold uppercase tracking-[0.28em] text-gold">{selectedTour.badge}</p>
-                <h3 className="mt-3 max-w-2xl font-display text-3xl font-normal leading-[1.2] text-obsidian md:text-4xl">{selectedTour.title}</h3>
-                <p className="mt-5 text-sm leading-8 text-charcoal/70 md:text-base">{selectedTour.description}</p>
-                <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                  <span className="rounded-lg bg-gold/10 p-4 font-bold"><Clock className="mb-2 size-5 text-gold" />{selectedTour.duration}</span>
-                  <span className="rounded-lg bg-black/5 p-4 font-bold"><Gauge className="mb-2 size-5 text-charcoal/62" />{selectedTour.difficulty}</span>
-                  <span className="rounded-lg bg-gold/12 p-4 font-bold"><CalendarDays className="mb-2 size-5 text-gold" />{selectedTour.schedule}</span>
-                </div>
-                <div className="mt-6 grid grid-cols-3 gap-3">
-                  {selectedTour.gallery.map((src) => <div key={src} className="relative h-28 overflow-hidden rounded-lg"><Image src={src} alt={selectedTour.title} fill sizes="33vw" className="object-cover" /></div>)}
-                </div>
-                <div className="map-frame mt-6 overflow-hidden rounded-lg border border-black/10">
-                  <iframe
-                    title={`Mapa de ${selectedTour.title}`}
-                    src={selectedTour.mapaUrl}
-                    width="100%"
-                    height="260"
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                </div>
-                <div className="mt-6">
-                  <h4 className="font-bold text-obsidian">Itinerario</h4>
-                  <div className="mt-3 grid gap-3">
+
+            <div className="grid gap-8 p-5 md:p-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+              <div className="min-w-0 space-y-8">
+                <section>
+                  <h4 className="text-xl font-black text-obsidian">Descripcion</h4>
+                  <p className="mt-3 text-sm leading-8 text-charcoal/70 md:text-base">{selectedTour.description}</p>
+                  <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                    <span className="rounded-lg bg-gold/10 p-4 font-bold"><Clock className="mb-2 size-5 text-gold" />{selectedTour.duration}</span>
+                    <span className="rounded-lg bg-black/5 p-4 font-bold"><Gauge className="mb-2 size-5 text-charcoal/62" />{selectedTour.difficulty}</span>
+                    <span className="rounded-lg bg-gold/12 p-4 font-bold"><CalendarDays className="mb-2 size-5 text-gold" />{selectedTour.schedule}</span>
+                  </div>
+                </section>
+
+                <section className="grid gap-6 md:grid-cols-2">
+                  <ListBlock title="Incluye" items={selectedTour.includes} />
+                  <ListBlock title="No incluye" items={selectedTour.excludes} />
+                  <ListBlock title="Que llevar" items={selectedTour.bring} />
+                  <ListBlock title="Recomendaciones" items={selectedTour.recommendations} />
+                </section>
+
+                <section>
+                  <h4 className="text-xl font-black text-obsidian">Mapa</h4>
+                  <div className="map-frame mt-4 overflow-hidden rounded-lg border border-black/10">
+                    <iframe title={`Mapa de ${selectedTour.title}`} src={selectedTour.mapaUrl} width="100%" height="300" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+                  </div>
+                </section>
+
+                <section>
+                  <h4 className="text-xl font-black text-obsidian">Itinerario</h4>
+                  <div className="mt-4 grid gap-3">
                     {selectedTour.itinerario.map((item, index) => (
-                      <div key={`${item.titulo}-${index}`} className="flex gap-3 rounded-lg bg-[#F8F6F0] p-3">
+                      <div key={`${item.titulo}-${index}`} className="flex gap-3 rounded-lg bg-[#F8F6F0] p-4">
                         <span className="grid size-8 shrink-0 place-items-center rounded-full bg-obsidian text-xs font-bold text-gold-soft">{index + 1}</span>
                         <span className="font-semibold text-charcoal/76"><strong className="text-obsidian">{item.titulo}:</strong> {item.descripcion}</span>
                       </div>
                     ))}
                   </div>
-                </div>
-              </div>
-              <div className="space-y-6">
-                <div className="rounded-lg bg-obsidian p-5 text-white"><p className="text-sm text-white/58">Precio</p><p className="font-display text-2xl font-normal leading-tight text-gold-soft">{selectedTour.price}</p></div>
-                {selectedTour.tipoServicio === "paquete" && (
-                  <div className="rounded-lg border border-gold/20 bg-gold/10 p-4">
-                    <h4 className="font-bold text-obsidian">Datos del paquete</h4>
-                    <div className="mt-3 grid gap-2 text-sm text-charcoal/76">
-                      {[
-                        ["Noches de hotel", selectedTour.nochesHotel],
-                        ["Categoria hotel", selectedTour.categoriaHotel],
-                        ["Precio neto", selectedTour.precioNeto ? `${selectedTour.moneda} ${selectedTour.precioNeto}` : "Consultar"],
-                        ["Comision agencia", selectedTour.comisionAgencia],
-                        ["Tarifa venta sugerida", selectedTour.tarifaVentaSugerida]
-                      ].map(([label, value]) => (
-                        <div key={label} className="flex justify-between gap-3 border-b border-black/8 py-1">
-                          <span className="font-bold">{label}</span>
-                          <span className="text-right">{value}</span>
-                        </div>
+                </section>
+
+                <section>
+                  <h4 className="text-xl font-black text-obsidian">Preguntas frecuentes</h4>
+                  <div className="mt-4 grid gap-2">
+                    {selectedTour.preguntasFrecuentes.map((item) => <p key={item} className="rounded-lg bg-black/5 p-3 text-sm text-charcoal/70">{item}</p>)}
+                  </div>
+                </section>
+
+                {relatedTours.length > 0 && (
+                  <section>
+                    <h4 className="text-xl font-black text-obsidian">Tours relacionados</h4>
+                    <div className="mt-4 grid gap-3 md:grid-cols-3">
+                      {relatedTours.map((tour) => (
+                        <button key={tour.slug} type="button" onClick={() => setSelectedTour(tour)} className="overflow-hidden rounded-lg border border-black/10 bg-[#F8F6F0] text-left transition hover:-translate-y-1 hover:bg-white">
+                          <div className="relative h-28"><Image src={tour.image} alt={tour.title} fill sizes="240px" className="object-cover" /></div>
+                          <div className="p-3">
+                            <p className="text-sm font-black leading-snug text-obsidian">{tour.title}</p>
+                            <p className="mt-1 text-xs font-bold text-gold">{formatExperiencePrice(tour)}</p>
+                          </div>
+                        </button>
                       ))}
                     </div>
-                    {selectedTour.serviciosIncluidos && <ListBlock title="Servicios incluidos" items={selectedTour.serviciosIncluidos} />}
-                  </div>
+                  </section>
                 )}
-                <ListBlock title="Incluye" items={selectedTour.includes} />
-                <ListBlock title="No incluye" items={selectedTour.excludes} />
-                <ListBlock title="Qué llevar" items={selectedTour.bring} />
-                <ListBlock title="Recomendaciones" items={selectedTour.recommendations} />
-                <div>
-                  <h4 className="font-bold text-obsidian">Preguntas frecuentes</h4>
-                  <div className="mt-3 space-y-2">
-                    {selectedTour.preguntasFrecuentes.map((item) => (
-                      <p key={item} className="rounded-lg bg-black/5 p-3 text-sm text-charcoal/70">{item}</p>
-                    ))}
+              </div>
+
+              <aside className="lg:sticky lg:top-6 lg:self-start">
+                <div className="rounded-lg border border-black/10 bg-white p-5 shadow-md">
+                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-gold">Reserva</p>
+                  <div className="mt-3 rounded-lg bg-obsidian p-4 text-white">
+                    <p className="text-sm text-white/58">Precio</p>
+                    <p className="text-2xl font-black text-gold-soft">{detailBasePrice ? `Desde USD ${detailBasePrice}` : "Consultar"}</p>
+                  </div>
+
+                  <div className="mt-5 grid gap-4">
+                    <label className="grid gap-2 text-sm font-bold text-obsidian">Seleccionar fecha<Input type="date" value={detailDate} onChange={(event) => setDetailDate(event.target.value)} /></label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <CounterInput label="Adultos" value={detailAdults} min={1} onChange={setDetailAdults} />
+                      <CounterInput label="Niños" value={detailChildren} min={0} onChange={setDetailChildren} />
+                    </div>
+
+                    {selectedTour.tipoServicio === "paquete" && (
+                      <div className="rounded-lg border border-gold/20 bg-gold/10 p-4">
+                        <p className="font-bold text-obsidian">Categoría de hotel</p>
+                        <div className="mt-3 grid grid-cols-4 gap-2">
+                          {Object.keys(hotelOptionsByCategory).map((category) => (
+                            <button key={category} type="button" onClick={() => { setDetailHotelCategory(category); setDetailHotel(""); }} className={cn("rounded-full px-3 py-2 text-sm font-black transition", detailHotelCategory === category ? "bg-obsidian text-gold-soft" : "bg-white text-charcoal/70")}>{category.replace(" estrellas", "★")}</button>
+                          ))}
+                        </div>
+                        <label className="mt-4 grid gap-2 text-sm font-bold text-obsidian">Hotel disponible
+                          <select value={detailHotel} onChange={(event) => setDetailHotel(event.target.value)} className="h-12 rounded-2xl border border-black/10 bg-white px-4 text-sm font-bold text-charcoal outline-none">
+                            <option value="">Seleccionar hotel</option>
+                            {detailHotelOptions.map((hotel) => <option key={hotel}>{hotel}</option>)}
+                          </select>
+                        </label>
+                      </div>
+                    )}
+
+                    <div>
+                      <p className="font-bold text-obsidian">Servicios adicionales</p>
+                      <div className="mt-3 grid gap-2">
+                        {detailExtras.map((extra) => (
+                          <label key={extra.id} className="flex items-center justify-between gap-3 rounded-lg bg-[#F8F6F0] p-3 text-sm font-semibold text-charcoal/76">
+                            <span className="flex items-center gap-2"><input type="checkbox" checked={selectedExtras.includes(extra.id)} onChange={(event) => setSelectedExtras((current) => event.target.checked ? [...current, extra.id] : current.filter((id) => id !== extra.id))} />{extra.label}</span>
+                            <span>+{extra.price} USD</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="rounded-lg border border-black/10 bg-[#F8F6F0] p-4">
+                      <p className="font-bold text-obsidian">Resumen</p>
+                      <div className="mt-3 grid gap-2 text-sm text-charcoal/72">
+                        <div className="flex justify-between"><span>Precio base</span><strong>USD {detailBasePrice || 0}</strong></div>
+                        <div className="flex justify-between"><span>Extras</span><strong>USD {detailExtrasTotal}</strong></div>
+                        <div className="flex justify-between"><span>Cantidad de personas</span><strong>{detailTravelers}</strong></div>
+                        <div className="flex justify-between"><span>Subtotal</span><strong>USD {detailSubtotal}</strong></div>
+                        <div className="flex justify-between border-t border-black/10 pt-2 text-lg text-obsidian"><span>Total</span><strong>USD {detailTotal}</strong></div>
+                      </div>
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="gold"
+                      size="lg"
+                      className="luxury-button w-full"
+                      onClick={() => {
+                        setBooking((current) => ({
+                          ...current,
+                          tour: selectedTour.title,
+                          date: detailDate,
+                          adults: detailAdults,
+                          children: detailChildren,
+                          babies: 0,
+                          hotelCategory: detailHotelCategory,
+                          selectedHotel: detailHotel,
+                          hotel: detailHotel,
+                          extras: selectedExtras
+                            .map((id) => detailExtras.find((extra) => extra.id === id))
+                            .filter(Boolean)
+                            .map((extra) => {
+                              if (extra?.id === "transporte-vip") return "transporte";
+                              if (extra?.id === "tren-vistadome") return "tren";
+                              if (extra?.id === "guía-privado") return "guía";
+                              if (extra?.id === "almuerzo-buffet") return "almuerzo";
+                              return extra?.id ?? "";
+                            })
+                            .filter(Boolean),
+                          comments: `Extras: ${detailSelectedExtras.map((extra) => extra.label).join(", ") || "Sin extras"}. Total estimado: USD ${detailTotal}. Hotel: ${detailHotel || "Por definir"}.`,
+                          message: `Extras: ${detailSelectedExtras.map((extra) => extra.label).join(", ") || "Sin extras"}. Total estimado: USD ${detailTotal}. Hotel: ${detailHotel || "Por definir"}.`,
+                          totalEstimate: detailTotal
+                        }));
+                        setBookingStep(1);
+                        setSelectedTour(null);
+                        setBookingOpen(true);
+                      }}
+                    >
+                      Continuar reserva
+                    </Button>
                   </div>
                 </div>
-                <div className="rounded-lg border border-gold/20 bg-gold/10 p-4">
-                  <div className="flex gap-1 text-gold">{Array.from({ length: 5 }).map((_, index) => <Star key={index} className="size-4 fill-current" />)}</div>
-                  <p className="mt-3 text-sm font-semibold text-charcoal/76">&ldquo;Experiencia puntual, guía atento y paisajes increíbles.&rdquo;</p>
-                  <p className="mt-2 text-xs font-bold uppercase tracking-[0.18em] text-gold">Viajero verificado</p>
-                </div>
-                <Button onClick={() => { openBooking(selectedTour.title); setSelectedTour(null); }} variant="gold" size="lg" className="luxury-button w-full">Reservar</Button>
-              </div>
+              </aside>
             </div>
           </motion.div>
         </div>
       )}
-
       {toast && <div className="fixed bottom-24 left-1/2 z-[90] -translate-x-1/2 rounded-full bg-obsidian px-5 py-3 text-sm font-bold text-gold-soft shadow-sm">{toast}</div>}
 
       <a href={whatsappUrl} target="_blank" aria-label="WhatsApp" className="fixed bottom-5 right-5 z-50 grid size-16 place-items-center rounded-full bg-emerald text-white shadow-glow before:absolute before:inset-0 before:animate-ping before:rounded-full before:bg-emerald/40">

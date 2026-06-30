@@ -4,8 +4,8 @@ import { LegalPage } from "@/components/legal-page";
 import { company } from "@/lib/company";
 
 export const metadata: Metadata = {
-  title: "Politica de Privacidad",
-  description: "Politica de privacidad de Spirit Qosqo Travel para usuarios de sus canales digitales."
+  title: "Política de Privacidad",
+  description: "Política de privacidad de Spirit Qosqo Travel para usuarios de sus canales digitales."
 };
 
 const privacyItems = [
@@ -13,15 +13,15 @@ const privacyItems = [
     title: "Alcance",
     content: (
       <p>
-        Esta politica aplica al uso del sitio web, formularios, WhatsApp, correo electronico y redes sociales administradas por {company.tradeName}.
+        Esta politica aplica al uso del sitio web, formularios, WhatsApp, correo electrónico y redes sociales administradas por {company.tradeName}.
       </p>
     )
   },
   {
-    title: "Uso de informacion",
+    title: "Uso de información",
     content: (
       <p>
-        La informacion recibida se usa para responder consultas, gestionar reservas, prestar servicios turisticos, enviar confirmaciones, atender solicitudes y mejorar la experiencia digital del usuario.
+        La información recibida se usa para responder consultas, gestionar reservas, prestar servicios turísticos, enviar confirmaciónes, atender solicitudes y mejorar la experiencia digital del usuario.
       </p>
     )
   },
@@ -29,9 +29,9 @@ const privacyItems = [
     title: "Cookies",
     content: (
       <p>
-        Usamos cookies tecnicas y, con consentimiento, cookies de analitica. Puedes revisar el detalle en la{" "}
+        Usamos cookies técnicas y, con consentimiento, cookies de analítica. Puedes revisar el detalle en la{" "}
         <Link href="/politica-cookies" className="font-bold text-obsidian underline underline-offset-4">
-          Politica de Cookies
+          Política de Cookies
         </Link>
         .
       </p>
@@ -43,7 +43,7 @@ const privacyItems = [
       <p>
         El tratamiento detallado de datos personales, derechos ARCO, transferencias y medidas de seguridad se encuentra en la{" "}
         <Link href="/politica-proteccion-datos-personales" className="font-bold text-obsidian underline underline-offset-4">
-          Politica de Proteccion de Datos Personales
+          Política de Protección de Datos Personales
         </Link>
         .
       </p>
@@ -53,7 +53,7 @@ const privacyItems = [
     title: "Contacto",
     content: (
       <p>
-        Para consultas de privacidad escribe a <span className="font-bold text-obsidian">{company.email}</span> o comunicate al <span className="font-bold text-obsidian">{company.phone}</span>.
+        Para consultas de privacidad escribe a <span className="font-bold text-obsidian">{company.email}</span> o comunícate al <span className="font-bold text-obsidian">{company.phone}</span>.
       </p>
     )
   }
@@ -63,8 +63,8 @@ export default function PrivacyPolicyPage() {
   return (
     <LegalPage
       eyebrow="Privacidad"
-      title="Politica de Privacidad"
-      description="Informacion general sobre privacidad, comunicaciones, cookies y uso responsable de los datos entregados en nuestros canales digitales."
+      title="Política de Privacidad"
+      description="Información general sobre privacidad, comunicaciones, cookies y uso responsable de los datos entregados en nuestros canales digitales."
     >
       <div className="not-prose grid gap-4">
         {privacyItems.map((item, index) => (

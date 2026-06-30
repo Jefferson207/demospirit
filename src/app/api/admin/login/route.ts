@@ -14,6 +14,6 @@ export async function POST(request: Request) {
 
     return response;
   } catch {
-    return NextResponse.json({ ok: false, error: "No se pudo iniciar sesion." }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "No se pudo iniciar sesión." }, { status: 400 });
   }
 }

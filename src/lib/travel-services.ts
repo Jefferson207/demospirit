@@ -52,7 +52,7 @@ export const serviceImages = {
 
 const defaultItinerary: ItineraryStep[] = [
   { titulo: "Recojo y bienvenida", descripcion: "Coordinacion previa y punto de encuentro confirmado." },
-  { titulo: "Ruta guiada", descripcion: "Servicio acompañado por guia o coordinador segun programa." },
+  { titulo: "Ruta guíada", descripcion: "Servicio acompañado por guía o coordinador segun programa." },
   { titulo: "Tiempo para fotografias", descripcion: "Paradas escenicas y espacios para disfrutar la experiencia." },
   { titulo: "Retorno coordinado", descripcion: "Finalizacion del servicio segun horario confirmado." }
 ];
@@ -60,7 +60,7 @@ const defaultItinerary: ItineraryStep[] = [
 export const travelServices: TravelService[] = [
   {
     nombre: "City Tour Clásico + Templo de la Luna + Zona X",
-    slug: "city-tour-clasico-templo-luna-zona-x",
+    slug: "city-tour-clásico-templo-luna-zona-x",
     categoria: "Cultura",
     etiqueta: "Más vendido",
     descripcionCorta: "Experiencia cultural y familiar por los espacios más representativos de Cusco.",
@@ -235,7 +235,7 @@ export const travelServices: TravelService[] = [
     itinerario: [
       { titulo: "Día 1", descripcion: "Recepción, traslado al hotel y City Tour Cusco." },
       { titulo: "Día 2", descripcion: "Tour Valle Sagrado y conexión hacia ruta de Machu Picchu." },
-      { titulo: "Día 3", descripcion: "Visita guiada a Machu Picchu y retorno coordinado." },
+      { titulo: "Día 3", descripcion: "Visita guíada a Machu Picchu y retorno coordinado." },
       { titulo: "Día 4", descripcion: "Desayuno, check-out y traslado de salida." }
     ],
     imagenPrincipal: serviceImages.machu,

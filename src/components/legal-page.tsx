@@ -6,10 +6,9 @@ import { company, whatsappReservationUrl } from "@/lib/company";
 
 const mainNav = [
   ["Inicio", "/#inicio"],
-  ["Nosotros", "/#nosotros"],
+  ["Nosotros", "/nosotros"],
   ["Tours", "/#tours"],
   ["Galeria", "/#galeria"],
-  ["Testimonios", "/#testimonios"],
   ["Contacto", "/#contacto"]
 ];
 
@@ -62,7 +61,7 @@ export function LegalPage({
           <h1 className="mt-5 font-display text-4xl font-normal leading-tight md:text-5xl">{title}</h1>
           <p className="mt-5 max-w-3xl text-base leading-8 text-charcoal/70">{description}</p>
           <div className="mt-8 grid gap-2 rounded-lg border border-black/10 bg-white p-5 text-sm text-charcoal/72 sm:grid-cols-2">
-            <p><span className="font-bold text-obsidian">Razon social:</span> {company.legalName}</p>
+            <p><span className="font-bold text-obsidian">Razón social:</span> {company.legalName}</p>
             <p><span className="font-bold text-obsidian">Nombre comercial:</span> {company.tradeName}</p>
             <p><span className="font-bold text-obsidian">RUC:</span> {company.ruc}</p>
             <p><span className="font-bold text-obsidian">Correo:</span> {company.email}</p>

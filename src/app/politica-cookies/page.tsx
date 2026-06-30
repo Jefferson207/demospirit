@@ -3,18 +3,18 @@ import { LegalPage } from "@/components/legal-page";
 import { company } from "@/lib/company";
 
 export const metadata: Metadata = {
-  title: "Politica de Cookies",
-  description: "Politica de cookies y consentimiento de Spirit Qosqo Travel."
+  title: "Política de Cookies",
+  description: "Política de cookies y consentimiento de Spirit Qosqo Travel."
 };
 
 const cookieItems = [
   {
     title: "Que son las cookies",
-    text: "Las cookies son pequenos archivos que permiten recordar preferencias, mantener funcionalidades tecnicas y medir el uso de la web para mejorar la experiencia del usuario."
+    text: "Las cookies son pequeños archivos que permiten recordar preferencias, mantener funcionalidades técnicas y medir el uso de la web para mejorar la experiencia del usuario."
   },
   {
     title: "Tipos de cookies",
-    text: "Usamos cookies tecnicas necesarias para la operacion del sitio y cookies de analitica solo cuando el usuario acepta el aviso de consentimiento. No usamos cookies para vender datos personales."
+    text: "Usamos cookies técnicas necesarias para la operación del sitio y cookies de analítica solo cuando el usuario acepta el aviso de consentimiento. No usamos cookies para vender datos personales."
   },
   {
     title: "Consentimiento",
@@ -22,7 +22,7 @@ const cookieItems = [
   },
   {
     title: "Gestion",
-    text: "Puedes bloquear o eliminar cookies desde la configuracion de tu navegador. Algunas funciones, como recordar preferencias, podrian dejar de operar correctamente."
+    text: "Puedes bloquear o eliminar cookies desde la configuración de tu navegador. Algunas funciones, como recordar preferencias, podrían dejar de operar correctamente."
   },
   {
     title: "Contacto",
@@ -34,7 +34,7 @@ export default function CookiesPage() {
   return (
     <LegalPage
       eyebrow="Privacidad"
-      title="Politica de Cookies"
+      title="Política de Cookies"
       description="Explicamos que cookies usamos, para que sirven y como puedes administrarlas."
     >
       <div className="not-prose grid gap-4">

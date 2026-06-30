@@ -61,23 +61,23 @@ export const defaultTariff: Tariff = {
   updatedAt: "2026",
   currency: "USD",
   classicTours: [
-    { tour: "City Tour Cusco", duration: "Medio dia", includes: "Transporte, guia profesional, entradas.", netPrice: "15" },
-    { tour: "Valle Sagrado VIP", duration: "Dia completo", includes: "Transporte, guia, almuerzo buffet, entradas.", netPrice: "35" },
-    { tour: "Maras & Moray", duration: "Medio dia", includes: "Transporte, guia profesional, entrada.", netPrice: "20" },
-    { tour: "Montana 7 Colores", duration: "Dia completo", includes: "Transporte, desayuno, almuerzo, guia.", netPrice: "25" },
-    { tour: "Laguna Humantay", duration: "Dia completo", includes: "Transporte, desayuno, almuerzo, guia.", netPrice: "30" },
-    { tour: "Machu Picchu", duration: "Full Day", includes: "Tren, bus, entrada, guia, traslados.", netPrice: "300" },
-    { tour: "Valle Sagrado + Machu Picchu 2D/1N", duration: "2 dias / 1 noche", includes: "Tren, hotel, entradas, guia, almuerzos.", netPrice: "380" },
-    { tour: "Camino Inca Corto", duration: "2 dias / 1 noche", includes: "Entradas, guia, transporte, hotel, tren.", netPrice: "450" },
-    { tour: "Salkantay Trek", duration: "4 dias / 3 noches", includes: "Alimentacion, campamento, guia, entradas.", netPrice: "350" },
-    { tour: "Cusco Clasico", duration: "4 dias / 3 noches", includes: "Tours, hotel, traslados, entradas.", netPrice: "425" },
-    { tour: "Cusco Completo", duration: "5 dias / 4 noches", includes: "Tours, hotel, traslados, entrada Machu Picchu.", netPrice: "525" }
+    { tour: "City Tour Cusco", duration: "Medio día", includes: "Transporte, guía profesional, entradas.", netPrice: "15" },
+    { tour: "Valle Sagrado VIP", duration: "Dia completo", includes: "Transporte, guía, almuerzo buffet, entradas.", netPrice: "35" },
+    { tour: "Maras & Moray", duration: "Medio día", includes: "Transporte, guía profesional, entrada.", netPrice: "20" },
+    { tour: "Montaña 7 Colores", duration: "Dia completo", includes: "Transporte, desayuno, almuerzo, guía.", netPrice: "25" },
+    { tour: "Laguna Humantay", duration: "Dia completo", includes: "Transporte, desayuno, almuerzo, guía.", netPrice: "30" },
+    { tour: "Machu Picchu", duration: "Full Day", includes: "Tren, bus, entrada, guía, traslados.", netPrice: "300" },
+    { tour: "Valle Sagrado + Machu Picchu 2D/1N", duration: "2 días / 1 noche", includes: "Tren, hotel, entradas, guía, almuerzos.", netPrice: "380" },
+    { tour: "Camino Inca Corto", duration: "2 días / 1 noche", includes: "Entradas, guía, transporte, hotel, tren.", netPrice: "450" },
+    { tour: "Salkantay Trek", duration: "4 días / 3 noches", includes: "Alimentación, campamento, guía, entradas.", netPrice: "350" },
+    { tour: "Cusco Clásico", duration: "4 días / 3 noches", includes: "Tours, hotel, traslados, entradas.", netPrice: "425" },
+    { tour: "Cusco Completo", duration: "5 días / 4 noches", includes: "Tours, hotel, traslados, entrada Machu Picchu.", netPrice: "525" }
   ],
   packages: [
-    { name: "Cusco + Machu Picchu 4 dias / 3 noches", hotelCategory: "2 estrellas", netPrice: "425", commission10: "42.50", commission15: "63.75", commission20: "85.00", suggestedPrice: "550 - 600" },
-    { name: "Cusco + Machu Picchu 4 dias / 3 noches", hotelCategory: "3 estrellas", netPrice: "480", commission10: "48.00", commission15: "72.00", commission20: "96.00", suggestedPrice: "620 - 680" },
-    { name: "Cusco + Machu Picchu 4 dias / 3 noches", hotelCategory: "4 estrellas", netPrice: "650", commission10: "65.00", commission15: "97.50", commission20: "130.00", suggestedPrice: "850 - 950" },
-    { name: "Cusco + Machu Picchu 4 dias / 3 noches", hotelCategory: "5 estrellas", netPrice: "1,100", commission10: "110.00", commission15: "165.00", commission20: "220.00", suggestedPrice: "1,400 - 1,800" }
+    { name: "Cusco + Machu Picchu 4 días / 3 noches", hotelCategory: "2 estrellas", netPrice: "425", commission10: "42.50", commission15: "63.75", commission20: "85.00", suggestedPrice: "550 - 600" },
+    { name: "Cusco + Machu Picchu 4 días / 3 noches", hotelCategory: "3 estrellas", netPrice: "480", commission10: "48.00", commission15: "72.00", commission20: "96.00", suggestedPrice: "620 - 680" },
+    { name: "Cusco + Machu Picchu 4 días / 3 noches", hotelCategory: "4 estrellas", netPrice: "650", commission10: "65.00", commission15: "97.50", commission20: "130.00", suggestedPrice: "850 - 950" },
+    { name: "Cusco + Machu Picchu 4 días / 3 noches", hotelCategory: "5 estrellas", netPrice: "1,100", commission10: "110.00", commission15: "165.00", commission20: "220.00", suggestedPrice: "1,400 - 1,800" }
   ],
   hotels: [
     { category: "Economica 2 estrellas", hotels: ["Hotel Prisma Cusco", "Hotel Inkarri Cusco", "Hospedaje El Triunfo"], priceRange: "18 - 30" },
@@ -87,7 +87,7 @@ export const defaultTariff: Tariff = {
   ],
   feed: [
     { service: "Desayuno", includes: "En todos los hoteles y tours que lo indiquen." },
-    { service: "Almuerzo", includes: "Buffet turistico en Valle Sagrado. Almuerzo box en hikes y trekking." },
+    { service: "Almuerzo", includes: "Buffet turístico en Valle Sagrado. Almuerzo box en hikes y trekking." },
     { service: "Cena", includes: "No incluida en programas regulares, salvo indicacion." },
     { service: "Dietas especiales", includes: "Vegetariana, vegana, sin gluten, otras. Solicitar con anticipacion." },
     { service: "Bebidas", includes: "No incluidas, salvo indicado en el programa." }
@@ -99,9 +99,9 @@ export const defaultTariff: Tariff = {
     "Tarifas validas hasta el 31 de diciembre del 2026."
   ],
   cancellationPolicies: [
-    { period: "Mas de 30 dias", charge: "Sin penalidad, se retiene 10% por gastos administrativos." },
-    { period: "29 a 15 dias", charge: "50% del total del servicio." },
-    { period: "14 a 7 dias", charge: "75% del total del servicio." },
-    { period: "Menos de 7 dias o No Show", charge: "100% del total del servicio." }
+    { period: "Más de 30 días", charge: "Sin penalidad, se retiene 10% por gastos administrativos." },
+    { period: "29 a 15 días", charge: "50% del total del servicio." },
+    { period: "14 a 7 días", charge: "75% del total del servicio." },
+    { period: "Menos de 7 días o No Show", charge: "100% del total del servicio." }
   ]
 };

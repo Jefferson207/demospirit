@@ -46,7 +46,7 @@ export function EsnnaPosterModal({ variant = "link" }: { variant?: "link" | "but
             <div className="overflow-hidden rounded-lg bg-white shadow-sm">
               <Image
                 src="/esnna.png"
-                alt="Afiche ESNNA de prevencion contra la explotacion sexual de niñas, niños y adolescentes"
+                alt="Afiche ESNNA de prevención contra la explotacion sexual de niñas, niños y adolescentes"
                 width={1240}
                 height={1500}
                 className="h-auto w-full object-contain"

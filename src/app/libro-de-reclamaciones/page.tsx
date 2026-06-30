@@ -54,10 +54,10 @@ export default function ComplaintsBookPage() {
   const establishment = useMemo(
     () => [
       ["Nombre comercial", company.tradeName],
-      ["Razon social", company.legalName],
+      ["Razón social", company.legalName],
       ["RUC", company.ruc],
-      ["Direccion fiscal", company.contactAddress],
-      ["Telefono", company.phone],
+      ["Dirección fiscal", company.contactAddress],
+      ["Teléfono", company.phone],
       ["Correo", company.email]
     ],
     []
@@ -79,9 +79,9 @@ export default function ComplaintsBookPage() {
 
   return (
     <LegalPage
-      eyebrow="Atencion al consumidor"
+      eyebrow="Atención al consumidor"
       title="Libro de Reclamaciones"
-      description="Registra reclamos o quejas vinculados con nuestros servicios turisticos. La informacion enviada sera atendida por nuestros canales oficiales dentro del plazo establecido por la normativa peruana."
+      description="Registra reclamos o quejas vinculados con nuestros servicios turísticos. La información enviada sera atendida por nuestros canales oficiales dentro del plazo establecido por la normativa peruana."
     >
       {claimCode && (
         <div className="not-prose mb-8 rounded-lg border border-emerald/20 bg-emerald/10 p-5">
@@ -90,14 +90,14 @@ export default function ComplaintsBookPage() {
             <div>
               <h2 className="text-xl font-bold text-obsidian">Tu reclamo fue registrado correctamente.</h2>
               <p className="mt-2 leading-7 text-charcoal/72">Te responderemos dentro del plazo establecido por la normativa peruana.</p>
-              <p className="mt-3 inline-flex rounded-full bg-white px-4 py-2 text-sm font-bold text-obsidian shadow-sm">Codigo de reclamo: {claimCode}</p>
+              <p className="mt-3 inline-flex rounded-full bg-white px-4 py-2 text-sm font-bold text-obsidian shadow-sm">Código de reclamo: {claimCode}</p>
             </div>
           </div>
         </div>
       )}
 
       <form onSubmit={sendClaim} className="not-prose mt-8 grid gap-6">
-        <Section title="1. Datos del establecimiento" description="Informacion de la agencia responsable de atender el reclamo o queja.">
+        <Section title="1. Datos del establecimiento" description="Información de la agencia responsable de atender el reclamo o queja.">
           <div className="grid gap-3">
             {establishment.map(([label, value]) => (
               <div key={label} className="grid gap-1 rounded-lg bg-[#F8F6F0] px-4 py-3 sm:grid-cols-[210px_1fr] sm:items-center">
@@ -128,11 +128,11 @@ export default function ComplaintsBookPage() {
             <Field label="Numero de documento">
               <Input required name="Numero de documento" placeholder="Numero de documento" />
             </Field>
-            <Field label="Domicilio fiscal o direccion">
-              <Input required name="Domicilio fiscal o direccion" placeholder="Direccion del consumidor" />
+            <Field label="Domicilio fiscal o dirección">
+              <Input required name="Domicilio fiscal o dirección" placeholder="Dirección del consumidor" />
             </Field>
-            <Field label="Correo electronico">
-              <Input required name="Correo electronico" type="email" placeholder="correo@dominio.com" />
+            <Field label="Correo electrónico">
+              <Input required name="Correo electrónico" type="email" placeholder="correo@dominio.com" />
             </Field>
             <Field label="Celular">
               <Input required name="Celular" type="tel" placeholder="+51 999 999 999" />
@@ -140,7 +140,7 @@ export default function ComplaintsBookPage() {
           </div>
         </Section>
 
-        <Section title="3. Datos del servicio contratado" description="Ayudanos a identificar la reserva o servicio relacionado.">
+        <Section title="3. Datos del servicio contratado" description="Ayudaños a identificar la reserva o servicio relacionado.">
           <div className="grid gap-4 md:grid-cols-2">
             <Field label="Nombre del servicio o producto contratado">
               <Input required name="Nombre del servicio o producto contratado" placeholder="Ej. Machu Picchu Full Day" />
@@ -152,7 +152,7 @@ export default function ComplaintsBookPage() {
               <Input required name="Monto reclamado" inputMode="decimal" placeholder="Ej. S/ 250.00" />
             </Field>
             <Field label="Numero de reserva o comprobante (opcional)">
-              <Input name="Numero de reserva o comprobante" placeholder="Codigo, boleta o comprobante" />
+              <Input name="Numero de reserva o comprobante" placeholder="Código, boleta o comprobante" />
             </Field>
           </div>
         </Section>
@@ -166,7 +166,7 @@ export default function ComplaintsBookPage() {
               </select>
             </Field>
             <Field label="Detalle de incidencia">
-              <Textarea required name="Detalle de incidencia" placeholder="Describe los hechos, fecha, personas involucradas y cualquier informacion relevante." className="min-h-36" />
+              <Textarea required name="Detalle de incidencia" placeholder="Describe los hechos, fecha, personas involucradas y cualquier información relevante." className="min-h-36" />
             </Field>
             <Field label="Pedido concreto del consumidor">
               <Textarea required name="Pedido concreto del consumidor" placeholder="Indica la solucion solicitada." className="min-h-28" />
@@ -191,7 +191,7 @@ export default function ComplaintsBookPage() {
 
         <div className="rounded-lg border border-gold/20 bg-gold/10 p-5 text-sm leading-7 text-charcoal/72">
           <ClipboardList className="mb-3 size-6 text-gold" />
-          La constancia generada en esta pagina confirma el registro digital de tu comunicacion. Conserva el codigo de reclamo para seguimiento.
+          La constancia generada en esta página confirma el registro digital de tu comunicacion. Conserva el código de reclamo para seguimiento.
         </div>
       </form>
     </LegalPage>

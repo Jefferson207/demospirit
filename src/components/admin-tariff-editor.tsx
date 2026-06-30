@@ -43,13 +43,13 @@ type FeedRecord = Tariff["feed"][number];
 type CancellationRecord = Tariff["cancellationPolicies"][number];
 
 const tabs: Array<{ id: AdminTab; label: string; helper: string }> = [
-  { id: "tour", label: "Tours clasicos", helper: "Experiencias y excursiones vendibles." },
-  { id: "paquete", label: "Paquetes", helper: "Programas por dias, noches y categoria hotelera." },
+  { id: "tour", label: "Tours clásicos", helper: "Experiencias y excursiones vendibles." },
+  { id: "paquete", label: "Paquetes", helper: "Programas por días, noches y categoría hotelera." },
   { id: "hotel", label: "Hoteles", helper: "Servicios hoteleros publicados como producto." },
-  { id: "feed", label: "Alimentacion", helper: "Desayuno, almuerzo, cenas y dietas." },
-  { id: "policies", label: "Politicas", helper: "Reserva, cancelacion y reembolsos." },
+  { id: "feed", label: "Alimentación", helper: "Desayuno, almuerzo, cenas y dietas." },
+  { id: "policies", label: "Políticas", helper: "Reserva, cancelacion y reembolsos." },
   { id: "legal", label: "Info legal", helper: "RUC, constancias y comunicados." },
-  { id: "contact", label: "Contacto", helper: "Direccion, telefonos y redes." },
+  { id: "contact", label: "Contacto", helper: "Dirección, teléfonos y redes." },
   { id: "advanced", label: "JSON", helper: "Importar, exportar y restaurar." }
 ];
 
@@ -120,23 +120,23 @@ function slugify(value: string) {
 }
 
 function defaultService(type: ServiceSection): EditableTravelService {
-  const name = type === "paquete" ? "Nuevo paquete turistico" : type === "hotel" ? "Nuevo hotel" : "Nuevo tour";
+  const name = type === "paquete" ? "Nuevo paquete turístico" : type === "hotel" ? "Nuevo hotel" : "Nuevo tour";
 
   return {
     nombre: name,
     slug: slugify(name),
-    categoria: type === "paquete" ? "Paquete turistico" : type === "hotel" ? "Hotel" : "Cultura",
+    categoria: type === "paquete" ? "Paquete turístico" : type === "hotel" ? "Hotel" : "Cultura",
     etiqueta: "Nuevo" as TravelService["etiqueta"],
     descripcionCorta: "Descripcion breve del servicio.",
-    descripcionCompleta: "Descripcion completa del servicio turistico.",
-    duracion: type === "paquete" ? "4 dias / 3 noches" : "Full day",
+    descripcionCompleta: "Descripcion completa del servicio turístico.",
+    duracion: type === "paquete" ? "4 días / 3 noches" : "Full day",
     dificultad: "Moderado",
     precio: null,
     moneda: type === "paquete" ? "USD" : "PEN",
     precioTexto: type === "paquete" ? "Consultar" : "Desde S/ 95",
     reservas: 0,
     rating: 5,
-    incluye: ["Transporte turistico", "Guia profesional"],
+    incluye: ["Transporte turístico", "Guía profesional"],
     noIncluye: ["Gastos personales"],
     queLlevar: ["Documento", "Ropa comoda"],
     recomendaciones: ["Reservar con anticipacion"],
@@ -154,8 +154,8 @@ function defaultService(type: ServiceSection): EditableTravelService {
     precioNeto: type === "paquete" ? 0 : undefined,
     comisionAgencia: type === "paquete" ? "10%, 15% o 20%" : undefined,
     tarifaVentaSugerida: type === "paquete" ? "Consultar" : undefined,
-    serviciosIncluidos: type === "paquete" ? ["Recepcion", "Traslados", "Hotel", "Tren", "Bus", "Entrada", "Guia", "Desayunos"] : undefined,
-    diasNoches: type === "paquete" ? "4 dias / 3 noches" : undefined,
+    serviciosIncluidos: type === "paquete" ? ["Recepcion", "Traslados", "Hotel", "Tren", "Bus", "Entrada", "Guía", "Desayunos"] : undefined,
+    diasNoches: type === "paquete" ? "4 días / 3 noches" : undefined,
     tablaPreciosHotel: type === "paquete" ? [] : undefined
   };
 }
@@ -395,7 +395,7 @@ export function AdminTariffEditor() {
     }));
     setFeedDraft(null);
     setEditingFeedIndex(null);
-    setMessage("Alimentacion lista. Presiona Guardar cambios para publicarla.");
+    setMessage("Alimentación lista. Presiona Guardar cambios para publicarla.");
   };
 
   const saveReservationPolicy = () => {
@@ -462,8 +462,8 @@ export function AdminTariffEditor() {
         </div>
         <div className="rounded-lg border border-black/10 bg-white p-5 shadow-sm">
           <ImageUp className="size-8 rounded-full bg-gold/15 p-1.5 text-obsidian" />
-          <h2 className="mt-4 text-base font-black text-obsidian">Imagenes</h2>
-          <p className="mt-2 text-sm leading-6 text-charcoal/68">Sube imagenes al hosting y asigna la URL al servicio.</p>
+          <h2 className="mt-4 text-base font-black text-obsidian">Imágenes</h2>
+          <p className="mt-2 text-sm leading-6 text-charcoal/68">Sube imágenes al hosting y asigna la URL al servicio.</p>
         </div>
         <div className="rounded-lg border border-black/10 bg-white p-5 shadow-sm">
           <CheckCircle2 className="size-8 rounded-full bg-obsidian/10 p-1.5 text-obsidian" />
@@ -655,7 +655,7 @@ export function AdminTariffEditor() {
 
         {activeTab === "legal" && (
           <LegalManager
-            value={tariff.legalInfo ?? { active: true, items: ["RUC 20615956997", "Razon social: SPIRIT QOSQO E.I.R.L"] }}
+            value={tariff.legalInfo ?? { active: true, items: ["RUC 20615956997", "Razón social: SPIRIT QOSQO E.I.R.L"] }}
             onChange={(legalInfo) => setTariff((current) => ({ ...current, legalInfo }))}
           />
         )}
@@ -763,10 +763,10 @@ function ServiceEditor({
               </Field>
               <Field label="Etiqueta">
                 <select value={String(draft.etiqueta)} onChange={(event) => set("etiqueta", event.target.value as TravelService["etiqueta"])} className="h-12 rounded-2xl border border-black/10 bg-white px-4 text-sm">
-                  {["Mas vendido", "Popular", "Oferta", "Nuevo", "MÃ¡s vendido"].map((item) => <option key={item}>{item}</option>)}
+                  {["Más vendido", "Popular", "Oferta", "Nuevo", "Más vendido"].map((item) => <option key={item}>{item}</option>)}
                 </select>
               </Field>
-              <Field label="Categoria">
+              <Field label="Categoría">
                 <Input value={draft.categoria} onChange={(event) => set("categoria", event.target.value)} />
               </Field>
               <Field label="Duracion">
@@ -860,13 +860,13 @@ function ServiceEditor({
 
             {draft.tipoServicio === "paquete" && (
               <div className="grid gap-4 rounded-lg border border-gold/25 bg-gold/10 p-5 md:grid-cols-2">
-                <Field label="Dias y noches">
+                <Field label="Días y noches">
                   <Input value={draft.diasNoches ?? draft.duracion} onChange={(event) => set("diasNoches", event.target.value)} />
                 </Field>
                 <Field label="Noches hotel">
                   <Input type="number" value={draft.nochesHotel ?? ""} onChange={(event) => set("nochesHotel", Number(event.target.value))} />
                 </Field>
-                <Field label="Categoria hotel">
+                <Field label="Categoría hotel">
                   <select value={draft.categoriaHotel ?? "3 estrellas"} onChange={(event) => set("categoriaHotel", event.target.value as EditableTravelService["categoriaHotel"])} className="h-12 rounded-2xl border border-black/10 bg-white px-4 text-sm">
                     {["2 estrellas", "3 estrellas", "4 estrellas", "5 estrellas"].map((item) => <option key={item}>{item}</option>)}
                   </select>
@@ -874,7 +874,7 @@ function ServiceEditor({
                 <Field label="Precio neto">
                   <Input type="number" value={draft.precioNeto ?? ""} onChange={(event) => set("precioNeto", Number(event.target.value))} />
                 </Field>
-                <Field label="Comision agencia">
+                <Field label="Comisión agencia">
                   <Input value={draft.comisionAgencia ?? ""} onChange={(event) => set("comisionAgencia", event.target.value)} />
                 </Field>
                 <Field label="Tarifa venta sugerida">
@@ -883,7 +883,7 @@ function ServiceEditor({
                 <Field label="Servicios incluidos, uno por linea">
                   <Textarea value={lines(draft.serviciosIncluidos)} onChange={(event) => set("serviciosIncluidos", toLines(event.target.value))} />
                 </Field>
-                <Field label="Tabla de precios: Categoria | Neto | Comision | Venta sugerida">
+                <Field label="Tabla de precios: Categoría | Neto | Comisión | Venta sugerida">
                   <Textarea value={priceTableToText(draft.tablaPreciosHotel)} onChange={(event) => set("tablaPreciosHotel", textToPriceTable(event.target.value))} />
                 </Field>
               </div>
@@ -951,9 +951,9 @@ function FullPreviewContent({ service, compact = false }: { service: EditableTra
             <div className="rounded-lg border border-gold/25 bg-gold/10 p-4 text-sm text-charcoal/76">
               <h4 className="font-black text-obsidian">Datos del paquete</h4>
               <p className="mt-2">Dias/noches: {service.diasNoches || service.duracion}</p>
-              <p>Categoria hotel: {service.categoriaHotel ?? "Consultar"}</p>
+              <p>Categoría hotel: {service.categoriaHotel ?? "Consultar"}</p>
               <p>Precio neto: {service.precioNeto ? `${service.moneda} ${service.precioNeto}` : "Consultar"}</p>
-              <p>Comision: {service.comisionAgencia ?? "Consultar"}</p>
+              <p>Comisión: {service.comisionAgencia ?? "Consultar"}</p>
               <p>Venta sugerida: {service.tarifaVentaSugerida ?? "Consultar"}</p>
             </div>
           )}
@@ -1004,7 +1004,7 @@ function TariffHotelsManager({
 }) {
   return (
     <div className="mt-6 grid gap-5">
-      <Button type="button" variant="gold" className="w-fit" onClick={onNew}><Plus className="size-4" />Nueva categoria hotelera</Button>
+      <Button type="button" variant="gold" className="w-fit" onClick={onNew}><Plus className="size-4" />Nueva categoría hotelera</Button>
       <div className="grid gap-4 md:grid-cols-2">
         {hotels.map((item, index) => (
           <article key={`${item.category}-${index}`} className="rounded-lg border border-black/10 bg-[#F8F6F0] p-4">
@@ -1032,7 +1032,7 @@ function TariffHotelsManager({
         <div className="rounded-lg border border-gold/25 bg-gold/10 p-5">
           <h3 className="font-black text-obsidian">{editingIndex === null ? "Nueva categoria" : "Editar categoria"}</h3>
           <div className="mt-4 grid gap-4 md:grid-cols-3">
-            <Field label="Categoria"><Input value={draft.category} onChange={(event) => onDraft({ ...draft, category: event.target.value })} /></Field>
+            <Field label="Categoría"><Input value={draft.category} onChange={(event) => onDraft({ ...draft, category: event.target.value })} /></Field>
             <Field label="Rango de precio"><Input value={draft.priceRange} onChange={(event) => onDraft({ ...draft, priceRange: event.target.value })} /></Field>
             <label className="flex items-center gap-3 rounded-2xl bg-white px-4 py-3 text-sm font-bold text-obsidian"><input type="checkbox" checked={draft.active !== false} onChange={(event) => onDraft({ ...draft, active: event.target.checked })} />Activo</label>
             <Field label="Hoteles, uno por linea"><Textarea value={lines(draft.hotels)} onChange={(event) => onDraft({ ...draft, hotels: toLines(event.target.value) })} className="md:col-span-3" /></Field>
@@ -1140,7 +1140,7 @@ function PoliciesManager({
     <div className="mt-6 grid gap-6 lg:grid-cols-2">
       <div className="grid content-start gap-4">
         <div className="flex items-center justify-between gap-3">
-          <h3 className="font-black text-obsidian">Politicas de reserva</h3>
+          <h3 className="font-black text-obsidian">Políticas de reserva</h3>
           <Button type="button" size="sm" variant="gold" onClick={() => onReservationDraft("")}><Plus className="size-4" />Nueva</Button>
         </div>
         {tariff.reservationPolicies.map((item, index) => (
@@ -1154,7 +1154,7 @@ function PoliciesManager({
         ))}
         {(reservationDraft || editingReservationIndex !== null) && (
           <div className="rounded-lg border border-gold/25 bg-gold/10 p-4">
-            <Field label="Politica"><Textarea value={reservationDraft} onChange={(event) => onReservationDraft(event.target.value)} /></Field>
+            <Field label="Política"><Textarea value={reservationDraft} onChange={(event) => onReservationDraft(event.target.value)} /></Field>
             <Button type="button" variant="gold" className="mt-3" onClick={onSaveReservation}>Guardar politica</Button>
           </div>
         )}
@@ -1162,7 +1162,7 @@ function PoliciesManager({
 
       <div className="grid content-start gap-4">
         <div className="flex items-center justify-between gap-3">
-          <h3 className="font-black text-obsidian">Cancelaciones y reembolsos</h3>
+          <h3 className="font-black text-obsidian">Cancelaciónes y reembolsos</h3>
           <Button type="button" size="sm" variant="gold" onClick={onNewCancellation}><Plus className="size-4" />Nueva</Button>
         </div>
         {tariff.cancellationPolicies.map((item, index) => (
@@ -1192,7 +1192,7 @@ function PoliciesManager({
 function LegalManager({ value, onChange }: { value: NonNullable<Tariff["legalInfo"]>; onChange: (value: NonNullable<Tariff["legalInfo"]>) => void }) {
   return (
     <div className="mt-6 rounded-lg border border-black/10 bg-[#F8F6F0] p-5">
-      <label className="flex items-center gap-3 text-sm font-bold text-obsidian"><input type="checkbox" checked={value.active !== false} onChange={(event) => onChange({ ...value, active: event.target.checked })} />Informacion legal activa</label>
+      <label className="flex items-center gap-3 text-sm font-bold text-obsidian"><input type="checkbox" checked={value.active !== false} onChange={(event) => onChange({ ...value, active: event.target.checked })} />Información legal activa</label>
       <Field label="Items legales, uno por linea">
         <Textarea value={lines(value.items)} onChange={(event) => onChange({ ...value, items: toLines(event.target.value) })} className="mt-4 min-h-52" />
       </Field>
@@ -1204,8 +1204,8 @@ function ContactManager({ value, onChange }: { value: NonNullable<Tariff["contac
   return (
     <div className="mt-6 grid gap-4 rounded-lg border border-black/10 bg-[#F8F6F0] p-5 md:grid-cols-2">
       <label className="flex items-center gap-3 text-sm font-bold text-obsidian md:col-span-2"><input type="checkbox" checked={value.active !== false} onChange={(event) => onChange({ ...value, active: event.target.checked })} />Contacto activo</label>
-      <Field label="Direccion"><Input value={value.address} onChange={(event) => onChange({ ...value, address: event.target.value })} /></Field>
-      <Field label="Telefono"><Input value={value.phone} onChange={(event) => onChange({ ...value, phone: event.target.value })} /></Field>
+      <Field label="Dirección"><Input value={value.address} onChange={(event) => onChange({ ...value, address: event.target.value })} /></Field>
+      <Field label="Teléfono"><Input value={value.phone} onChange={(event) => onChange({ ...value, phone: event.target.value })} /></Field>
       <Field label="WhatsApp"><Input value={value.whatsapp} onChange={(event) => onChange({ ...value, whatsapp: event.target.value })} /></Field>
       <Field label="Correo"><Input value={value.email} onChange={(event) => onChange({ ...value, email: event.target.value })} /></Field>
       <Field label="Web"><Input value={value.website} onChange={(event) => onChange({ ...value, website: event.target.value })} /></Field>

@@ -20,7 +20,7 @@ const dmSerif = DM_Serif_Display({
 
 const siteName = company.tradeName;
 const businessDescription =
-  "Descubre Cusco con Spirit Qosqo Travel. City Tour, Machu Picchu, Valle Sagrado, Montana de Colores, Laguna Humantay y experiencias premium con guias profesionales.";
+  "Descubre Cusco con Spirit Qosqo Travel. City Tour, Machu Picchu, Valle Sagrado, Montaña de Colores, Laguna Humantay y experiencias premium con guías profesionales.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     "tours en Cusco",
     "Machu Picchu full day",
     "Valle Sagrado",
-    "Montana de Colores",
+    "Montaña de Colores",
     "Laguna Humantay",
     "City Tour Cusco",
     "tours privados Cusco",
@@ -138,7 +138,7 @@ const travelAgencySchema = {
     "@type": "GeoCoordinates",
     address: company.contactAddress
   },
-  areaServed: ["Cusco", "Machu Picchu", "Valle Sagrado", "Montana de Colores", "Laguna Humantay"],
+  areaServed: ["Cusco", "Machu Picchu", "Valle Sagrado", "Montaña de Colores", "Laguna Humantay"],
   openingHours: "Mo-Su 08:00-20:00",
   priceRange: "$$",
   sameAs: [company.facebook, company.instagram, `https://wa.me/${company.whatsappNumber}`]
@@ -165,9 +165,9 @@ const tourCatalogSchema = {
   "@type": "ItemList",
   name: "Tours destacados en Cusco",
   itemListElement: [
-    "City Tour Clasico + Templo de la Luna + Zona X",
+    "City Tour Clásico + Templo de la Luna + Zona X",
     "Valle Sagrado",
-    "Montana de Colores",
+    "Montaña de Colores",
     "Laguna Humantay",
     "Machu Picchu Full Day",
     "Maras y Moray",

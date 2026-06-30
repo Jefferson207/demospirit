@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 const consentText =
-  "Debe aceptar la Politica de Privacidad, la Politica de Proteccion de Datos Personales y los Terminos y Condiciones para continuar.";
+  "Debe aceptar la Política de Privacidad, la Política de Protección de Datos Personales y los Términos y Condiciones para continuar.";
 
 export function LegalConsent({
   checked,
@@ -28,15 +28,15 @@ export function LegalConsent({
         <span>
           Acepto la{" "}
           <Link href="/politica-privacidad" target="_blank" className="text-obsidian underline underline-offset-4">
-            Politica de Privacidad
+            Política de Privacidad
           </Link>
           , la{" "}
           <Link href="/politica-proteccion-datos-personales" target="_blank" className="text-obsidian underline underline-offset-4">
-            Politica de Proteccion de Datos Personales
+            Política de Protección de Datos Personales
           </Link>{" "}
           y los{" "}
           <Link href="/terminos-y-condiciones" target="_blank" className="text-obsidian underline underline-offset-4">
-            Terminos y Condiciones
+            Términos y Condiciones
           </Link>
           .
         </span>

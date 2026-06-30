@@ -5,7 +5,7 @@ import { company, whatsappReservationUrl } from "@/lib/company";
 
 const quickLinks = [
   ["Inicio", "/#inicio"],
-  ["Nosotros", "/#nosotros"],
+  ["Nosotros", "/nosotros"],
   ["Tours", "/#tours"],
   ["Contacto", "/#contacto"],
   ["Tarifario", "/tarifario"],
@@ -14,11 +14,11 @@ const quickLinks = [
 ];
 
 const legalLinks = [
-  ["Politica de Privacidad", "/politica-privacidad"],
-  ["Politica de Proteccion de Datos Personales", "/politica-proteccion-datos-personales"],
-  ["Terminos y Condiciones", "/terminos-y-condiciones"],
+  ["Política de Privacidad", "/politica-privacidad"],
+  ["Política de Protección de Datos Personales", "/politica-proteccion-datos-personales"],
+  ["Términos y Condiciones", "/terminos-y-condiciones"],
   ["Medios de Pago", "/medios-de-pago"],
-  ["Politica de Cookies", "/politica-cookies"]
+  ["Política de Cookies", "/politica-cookies"]
 ];
 
 export function SiteFooter() {
@@ -28,10 +28,10 @@ export function SiteFooter() {
         <div>
           <BrandLogo inverse />
           <p className="mt-5 max-w-md leading-7 text-white/68">
-            Agencia de viajes y turismo en Cusco para experiencias culturales, naturaleza, aventura y atencion personalizada por canales digitales.
+            Agencia de viajes y turismo en Cusco para experiencias culturales, naturaleza, aventura y atención personalizada por canales digitales.
           </p>
           <div className="mt-5 grid gap-2 text-sm text-white/72">
-            <p><span className="font-bold text-gold-soft">Razon social:</span> {company.legalName}</p>
+            <p><span className="font-bold text-gold-soft">Razón social:</span> {company.legalName}</p>
             <p><span className="font-bold text-gold-soft">Nombre comercial:</span> {company.tradeName}</p>
             <p><span className="font-bold text-gold-soft">RUC:</span> {company.ruc}</p>
             <p><span className="font-bold text-gold-soft">Clasificacion:</span> {company.classification}</p>
@@ -70,7 +70,7 @@ export function SiteFooter() {
           </div>
           <div className="mt-5 rounded-lg border border-gold/24 bg-white/5 p-4 text-sm leading-6 text-white/70">
             <ShieldCheck className="mb-2 size-5 text-gold-soft" />
-            Publicamos informacion exigida para agencias digitales, prevencion ESNNA, politicas comerciales y proteccion de datos personales.
+            Publicamos información exigida para agencias digitales, prevención ESNNA, políticas comerciales y protección de datos personales.
           </div>
         </div>
 

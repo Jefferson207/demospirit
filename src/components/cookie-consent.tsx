@@ -30,10 +30,10 @@ export function CookieConsent() {
         <div>
           <h2 className="font-bold text-obsidian">Privacidad y cookies</h2>
           <p className="mt-1 text-sm leading-6 text-charcoal/68">
-            Usamos cookies tecnicas y, con tu consentimiento, cookies de analitica para mejorar la experiencia de reserva. Puedes revisar nuestra politica de cookies y proteccion de datos.
+            Usamos cookies técnicas y, con tu consentimiento, cookies de analítica para mejorar la experiencia de reserva. Puedes revisar nuestra política de cookies y protección de datos.
           </p>
           <div className="mt-3 flex flex-wrap gap-3 text-sm font-bold">
-            <Link href="/politica-cookies" className="text-obsidian underline-offset-4 hover:underline">Politica de cookies</Link>
+            <Link href="/politica-cookies" className="text-obsidian underline-offset-4 hover:underline">Política de cookies</Link>
             <Link href="/politica-proteccion-datos-personales" className="text-obsidian underline-offset-4 hover:underline">Datos personales</Link>
           </div>
         </div>

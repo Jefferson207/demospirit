@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminLoginPage() {
-  if (await isAdminAuthenticated()) redirect("/admin/tarifario");
+  if (await isAdminAuthenticated()) redirect("/admin");
 
   return (
     <main className="bg-[#F8F6F0] px-4 py-12 sm:py-16">
@@ -21,23 +21,15 @@ export default async function AdminLoginPage() {
           <BrandLogo inverse />
           <div className="mt-12 max-w-sm">
             <p className="text-sm font-bold uppercase tracking-[0.22em] text-gold">Panel seguro</p>
-            <h1 className="mt-4 text-3xl font-black leading-tight sm:text-4xl">Administrador de tarifario y contenido turistico</h1>
-            <p className="mt-5 text-sm leading-7 text-white/72">
-              Gestiona tarifas, servicios, imagenes y datos publicados desde un entorno privado con sesion protegida.
-            </p>
-          </div>
-          <div className="mt-10 grid gap-3 text-sm text-white/78">
-            <p className="rounded-lg border border-white/12 bg-white/8 p-4">Conexion preparada para Upstash Redis.</p>
-            <p className="rounded-lg border border-white/12 bg-white/8 p-4">Subida de imagenes mediante el endpoint del hosting.</p>
+            <h1 className="mt-4 text-3xl font-black leading-tight sm:text-4xl">Administrador</h1>
+            <p className="mt-5 text-sm leading-7 text-white/72">Acceso privado para gestionar el contenido publicado en la web.</p>
           </div>
         </div>
 
         <div className="p-8 sm:p-10">
           <p className="text-sm font-bold uppercase tracking-[0.22em] text-emerald">Acceso privado</p>
           <h2 className="mt-3 text-2xl font-black text-obsidian">Iniciar sesion</h2>
-          <p className="mt-3 text-sm leading-7 text-charcoal/68">
-            Ingresa las credenciales administrativas configuradas en el servidor. La sesion se guarda en una cookie segura HTTP-only.
-          </p>
+          <p className="mt-3 text-sm leading-7 text-charcoal/68">Ingresa la contrasena del administrador.</p>
           <div className="mt-8">
             <AdminLoginForm />
           </div>

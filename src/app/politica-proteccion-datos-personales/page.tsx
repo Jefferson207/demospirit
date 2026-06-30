@@ -4,25 +4,25 @@ import { LegalPage } from "@/components/legal-page";
 import { company } from "@/lib/company";
 
 export const metadata: Metadata = {
-  title: "Politica de Proteccion de Datos Personales",
-  description: "Politica profesional de proteccion de datos personales de Spirit Qosqo Travel conforme a la Ley N. 29733 y su Reglamento."
+  title: "Política de Protección de Datos Personales",
+  description: "Política profesional de protección de datos personales de Spirit Qosqo Travel conforme a la Ley N. 29733 y su Reglamento."
 };
 
 const sections = [
   {
     icon: UserCheck,
     title: "Responsable del tratamiento",
-    text: `${company.legalName}, RUC: ${company.ruc}, correo: ${company.email}, telefono: ${company.phone}, con domicilio de contacto en ${company.contactAddress}.`
+    text: `${company.legalName}, RUC: ${company.ruc}, correo: ${company.email}, teléfono: ${company.phone}, con domicilio de contacto en ${company.contactAddress}.`
   },
   {
     icon: Database,
     title: "Datos personales que recopilamos",
-    text: "Nombres y apellidos, documento de identidad o pasaporte cuando corresponda, correo, telefono, WhatsApp, pais, idioma, hotel o punto de recojo, datos de pasajeros, preferencias de viaje, mensajes de consulta y constancias de pago."
+    text: "Nombres y apellidos, documento de identidad o pasaporte cuando corresponda, correo, teléfono, WhatsApp, pais, idioma, hotel o punto de recojo, datos de pasajeros, preferencias de viaje, mensajes de consulta y constancias de pago."
   },
   {
     icon: Scale,
     title: "Base legal",
-    text: "Tratamos los datos conforme a la Ley N. 29733, Ley de Proteccion de Datos Personales, su Reglamento y el consentimiento otorgado por el usuario al enviar formularios, reservar o contratar servicios."
+    text: "Tratamos los datos conforme a la Ley N. 29733, Ley de Protección de Datos Personales, su Reglamento y el consentimiento otorgado por el usuario al enviar formularios, reservar o contratar servicios."
   },
   {
     icon: LockKeyhole,
@@ -34,11 +34,11 @@ const sections = [
 const policyBlocks = [
   {
     title: "Introduccion",
-    text: `La privacidad del viajero es prioritaria. Esta politica se aplica a toda persona que entregue datos personales a ${company.tradeName} mediante formularios web, WhatsApp, correo electronico, redes sociales, llamadas o cualquier canal digital administrado por la agencia.`
+    text: `La privacidad del viajero es prioritaria. Esta politica se aplica a toda persona que entregue datos personales a ${company.tradeName} mediante formularios web, WhatsApp, correo electrónico, redes sociales, llamadas o cualquier canal digital administrado por la agencia.`
   },
   {
     title: "Finalidad del tratamiento",
-    text: "Usamos los datos para atender consultas, verificar disponibilidad, elaborar cotizaciones, gestionar reservas, emitir vouchers, coordinar recojos, operar tours, procesar pagos, cumplir obligaciones administrativas, tributarias y de atencion al consumidor, responder reclamos y brindar soporte antes, durante y despues del servicio."
+    text: "Usamos los datos para atender consultas, verificar disponibilidad, elaborar cotizaciones, gestionar reservas, emitir vouchers, coordinar recojos, operar tours, procesar pagos, cumplir obligaciones administrativas, tributarias y de atención al consumidor, responder reclamos y brindar soporte antes, durante y despues del servicio."
   },
   {
     title: "Conservacion de los datos",
@@ -46,11 +46,11 @@ const policyBlocks = [
   },
   {
     title: "Transferencia de datos",
-    text: "Cuando sea necesario para prestar el servicio, podremos compartir datos estrictamente indispensables con hoteles, operadores turisticos, guias, transportistas, proveedores de tickets, empresas ferroviarias, entidades financieras o autoridades competentes. Estas transferencias se realizan bajo criterios de necesidad, proporcionalidad y confidencialidad."
+    text: "Cuando sea necesario para prestar el servicio, podremos compartir datos estrictamente indispensables con hoteles, operadores turísticos, guías, transportistas, proveedores de tickets, empresas ferroviarias, entidades financieras o autoridades competentes. Estas transferencias se realizan bajo criterios de necesidad, proporcionalidad y confidencialidad."
   },
   {
     title: "Derechos ARCO",
-    text: "El titular de los datos puede ejercer sus derechos de Acceso, Rectificacion, Cancelacion y Oposicion. Tambien puede solicitar informacion sobre el uso de sus datos, actualizar informacion inexacta, pedir la supresion cuando corresponda u oponerse al tratamiento para finalidades no necesarias."
+    text: "El titular de los datos puede ejercer sus derechos de Acceso, Rectificación, Cancelación y Oposición. También puede solicitar información sobre el uso de sus datos, actualizar información inexacta, pedir la supresión cuando corresponda u oponerse al tratamiento para finalidades no necesarias."
   },
   {
     title: "Procedimiento para ejercer derechos ARCO",
@@ -58,7 +58,7 @@ const policyBlocks = [
   },
   {
     title: "Correo de contacto",
-    text: `Para consultas sobre privacidad, tratamiento de datos personales o derechos ARCO, escribe a ${company.email} o comunicate al ${company.phone}.`
+    text: `Para consultas sobre privacidad, tratamiento de datos personales o derechos ARCO, escribe a ${company.email} o comunícate al ${company.phone}.`
   }
 ];
 
@@ -66,8 +66,8 @@ export default function PersonalDataProtectionPage() {
   return (
     <LegalPage
       eyebrow="Ley N. 29733"
-      title="Politica de Proteccion de Datos Personales"
-      description="Esta politica informa de forma clara como Spirit Qosqo Travel recopila, usa, conserva, transfiere y protege los datos personales recibidos por su pagina web, WhatsApp, correo electronico, formularios y canales digitales."
+      title="Política de Protección de Datos Personales"
+      description="Esta política informa de forma clara como Spirit Qosqo Travel recopila, usa, conserva, transfiere y protege los datos personales recibidos por su página web, WhatsApp, correo electrónico, formularios y canales digitales."
     >
       <div className="not-prose grid gap-4 md:grid-cols-2">
         {sections.map(({ icon: Icon, title, text }) => (

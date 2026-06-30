@@ -3,30 +3,30 @@ import { LegalPage } from "@/components/legal-page";
 import { company } from "@/lib/company";
 
 export const metadata: Metadata = {
-  title: "Politica de Proteccion de Datos Personales",
-  description: "Politica de tratamiento de datos personales de Spirit Qosqo Travel conforme a la Ley N. 29733."
+  title: "Política de Protección de Datos Personales",
+  description: "Política de tratamiento de datos personales de Spirit Qosqo Travel conforme a la Ley N. 29733."
 };
 
 const dataPolicyItems = [
   {
     title: "Responsable del tratamiento",
-    text: `${company.legalName}, con nombre comercial ${company.tradeName}, es responsable del tratamiento de los datos personales que el usuario proporcione para consultas, reservas, pagos, atencion posventa y cumplimiento de obligaciones legales.`
+    text: `${company.legalName}, con nombre comercial ${company.tradeName}, es responsable del tratamiento de los datos personales que el usuario proporcione para consultas, reservas, pagos, atención posventa y cumplimiento de obligaciones legales.`
   },
   {
     title: "Datos que solicitamos",
-    text: "Podemos solicitar nombres, documento de identidad o pasaporte cuando corresponda, correo, telefono, WhatsApp, pais de origen, hotel o punto de recojo, datos de viajeros, preferencias de idioma, mensajes de consulta y comprobantes de pago."
+    text: "Podemos solicitar nombres, documento de identidad o pasaporte cuando corresponda, correo, teléfono, WhatsApp, pais de origen, hotel o punto de recojo, datos de viajeros, preferencias de idioma, mensajes de consulta y comprobantes de pago."
   },
   {
     title: "Finalidades",
-    text: "Usamos los datos para atender consultas, verificar disponibilidad, gestionar reservas, emitir vouchers, coordinar servicios turisticos, procesar pagos por medios verificados, cumplir obligaciones tributarias y comerciales, responder reclamos y enviar comunicaciones relacionadas con el servicio contratado."
+    text: "Usamos los datos para atender consultas, verificar disponibilidad, gestionar reservas, emitir vouchers, coordinar servicios turísticos, procesar pagos por medios verificados, cumplir obligaciones tributarias y comerciales, responder reclamos y enviar comunicaciones relacionadas con el servicio contratado."
   },
   {
     title: "Base de consentimiento",
-    text: "El usuario autoriza el tratamiento al enviar formularios, iniciar conversaciones por WhatsApp, aceptar politicas durante la reserva o contratar un servicio. El consentimiento puede ser revocado sin afectar obligaciones pendientes derivadas de servicios ya contratados."
+    text: "El usuario autoriza el tratamiento al enviar formularios, iniciar conversaciones por WhatsApp, aceptar políticas durante la reserva o contratar un servicio. El consentimiento puede ser revocado sin afectar obligaciones pendientes derivadas de servicios ya contratados."
   },
   {
     title: "Transferencias necesarias",
-    text: "Cuando sea necesario para prestar el servicio, podremos compartir datos estrictamente requeridos con guias, operadores, empresas de transporte, hospedajes, proveedores de tickets, entidades financieras o autoridades competentes. No vendemos bases de datos."
+    text: "Cuando sea necesario para prestar el servicio, podremos compartir datos estrictamente requeridos con guías, operadores, empresas de transporte, hospedajes, proveedores de tickets, entidades financieras o autoridades competentes. No vendemos bases de datos."
   },
   {
     title: "Seguridad",
@@ -46,7 +46,7 @@ export default function DataProtectionPage() {
   return (
     <LegalPage
       eyebrow="Ley N. 29733"
-      title="Politica de Proteccion de Datos Personales"
+      title="Política de Protección de Datos Personales"
       description="Informamos como recolectamos, usamos, conservamos y protegemos los datos personales recibidos por nuestra web, WhatsApp, correo y formularios de reserva."
     >
       <div className="not-prose grid gap-4">
