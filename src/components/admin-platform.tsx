@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Download, Eye, Pencil, Plus, Save, Search, Trash2, Upload, X } from "lucide-react";
+import Image from "next/image";
+import { Eye, Pencil, Plus, Save, Search, Trash2, Upload, X } from "lucide-react";
 import { AdminLogoutButton } from "@/components/admin-logout-button";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { adminFieldLabels, adminSchemas, defaultAdminContent, type AdminContent, type AdminReservation } from "@/lib/admin-content";
 import { cn } from "@/lib/utils";
 
-type ModuleKey = "dashboard" | "tours" | "packages" | "hotels" | "reservations" | "clients" | "extras" | "categories" | "settings" | "users";
+type ModuleKey = "dashboard" | "tours" | "packages" | "hotels" | "reservations" | "extras" | "categories" | "paymentMethods" | "settings";
 
 const modules: Array<{ key: ModuleKey; label: string }> = [
   { key: "dashboard", label: "Dashboard" },
@@ -19,6 +20,7 @@ const modules: Array<{ key: ModuleKey; label: string }> = [
   { key: "reservations", label: "Reservas" },
   { key: "extras", label: "Extras" },
   { key: "categories", label: "Categorias" },
+  { key: "paymentMethods", label: "Medios de pago" },
   { key: "settings", label: "Configuracion" },
 ];
 
@@ -55,6 +57,7 @@ function normalizeContent(content?: Partial<AdminContent>): AdminContent {
     clients: Array.isArray(content?.clients) ? content.clients : defaultAdminContent.clients,
     extras: Array.isArray(content?.extras) ? content.extras : defaultAdminContent.extras,
     categories: Array.isArray(content?.categories) ? content.categories : defaultAdminContent.categories,
+    paymentMethods: Array.isArray(content?.paymentMethods) ? content.paymentMethods : defaultAdminContent.paymentMethods,
     settings: { ...defaultAdminContent.settings, ...(content?.settings ?? {}) },
     users: Array.isArray(content?.users) ? content.users : defaultAdminContent.users
   };
@@ -103,6 +106,20 @@ export function AdminPlatform() {
       ["Ingresos estimados", `USD ${reservations.reduce((sum, item) => sum + Number(item.total ?? 0), 0)}`]
     ];
   }, [content]);
+  const categoryOptions = useMemo(() => {
+    const options = (Array.isArray(content.categories) ? content.categories : [])
+      .filter((item) => item.status !== "Inactivo")
+      .map((item) => String(item.name ?? ""))
+      .filter(Boolean);
+
+    return options.length ? options : ["Tours", "Aventura", "Premium"];
+  }, [content.categories]);
+
+  const createRecord = (targetModule: ModuleKey) => {
+    const record = emptyRecord(targetModule);
+    if (targetModule === "tours") record.category = categoryOptions[0] ?? "";
+    return record;
+  };
 
   const saveContent = async (next = content) => {
     setSaving(true);
@@ -201,7 +218,7 @@ export function AdminPlatform() {
           {module !== "dashboard" && module !== "reservations" && (
             <div className="flex flex-wrap gap-2 md:justify-end">
               <Button variant="default" onClick={() => saveContent()} disabled={saving}><Save className="size-4" />{saving ? "Guardando..." : "Guardar"}</Button>
-              {module !== "settings" && <Button variant="gold" onClick={() => setEditing(emptyRecord(module))}><Plus className="size-4" />Nuevo</Button>}
+              {module !== "settings" && <Button variant="gold" onClick={() => setEditing(createRecord(module))}><Plus className="size-4" />Nuevo</Button>}
             </div>
           )}
         </div>
@@ -222,13 +239,13 @@ export function AdminPlatform() {
               </select>
             </div>
             {module === "reservations"
-              ? <ReservationsView reservations={currentList as unknown as AdminReservation[]} onOpen={setReservationDetail} onEdit={setEditing} onDelete={deleteRecord} />
+              ? <ReservationsView reservations={currentList as unknown as AdminReservation[]} onOpen={setReservationDetail} onDelete={deleteRecord} />
               : <RecordsGrid module={module} records={currentList} onEdit={setEditing} onDelete={deleteRecord} onDuplicate={duplicateRecord} onToggle={toggleRecord} />}
           </>
         )}
       </main>
 
-      {editing && <EditModal module={module} record={editing} onChange={setEditing} onClose={() => setEditing(null)} onSave={upsertRecord} />}
+      {editing && <EditModal module={module} record={editing} categoryOptions={categoryOptions} onChange={setEditing} onClose={() => setEditing(null)} onSave={upsertRecord} />}
       {reservationDetail && <ReservationModal reservation={reservationDetail} onClose={() => setReservationDetail(null)} onStatus={updateReservation} />}
       </div>
     </div>
@@ -240,14 +257,15 @@ function Dashboard({ stats, content, onOpenReservation, onSelectModule }: { stat
   const shortcuts: Array<{ label: string; description: string; module: ModuleKey }> = [
     { label: "Ver reservas", description: "Revisar solicitudes y cambiar estados.", module: "reservations" },
     { label: "Editar tours", description: "Actualizar experiencias publicadas.", module: "tours" },
-    { label: "Editar paquetes", description: "Gestionar paquetes turisticos.", module: "packages" }
+    { label: "Editar paquetes", description: "Gestionar paquetes turisticos.", module: "packages" },
+    { label: "Medios de pago", description: "Crear y actualizar las cards de pago.", module: "paymentMethods" }
   ];
   return (
     <div className="grid gap-5">
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map(([label, value]) => <div key={label} className="rounded-lg border border-black/10 bg-white p-4 shadow-sm"><p className="text-xs font-bold uppercase tracking-[0.14em] text-charcoal/45">{label}</p><p className="mt-2 text-2xl font-black text-obsidian">{value}</p></div>)}
       </div>
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {shortcuts.map((item) => (
           <button key={item.module} type="button" onClick={() => onSelectModule(item.module)} className="rounded-lg border border-black/10 bg-white p-4 text-left shadow-sm transition hover:border-gold/40 hover:bg-gold/8">
             <p className="font-black text-obsidian">{item.label}</p>
@@ -321,7 +339,7 @@ function RecordsGrid({
   );
 }
 
-function ReservationsView({ reservations, onOpen, onEdit, onDelete }: { reservations: AdminReservation[]; onOpen: (reservation: AdminReservation) => void; onEdit: (record: Record<string, unknown>) => void; onDelete: (record: Record<string, unknown>) => void }) {
+function ReservationsView({ reservations, onOpen, onDelete }: { reservations: AdminReservation[]; onOpen: (reservation: AdminReservation) => void; onDelete: (record: Record<string, unknown>) => void }) {
   return (
     <div className="grid gap-3">
       {reservations.map((item) => (
@@ -335,9 +353,8 @@ function ReservationsView({ reservations, onOpen, onEdit, onDelete }: { reservat
             <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-charcoal/45">Total</p><p className="font-black text-obsidian">USD {item.total}</p></div>
             <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-charcoal/45">Hotel</p><p className="text-sm font-semibold text-charcoal/75">{item.hotel || "No aplica"}</p></div>
           </div>
-          <div className="grid content-start gap-2 sm:grid-cols-3 xl:w-[260px] xl:grid-cols-1">
+          <div className="grid content-start gap-2 sm:grid-cols-2 xl:w-[180px] xl:grid-cols-1">
             <Button size="sm" variant="default" className="justify-center" onClick={() => onOpen(item)}><Eye className="size-4" />Ver</Button>
-            <Button size="sm" variant="ghost" className="justify-center" onClick={() => onEdit(item)}><Pencil className="size-4" />Editar</Button>
             <Button size="sm" variant="ghost" className="justify-center text-red-600 hover:text-red-700" onClick={() => onDelete(item)}><Trash2 className="size-4" />Eliminar</Button>
           </div>
         </article>
@@ -359,13 +376,56 @@ function SettingsEditor({ content, setContent, saveContent }: { content: AdminCo
           </label>
         ))}
       </div>
-      <Button className="mt-5" variant="gold" onClick={() => saveContent(content)}><Save className="size-4" />Guardar configuraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n</Button>
+      <Button className="mt-5" variant="gold" onClick={() => saveContent(content)}><Save className="size-4" />Guardar configuraciÃ³n</Button>
     </div>
   );
 }
 
-function EditModal({ module, record, onChange, onClose, onSave }: { module: ModuleKey; record: Record<string, unknown>; onChange: (record: Record<string, unknown>) => void; onClose: () => void; onSave: () => void }) {
+function EditModal({
+  module,
+  record,
+  categoryOptions,
+  onChange,
+  onClose,
+  onSave
+}: {
+  module: ModuleKey;
+  record: Record<string, unknown>;
+  categoryOptions: string[];
+  onChange: (record: Record<string, unknown>) => void;
+  onClose: () => void;
+  onSave: () => void;
+}) {
   const fields = moduleSchema(module);
+  const [uploadMessage, setUploadMessage] = useState("");
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const logoValue = String(record.logo ?? "");
+  const logoIsImage = logoValue.startsWith("http") || logoValue.startsWith("/");
+
+  const uploadLogo = async (file?: File) => {
+    if (!file) return;
+    setUploadingLogo(true);
+    setUploadMessage("Subiendo logo...");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await fetch("/api/upload-image", { method: "POST", body: formData });
+      const payload = await response.json();
+      if (!response.ok || !payload.ok) throw new Error(payload.error ?? "No se pudo subir el logo.");
+
+      const possibleUrl = payload.payload?.url ?? payload.payload?.file ?? payload.payload?.path ?? payload.payload?.body ?? "";
+      if (!possibleUrl) throw new Error("La subida termino, pero no se encontro una URL.");
+
+      onChange({ ...record, logo: possibleUrl });
+      setUploadMessage("Logo cargado. Guarda el registro para publicarlo.");
+    } catch (error) {
+      setUploadMessage(error instanceof Error ? error.message : "No se pudo subir el logo.");
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[95] overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
       <div className="mx-auto max-w-5xl rounded-lg bg-[#F8F6F0] shadow-xl">
@@ -375,7 +435,7 @@ function EditModal({ module, record, onChange, onClose, onSave }: { module: Modu
         </div>
         <div className="grid gap-4 p-5 md:grid-cols-2">
           {fields.map((field) => {
-            const isLong = ["description", "shortDescription", "gallery", "includes", "excludes", "bring", "itinerary", "faqs", "policies", "services", "permissions", "history"].includes(field);
+            const isLong = ["description", "shortDescription", "gallery", "includes", "excludes", "bring", "itinerary", "faqs", "policies", "services", "permissions", "history", "fieldRows", "details"].includes(field);
             const value = String(record[field] ?? "");
             const statusOptions = module === "reservations" ? ["Pendiente", "Confirmada", "Cancelada", "Finalizada"] : ["Activo", "Inactivo"];
             return (
@@ -387,6 +447,12 @@ function EditModal({ module, record, onChange, onClose, onSave }: { module: Modu
                       {statusOptions.map((option) => <option key={option}>{option}</option>)}
                     </select>
                   )
+                  : field === "category" && module === "tours"
+                    ? (
+                      <select value={value || categoryOptions[0] || ""} onChange={(event) => onChange({ ...record, [field]: event.target.value })} className="h-12 rounded-2xl border border-black/10 bg-white px-4 text-sm font-bold text-charcoal outline-none">
+                        {categoryOptions.map((option) => <option key={option}>{option}</option>)}
+                      </select>
+                    )
                   : isLong
                     ? <Textarea value={value} onChange={(event) => onChange({ ...record, [field]: event.target.value })} className="min-h-28" />
                     : <Input value={value} onChange={(event) => onChange({ ...record, [field]: event.target.value })} />}
@@ -396,8 +462,29 @@ function EditModal({ module, record, onChange, onClose, onSave }: { module: Modu
           {["mainImage", "gallery"].some((field) => fields.includes(field)) && (
             <label className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-obsidian px-6 text-sm font-semibold text-ivory shadow-sm">
               <Upload className="size-4" />Subir imagen
-              <input type="file" className="sr-only" onChange={() => window.alert("La subida de imÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡genes esta disponible desde el editor de tarifario conectado al hosting.")} />
+              <input type="file" className="sr-only" onChange={() => window.alert("La subida de imÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡genes esta disponible desde el editor de tarifario conectado al hosting.")} />
             </label>
+          )}
+          {module === "paymentMethods" && (
+            <div className="grid gap-3 rounded-lg border border-black/10 bg-white p-4 md:col-span-2">
+              <p className="text-sm font-bold text-obsidian">Logo del medio de pago</p>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                <div className="relative flex h-24 w-full max-w-[190px] items-center justify-center overflow-hidden rounded-lg border border-black/10 bg-[#F8F6F0]">
+                  {logoIsImage
+                    ? <Image src={logoValue} alt="Logo cargado" fill sizes="190px" className="object-contain p-3" unoptimized />
+                    : <span className="text-sm font-black uppercase tracking-[0.16em] text-charcoal/45">{logoValue || "Sin logo"}</span>}
+                </div>
+                <div className="grid gap-2">
+                  <label className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-obsidian px-6 text-sm font-semibold text-ivory shadow-sm transition hover:bg-charcoal">
+                    <Upload className="size-4" />
+                    {uploadingLogo ? "Subiendo..." : "Cargar logo"}
+                    <input type="file" accept="image/*" className="sr-only" onChange={(event) => uploadLogo(event.target.files?.[0])} />
+                  </label>
+                  <p className="text-xs leading-5 text-charcoal/55">Tambien puedes escribir yape, plin, bcp o cci en el campo Logo.</p>
+                </div>
+              </div>
+              {uploadMessage && <p className="rounded-lg bg-gold/10 p-3 text-sm font-semibold text-obsidian">{uploadMessage}</p>}
+            </div>
           )}
         </div>
         <div className="flex justify-end gap-3 border-t border-black/10 bg-white p-4">
@@ -415,6 +502,7 @@ function ReservationModal({ reservation, onClose, onStatus }: { reservation: Adm
   const tourName = reservation.tour || "tu tour";
   const whatsappNumber = String(reservation.whatsapp ?? "").replace(/\D/g, "");
   const email = String(reservation.email ?? "");
+  const isConfirmed = reservation.status === "Confirmada";
   const whatsappText = encodeURIComponent(`Hola ${clientName}, te escribimos por tu reserva ${reservationCode} para ${tourName}.`);
   return (
     <div className="fixed inset-0 z-[96] overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
@@ -429,17 +517,18 @@ function ReservationModal({ reservation, onClose, onStatus }: { reservation: Adm
           ))}
           <div className="md:col-span-2"><h3 className="font-black text-obsidian">Historial</h3><div className="mt-2 grid gap-2">{(reservation.history ?? []).map((item) => <p key={item} className="rounded-lg bg-[#F8F6F0] p-3 text-sm">{item}</p>)}</div></div>
         </div>
-        <div className="flex flex-wrap gap-2 border-t border-black/10 p-4">
-          <Button variant="gold" onClick={() => onStatus(reservation, "Confirmada")}>Confirmar reserva</Button>
-          <Button variant="ghost" onClick={() => onStatus(reservation, "Cancelada")}>Cancelar</Button>
-          {whatsappNumber
-            ? <a className={cn(buttonVariants({ variant: "default", size: "default" }))} href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`} target="_blank">Enviar WhatsApp</a>
-            : <Button variant="ghost" disabled>Sin WhatsApp</Button>}
-          {email
-            ? <a className={cn(buttonVariants({ variant: "default", size: "default" }))} href={`mailto:${email}?subject=Reserva ${reservationCode}`}>Enviar correo</a>
-            : <Button variant="ghost" disabled>Sin correo</Button>}
-          <Button variant="ghost" onClick={() => window.print()}><Download className="size-4" />Imprimir / PDF</Button>
-        </div>
+        {!isConfirmed && (
+          <div className="flex flex-wrap gap-2 border-t border-black/10 p-4">
+            <Button variant="gold" onClick={() => onStatus(reservation, "Confirmada")}>Confirmar reserva</Button>
+            <Button variant="ghost" onClick={() => onStatus(reservation, "Cancelada")}>Cancelar</Button>
+            {whatsappNumber
+              ? <a className={cn(buttonVariants({ variant: "default", size: "default" }))} href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`} target="_blank">Enviar WhatsApp</a>
+              : <Button variant="ghost" disabled>Sin WhatsApp</Button>}
+            {email
+              ? <a className={cn(buttonVariants({ variant: "default", size: "default" }))} href={`mailto:${email}?subject=Reserva ${reservationCode}`}>Enviar correo</a>
+              : <Button variant="ghost" disabled>Sin correo</Button>}
+          </div>
+        )}
       </div>
     </div>
   );

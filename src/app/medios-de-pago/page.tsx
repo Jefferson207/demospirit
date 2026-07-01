@@ -1,14 +1,21 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Building2, CheckCircle2, Landmark, MessageCircle, ShieldCheck, Smartphone } from "lucide-react";
 import { LegalPage } from "@/components/legal-page";
 import { company, whatsappReservationUrl } from "@/lib/company";
+import { defaultAdminContent, type AdminContent } from "@/lib/admin-content";
+import { getJson } from "@/lib/server/upstash";
 
 export const metadata: Metadata = {
   title: "Medios de Pago",
   description: "Medios de pago aceptados por Spirit Qosqo Travel: Yape, Plin, transferencia bancaria e interbancaria."
 };
 
-const paymentMethods = [
+export const dynamic = "force-dynamic";
+
+const adminContentKey = "spirit-qosqo:admin-content";
+
+const fallbackPaymentMethods = [
   {
     title: "Yape",
     icon: Smartphone,
@@ -57,8 +64,57 @@ const paymentMethods = [
   }
 ];
 
+function lines(value: unknown) {
+  if (Array.isArray(value)) return value.map(String).filter(Boolean);
+  if (typeof value !== "string") return [];
+  return value.split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
+}
+
+function fieldsFrom(value: unknown) {
+  return lines(value).map((item) => {
+    const [label, ...rest] = item.split(":");
+    return [label.trim(), rest.join(":").trim() || "Por completar"] as [string, string];
+  });
+}
+
+async function getPaymentMethods() {
+  const content = await getJson<AdminContent>(adminContentKey, defaultAdminContent).catch(() => defaultAdminContent);
+  const adminMethods = Array.isArray(content.paymentMethods) ? content.paymentMethods : [];
+
+  const methods = adminMethods
+    .filter((item) => item.status !== "Inactivo")
+    .sort((a, b) => Number(a.order ?? 0) - Number(b.order ?? 0))
+    .map((item) => {
+      const title = String(item.name ?? "Medio de pago");
+      const logo = String(item.logo ?? "cci");
+      const logoType = logo.toLowerCase();
+      const details = lines(item.details);
+      const fields = fieldsFrom(item.fieldRows);
+
+      return {
+        title,
+        icon: logoType === "bcp" || logoType === "cci" ? Landmark : Smartphone,
+        logo,
+        details: details.length ? details : [String(item.description ?? "Pago previa confirmacion de disponibilidad.")],
+        fields: fields.length ? fields : [["Titular", company.legalName]]
+      };
+    });
+
+  return methods.length ? methods : fallbackPaymentMethods;
+}
+
 function PaymentLogo({ type }: { type: string }) {
-  if (type === "plin") {
+  if (type.startsWith("http") || type.startsWith("/")) {
+    return (
+      <div className="relative flex h-24 w-full max-w-[190px] items-center justify-center overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm">
+        <Image src={type} alt="Logo de medio de pago" fill sizes="190px" className="object-contain p-3" unoptimized />
+      </div>
+    );
+  }
+
+  const logoType = type.toLowerCase();
+
+  if (logoType === "plin") {
     return (
       <div className="flex h-24 w-full max-w-[190px] items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-[#5AA9E6] to-[#62D0C9] shadow-sm">
         <div className="flex size-20 items-center justify-center rounded-[42%] bg-white text-3xl font-black lowercase tracking-tight text-[#67B7E1]">
@@ -68,7 +124,7 @@ function PaymentLogo({ type }: { type: string }) {
     );
   }
 
-  if (type === "yape") {
+  if (logoType === "yape") {
     return (
       <div className="flex h-24 w-full max-w-[190px] items-center justify-center rounded-lg bg-[#742196] shadow-sm">
         <div className="grid place-items-center text-white">
@@ -79,7 +135,7 @@ function PaymentLogo({ type }: { type: string }) {
     );
   }
 
-  if (type === "bcp") {
+  if (logoType === "bcp") {
     return (
       <div className="flex h-24 w-full max-w-[190px] items-center justify-center rounded-lg bg-[#063B82] shadow-sm">
         <div className="flex items-center gap-2 text-4xl font-black italic text-white">
@@ -98,7 +154,9 @@ function PaymentLogo({ type }: { type: string }) {
   );
 }
 
-export default function PaymentMethodsPage() {
+export default async function PaymentMethodsPage() {
+  const paymentMethods = await getPaymentMethods();
+
   return (
     <LegalPage
       eyebrow="Pagos verificados"

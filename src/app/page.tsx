@@ -83,6 +83,15 @@ type Booking = {
   dataConsent: boolean;
 };
 
+type CreatedReservation = {
+  code: string;
+};
+
+type PaymentSummaryMethod = {
+  title: string;
+  fields: [string, string][];
+};
+
 const whatsappNumber = company.whatsappNumber;
 const whatsappUrl = whatsappReservationUrl;
 const navItems = [
@@ -568,6 +577,9 @@ export default function Home() {
   const [bookingOpen, setBookingOpen] = useState(false);
   const [bookingStep, setBookingStep] = useState(0);
   const [toast, setToast] = useState("");
+  const [bookingSubmitting, setBookingSubmitting] = useState(false);
+  const [generatedReservation, setGeneratedReservation] = useState<CreatedReservation | null>(null);
+  const [paymentSummary, setPaymentSummary] = useState<PaymentSummaryMethod[]>([]);
   const [bookingConsentError, setBookingConsentError] = useState("");
   const [contactConsent, setContactConsent] = useState(false);
   const [contactConsentError, setContactConsentError] = useState("");
@@ -606,14 +618,10 @@ export default function Home() {
   useEffect(() => {
     const loadServices = async () => {
       try {
-        const [servicesResponse, tariffResponse] = await Promise.all([
-          fetch("/api/travel-services", { cache: "no-store" }),
-          fetch("/api/tariff", { cache: "no-store" })
-        ]);
+        const servicesResponse = await fetch("/api/travel-services", { cache: "no-store" });
         const servicesPayload = (await servicesResponse.json()) as { services?: TravelService[] };
-        const tariffPayload = (await tariffResponse.json()) as { tariff?: Tariff };
 
-        setTours(mergeServicesWithPackageTariff(servicesPayload.services ?? travelServices, tariffPayload.tariff));
+        setTours(mergeServicesWithPackageTariff(servicesPayload.services ?? travelServices));
       } catch {
         setTours(fallbackTours);
       }
@@ -633,7 +641,7 @@ export default function Home() {
     setSelectedExtras([]);
   }, [selectedTour]);
 
-  const progress = ((bookingStep + 1) / 7) * 100;
+  const progress = ((bookingStep + 1) / 8) * 100;
   const canContinue = useMemo(() => {
     if (bookingStep === 0) return Boolean(booking.tour);
     if (bookingStep === 1) return Boolean(booking.date);
@@ -649,6 +657,56 @@ export default function Home() {
       ...current,
       [key]: Math.max(key === "adults" ? 1 : 0, current[key] + delta)
     }));
+  };
+
+  const createReservation = async (method: "WhatsApp" | "Pago ahora") => {
+    const response = await fetch("/api/reservations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        clientName: booking.name,
+        clientLastName: booking.lastName,
+        email: booking.email,
+        whatsapp: booking.phone,
+        country: booking.country,
+        tour: booking.tour,
+        packageName: bookingSelectedTour?.tipoServicio === "paquete" ? booking.tour : "",
+        date: booking.date,
+        adults: booking.adults,
+        children: booking.children,
+        babies: booking.babies,
+        hotel: booking.selectedHotel || booking.hotel || "",
+        extras: bookingSelectedExtras.map((extra) => extra.label),
+        basePrice: bookingBasePrice,
+        extrasPrice: bookingExtrasTotal,
+        subtotal: bookingSubtotal,
+        discount: 0,
+        taxes: bookingTaxes,
+        total: bookingTotal,
+        method,
+        observations: booking.comments || booking.message
+      })
+    });
+
+    const payload = (await response.json()) as { ok?: boolean; reservation?: CreatedReservation; error?: string };
+
+    if (!response.ok || !payload.ok || !payload.reservation) {
+      throw new Error(payload.error ?? "No se pudo registrar la reserva.");
+    }
+
+    return payload.reservation;
+  };
+
+  const loadPaymentSummary = async () => {
+    try {
+      const response = await fetch("/api/payment-methods", { cache: "no-store" });
+      const payload = (await response.json()) as { methods?: PaymentSummaryMethod[] };
+      setPaymentSummary(payload.methods ?? []);
+      return payload.methods ?? [];
+    } catch {
+      setPaymentSummary([]);
+      return [];
+    }
   };
 
   const sendReservation = async () => {
@@ -684,35 +742,14 @@ Comentarios: ${booking.comments || booking.message || "Sin comentarios"}
 Quedo atento a la confirmación de disponibilidad y precio.`;
 
     try {
-      await fetch("/api/reservations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          clientName: booking.name,
-          clientLastName: booking.lastName,
-          email: booking.email,
-          whatsapp: booking.phone,
-          country: booking.country,
-          tour: booking.tour,
-          packageName: bookingSelectedTour?.tipoServicio === "paquete" ? booking.tour : "",
-          date: booking.date,
-          adults: booking.adults,
-          children: booking.children,
-          babies: booking.babies,
-          hotel: booking.selectedHotel || booking.hotel || "",
-          extras: bookingSelectedExtras.map((extra) => extra.label),
-          basePrice: bookingBasePrice,
-          extrasPrice: bookingExtrasTotal,
-          subtotal: bookingSubtotal,
-          discount: 0,
-          taxes: bookingTaxes,
-          total: bookingTotal,
-          method: "WhatsApp",
-          observations: booking.comments || booking.message
-        })
-      });
-    } catch {
-      // La reserva puede continuar por WhatsApp aunque falle el registro remoto.
+      setBookingSubmitting(true);
+      await createReservation("WhatsApp");
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : "No se pudo registrar la reserva.");
+      window.setTimeout(() => setToast(""), 2600);
+      return;
+    } finally {
+      setBookingSubmitting(false);
     }
 
     setToast("Reserva registrada y lista para enviar por WhatsApp");
@@ -720,11 +757,54 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
     window.setTimeout(() => setToast(""), 2600);
   };
 
+  const handlePayNow = async () => {
+    if (!booking.policies || !booking.dataConsent) {
+      setBookingConsentError(consentText);
+      setBookingStep(6);
+      return;
+    }
+
+    try {
+      setBookingSubmitting(true);
+      const reservation = await createReservation("Pago ahora");
+      const methods = await loadPaymentSummary();
+      setGeneratedReservation(reservation);
+      setBookingStep(7);
+      setToast("Reserva generada correctamente.");
+      window.setTimeout(() => setToast(""), 2600);
+
+      const emailBody = [
+        `Reserva generada: ${reservation.code}`,
+        `Cliente: ${booking.name} ${booking.lastName}`,
+        `Tour: ${booking.tour}`,
+        `Fecha: ${booking.date}`,
+        `Total estimado: USD ${bookingTotal}`,
+        `WhatsApp: ${booking.phone}`,
+        "",
+        "El cliente eligio pagar ahora. Medios disponibles:",
+        ...(methods.length ? methods.map((method) => `- ${method.title}`) : ["- Ver medios configurados en la web"]),
+        "",
+        "Una vez realice el pago por cualquier medio, escribira al WhatsApp para validar la reserva."
+      ].join("\n");
+
+      window.setTimeout(() => {
+        window.location.href = `mailto:${company.email}?subject=${encodeURIComponent(`Reserva generada ${reservation.code}`)}&body=${encodeURIComponent(emailBody)}`;
+      }, 150);
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : "No se pudo generar la reserva.");
+      window.setTimeout(() => setToast(""), 2600);
+    } finally {
+      setBookingSubmitting(false);
+    }
+  };
+
   const openBooking = (tourTitle?: string) => {
     if (tourTitle) {
       setBooking((current) => ({ ...current, tour: tourTitle, selectedHotel: "", hotel: "", extras: [], policies: false, dataConsent: false }));
       setBookingTourFilter(allToursFilter);
     }
+    setGeneratedReservation(null);
+    setPaymentSummary([]);
     setBookingStep(tourTitle ? 1 : 0);
     setBookingOpen(true);
   };
@@ -1173,8 +1253,8 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
               <div className="h-2 bg-black/5"><motion.div className="h-full bg-gold" animate={{ width: `${progress}%` }} /></div>
               <div className="border-b border-black/10 bg-white p-3 sm:p-4">
                 <div className="flex max-w-full items-center gap-2 overflow-x-auto text-xs font-black uppercase tracking-[0.12em] text-charcoal/52">
-                  {["Experiencia", "Fecha", "Viajeros", "Hotel", "Extras", "Resumen", "Confirmación"].map((step, index) => (
-                    <button key={step} type="button" onClick={() => setBookingStep(index)} className={cn("flex shrink-0 items-center gap-2 rounded-full px-3 py-2 transition", bookingStep === index ? "bg-obsidian text-gold-soft" : "bg-[#F8F6F0] hover:bg-gold/12")}>
+                  {["Experiencia", "Fecha", "Viajeros", "Hotel", "Extras", "Resumen", "Confirmacion", "Reserva generada"].map((step, index) => (
+                    <button key={step} type="button" disabled={index === 7 && !generatedReservation} onClick={() => setBookingStep(index)} className={cn("flex shrink-0 items-center gap-2 rounded-full px-3 py-2 transition disabled:cursor-not-allowed disabled:opacity-45", bookingStep === index ? "bg-obsidian text-gold-soft" : "bg-[#F8F6F0] hover:bg-gold/12")}>
                       <span className={cn("grid size-6 place-items-center rounded-full text-[11px]", index < bookingStep ? "bg-emerald text-white" : "bg-gold text-obsidian")}>{index < bookingStep ? <Check className="size-3.5" /> : index + 1}</span>
                       {step}
                     </button>
@@ -1329,8 +1409,48 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
                         </div>
                         <div className="mt-5"><LegalConsent checked={booking.policies && booking.dataConsent} error={bookingConsentError} onChange={(checked) => { setBookingConsentError(""); setBooking((current) => ({ ...current, policies: checked, dataConsent: checked })); }} /></div>
                         <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                          <Button className="luxury-button w-full" size="lg" variant="gold" onClick={sendReservation}><MessageCircle className="size-5" />Reservar por WhatsApp</Button>
-                          <Link href="/medios-de-pago" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full")}>Pagar ahora</Link>
+                          <Button className="luxury-button w-full" size="lg" variant="gold" disabled={bookingSubmitting} onClick={sendReservation}><MessageCircle className="size-5" />Reservar por WhatsApp</Button>
+                          <Button className="w-full" size="lg" variant="default" disabled={bookingSubmitting} onClick={handlePayNow}>{bookingSubmitting ? "Generando..." : "Pagar ahora"}</Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {bookingStep === 7 && (
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-[0.24em] text-gold">Reserva generada</p>
+                        <h3 className="mt-2 text-2xl font-black text-obsidian">Tu reserva fue creada</h3>
+                        <div className="mt-5 rounded-lg border border-black/10 bg-[#F8F6F0] p-5">
+                          <p className="text-sm font-bold uppercase tracking-[0.2em] text-charcoal/60">Codigo de reserva</p>
+                          <p className="mt-2 text-3xl font-black text-obsidian">{generatedReservation?.code ?? "Pendiente"}</p>
+                          <p className="mt-4 text-sm leading-7 text-charcoal/70">Se preparo un correo para {company.email}. Revisa los medios de pago y conserva tu codigo.</p>
+                        </div>
+
+                        <div className="mt-5 rounded-lg border border-black/10 bg-white p-5">
+                          <h4 className="text-base font-black text-obsidian">Medios de pago</h4>
+                          <div className="mt-4 grid gap-3">
+                            {(paymentSummary.length ? paymentSummary : [{ title: "Medios configurados", fields: [["Detalle", "Ver pagina de medios de pago"]] }]).slice(0, 4).map((method) => (
+                              <div key={method.title} className="rounded-lg border border-black/10 p-4">
+                                <p className="font-black text-obsidian">{method.title}</p>
+                                <div className="mt-2 grid gap-1 text-sm text-charcoal/70">
+                                  {method.fields.slice(0, 3).map(([label, value]) => (
+                                    <div key={`${method.title}-${label}`} className="flex justify-between gap-4">
+                                      <span>{label}</span>
+                                      <strong className="text-right text-obsidian">{value}</strong>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="mt-5 rounded-lg bg-obsidian p-5 text-white">
+                          <p className="text-sm leading-7">Una vez realices el pago por cualquier medio, escribe al WhatsApp para validar tu reserva.</p>
+                        </div>
+
+                        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                          <a className={cn(buttonVariants({ variant: "gold", size: "lg" }), "luxury-button w-full")} href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Hola, ya realice el pago de mi reserva ${generatedReservation?.code ?? ""}.`)}`} target="_blank">Escribir al WhatsApp</a>
+                          <Link href="/medios-de-pago" className={cn(buttonVariants({ variant: "default", size: "lg" }), "w-full")}>Ver medios completos</Link>
                         </div>
                       </div>
                     )}

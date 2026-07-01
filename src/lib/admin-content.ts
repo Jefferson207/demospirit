@@ -40,6 +40,7 @@ export type AdminContent = {
   clients: Array<Record<string, unknown>>;
   extras: Array<Record<string, unknown>>;
   categories: Array<Record<string, unknown>>;
+  paymentMethods: Array<Record<string, unknown>>;
   settings: Record<string, unknown>;
   users: Array<Record<string, unknown>>;
 };
@@ -47,7 +48,7 @@ export type AdminContent = {
 export const adminFieldLabels: Record<string, string> = {
   name: "Nombre",
   slug: "Slug",
-  category: "Categoría",
+  category: "Categorí­a",
   destination: "Destino",
   duration: "Duracion",
   difficulty: "Dificultad",
@@ -65,25 +66,30 @@ export const adminFieldLabels: Record<string, string> = {
   mapUrl: "Mapa",
   itinerary: "Itinerario",
   faqs: "Preguntas frecuentes",
-  policies: "Políticas",
+  policies: "PolÃ­ticas",
   status: "Estado",
   order: "Orden",
   metaTitle: "Meta title",
   metaDescription: "Meta description",
-  hotelCategories: "Categorías de hotel",
+  hotelCategories: "s de hotel",
   toursIncluded: "Tours incluidos",
   extras: "Extras",
   city: "Ciudad",
   nightlyPriceUsd: "Precio por noche",
   services: "Servicios",
-  address: "Dirección",
+  address: "DirecciÃ³n",
   priceUsd: "Precio USD",
-  code: "Código",
+  code: "CÃ³digo",
   clientName: "Cliente",
   whatsapp: "WhatsApp",
   total: "Total",
   role: "Rol",
-  permissions: "Permisos"
+  permissions: "Permisos",
+  logo: "Logo",
+  details: "Indicaciones",
+  fieldRows: "Datos de pago",
+  holder: "Titular",
+  qr: "QR"
 };
 
 export const adminSchemas: Record<string, string[]> = {
@@ -99,6 +105,7 @@ export const adminSchemas: Record<string, string[]> = {
   hotels: ["name", "category", "city", "nightlyPriceUsd", "description", "services", "address", "mapUrl", "gallery", "mainImage", "status"],
   extras: ["name", "description", "priceUsd", "mainImage", "status"],
   categories: ["name", "slug", "description", "status", "order"],
+  paymentMethods: ["name", "logo", "description", "fieldRows", "details", "status", "order"],
   clients: ["name", "lastName", "email", "whatsapp", "country", "reservationsCount", "totalSpent", "history"],
   users: ["name", "email", "role", "permissions", "status"]
 };
@@ -154,7 +161,7 @@ export const defaultAdminContent: AdminContent = {
       metaDescription: item.descripcionCorta,
       hotels: "Hoteles por categoria",
       tours: "City Tour Cusco\nValle Sagrado\nMachu Picchu",
-      extras: "Tren Vistadome\nGuía privado\nSeguro"
+      extras: "Tren Vistadome\nGuÃ­a privado\nSeguro"
     })),
   hotels: [
     { id: "hotel-prisma", name: "Hotel Prisma Cusco", category: "2 estrellas", city: "Cusco", nightlyPriceUsd: 18, description: "Hotel economico.", services: "Desayuno\nWiFi", address: "Cusco", mapUrl: "", gallery: "", mainImage: "", status: "Activo" },
@@ -163,16 +170,68 @@ export const defaultAdminContent: AdminContent = {
   reservations: [],
   clients: [],
   extras: [
-    { id: "almuerzo-buffet", name: "Almuerzo buffet", description: "Almuerzo turístico.", priceUsd: 20, mainImage: "", status: "Activo" },
+    { id: "almuerzo-buffet", name: "Almuerzo buffet", description: "Almuerzo turÃ­stico.", priceUsd: 20, mainImage: "", status: "Activo" },
     { id: "caballo", name: "Caballo", description: "Caballo de apoyo segun ruta.", priceUsd: 25, mainImage: "", status: "Activo" },
     { id: "tren-vistadome", name: "Tren Vistadome", description: "Upgrade de tren.", priceUsd: 75, mainImage: "", status: "Activo" },
-    { id: "guía-privado", name: "Guía privado", description: "Guía exclusivo.", priceUsd: 80, mainImage: "", status: "Activo" }
+    { id: "guÃ­a-privado", name: "GuÃ­a privado", description: "GuÃ­a exclusivo.", priceUsd: 80, mainImage: "", status: "Activo" }
   ],
   categories: [
-    { id: "tours", name: "Tours", slug: "tours", description: "Tours clásicos", status: "Activo", order: 1 },
-    { id: "paquetes", name: "Paquetes", slug: "paquetes", description: "Paquetes turísticos", status: "Activo", order: 2 },
+    { id: "tours", name: "Tours", slug: "tours", description: "Tours clÃ¡sicos", status: "Activo", order: 1 },
+    { id: "paquetes", name: "Paquetes", slug: "paquetes", description: "Paquetes turÃ­sticos", status: "Activo", order: 2 },
     { id: "aventura", name: "Aventura", slug: "aventura", description: "Experiencias de aventura", status: "Activo", order: 3 },
     { id: "premium", name: "Premium", slug: "premium", description: "Servicios premium", status: "Activo", order: 4 }
+  ],
+  paymentMethods: [
+    {
+      id: "yape",
+      name: "Yape",
+      logo: "yape",
+      description: "Pago movil previa confirmacion de disponibilidad.",
+      fieldRows: `Numero Yape: Por completar
+Titular: ${company.legalName}
+QR: Por completar`,
+      details: "Enviar captura o constancia para validar la reserva.\nLa reserva se confirma despues de verificar el abono.",
+      status: "Activo",
+      order: 1
+    },
+    {
+      id: "plin",
+      name: "Plin",
+      logo: "plin",
+      description: "Disponible para pagos coordinados con el asesor.",
+      fieldRows: `Numero Plin: Por completar
+Titular: ${company.legalName}
+QR: Por completar`,
+      details: "Enviar captura o constancia para validar la reserva.\nLa reserva se confirma despues de verificar el abono.",
+      status: "Activo",
+      order: 2
+    },
+    {
+      id: "bcp",
+      name: "Transferencia bancaria BCP",
+      logo: "bcp",
+      description: "Pago a cuenta bancaria verificada.",
+      fieldRows: `Banco: Por completar
+Tipo de cuenta: Por completar
+Numero de cuenta: Por completar
+Titular: ${company.legalName}`,
+      details: "Indica nombre del pasajero y tour en la constancia.\nLa validacion se realiza por canales oficiales.",
+      status: "Activo",
+      order: 3
+    },
+    {
+      id: "cci",
+      name: "Transferencia interbancaria",
+      logo: "cci",
+      description: "Disponible mediante codigo de cuenta interbancario.",
+      fieldRows: `Banco: Por completar
+CCI: Por completar
+Moneda: Soles
+Titular: ${company.legalName}`,
+      details: "Considera los tiempos de validacion del banco.\nEnviar constancia para confirmar la reserva.",
+      status: "Activo",
+      order: 4
+    }
   ],
   settings: {
     whatsapp: company.whatsapp,
