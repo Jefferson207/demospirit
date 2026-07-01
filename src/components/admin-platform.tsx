@@ -402,7 +402,8 @@ function EditModal({
   const [uploadingField, setUploadingField] = useState("");
   const logoValue = String(record.logo ?? "");
   const logoIsImage = logoValue.startsWith("http") || logoValue.startsWith("/");
-  const packageImagesReady = module !== "packages" || Boolean(record.mainImage && record.gallery);
+  const serviceImageModule = ["tours", "packages", "hotels"].includes(module);
+  const serviceImagesReady = !serviceImageModule || Boolean(record.mainImage && record.gallery);
 
   const uploadedUrlFrom = (payload: Record<string, unknown>) => {
     const data = payload.payload as Record<string, unknown> | undefined;
@@ -499,10 +500,10 @@ function EditModal({
             const isLong = ["description", "shortDescription", "gallery", "includes", "excludes", "bring", "itinerary", "faqs", "policies", "services", "permissions", "history", "fieldRows", "details"].includes(field);
             const value = String(record[field] ?? "");
             const statusOptions = module === "reservations" ? ["Pendiente", "Confirmada", "Cancelada", "Finalizada"] : ["Activo", "Inactivo"];
-            const packageImageField = module === "packages" && ["mainImage", "gallery"].includes(field);
+            const serviceImageField = serviceImageModule && ["mainImage", "gallery"].includes(field);
             const galleryImages = value.split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
 
-            if (packageImageField) {
+            if (serviceImageField) {
               return (
                 <div key={field} className="grid gap-3 rounded-lg border border-black/10 bg-white p-4 md:col-span-2">
                   <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
@@ -560,7 +561,7 @@ function EditModal({
               </label>
             );
           })}
-          {module !== "packages" && ["mainImage", "gallery"].some((field) => fields.includes(field)) && (
+          {module === "extras" && ["mainImage", "gallery"].some((field) => fields.includes(field)) && (
             <label className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-obsidian px-6 text-sm font-semibold text-ivory shadow-sm">
               <Upload className="size-4" />Subir imagen
               <input type="file" className="sr-only" onChange={() => window.alert("La subida de imÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡genes esta disponible desde el editor de tarifario conectado al hosting.")} />
@@ -589,9 +590,9 @@ function EditModal({
           )}
         </div>
         <div className="flex justify-end gap-3 border-t border-black/10 bg-white p-4">
-          {!packageImagesReady && <p className="mr-auto self-center text-sm font-semibold text-red-600">Carga imagen principal y galeria para guardar el paquete.</p>}
+          {!serviceImagesReady && <p className="mr-auto self-center text-sm font-semibold text-red-600">Carga imagen principal y galeria para guardar este registro.</p>}
           <Button variant="ghost" onClick={onClose}>Cancelar</Button>
-          <Button variant="gold" disabled={!packageImagesReady} onClick={onSave}><Save className="size-4" />Guardar registro</Button>
+          <Button variant="gold" disabled={!serviceImagesReady} onClick={onSave}><Save className="size-4" />Guardar registro</Button>
         </div>
       </div>
     </div>
