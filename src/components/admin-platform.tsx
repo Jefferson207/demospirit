@@ -399,8 +399,69 @@ function EditModal({
   const fields = moduleSchema(module);
   const [uploadMessage, setUploadMessage] = useState("");
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingField, setUploadingField] = useState("");
   const logoValue = String(record.logo ?? "");
   const logoIsImage = logoValue.startsWith("http") || logoValue.startsWith("/");
+  const packageImagesReady = module !== "packages" || Boolean(record.mainImage && record.gallery);
+
+  const uploadedUrlFrom = (payload: Record<string, unknown>) => {
+    const data = payload.payload as Record<string, unknown> | undefined;
+    return String(data?.url ?? data?.file ?? data?.path ?? data?.body ?? "");
+  };
+
+  const uploadImageField = async (field: string, file?: File) => {
+    if (!file) return;
+    setUploadingField(field);
+    setUploadMessage("Subiendo imagen...");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await fetch("/api/upload-image", { method: "POST", body: formData });
+      const payload = (await response.json()) as Record<string, unknown> & { ok?: boolean; error?: string };
+      if (!response.ok || !payload.ok) throw new Error(payload.error ?? "No se pudo subir la imagen.");
+
+      const possibleUrl = uploadedUrlFrom(payload);
+      if (!possibleUrl) throw new Error("La subida termino, pero no se encontro una URL.");
+
+      onChange({ ...record, [field]: possibleUrl });
+      setUploadMessage("Imagen cargada. Guarda el registro para publicarla.");
+    } catch (error) {
+      setUploadMessage(error instanceof Error ? error.message : "No se pudo subir la imagen.");
+    } finally {
+      setUploadingField("");
+    }
+  };
+
+  const uploadGalleryImages = async (files?: FileList | null) => {
+    if (!files?.length) return;
+    setUploadingField("gallery");
+    setUploadMessage("Subiendo galeria...");
+
+    try {
+      const uploaded: string[] = [];
+
+      for (const file of Array.from(files)) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const response = await fetch("/api/upload-image", { method: "POST", body: formData });
+        const payload = (await response.json()) as Record<string, unknown> & { ok?: boolean; error?: string };
+        if (!response.ok || !payload.ok) throw new Error(payload.error ?? "No se pudo subir una imagen.");
+
+        const possibleUrl = uploadedUrlFrom(payload);
+        if (!possibleUrl) throw new Error("La subida termino, pero no se encontro una URL.");
+        uploaded.push(possibleUrl);
+      }
+
+      const currentGallery = String(record.gallery ?? "").split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
+      onChange({ ...record, gallery: [...currentGallery, ...uploaded].join("\n") });
+      setUploadMessage("Galeria cargada. Guarda el registro para publicarla.");
+    } catch (error) {
+      setUploadMessage(error instanceof Error ? error.message : "No se pudo subir la galeria.");
+    } finally {
+      setUploadingField("");
+    }
+  };
 
   const uploadLogo = async (file?: File) => {
     if (!file) return;
@@ -414,7 +475,7 @@ function EditModal({
       const payload = await response.json();
       if (!response.ok || !payload.ok) throw new Error(payload.error ?? "No se pudo subir el logo.");
 
-      const possibleUrl = payload.payload?.url ?? payload.payload?.file ?? payload.payload?.path ?? payload.payload?.body ?? "";
+      const possibleUrl = uploadedUrlFrom(payload);
       if (!possibleUrl) throw new Error("La subida termino, pero no se encontro una URL.");
 
       onChange({ ...record, logo: possibleUrl });
@@ -438,6 +499,46 @@ function EditModal({
             const isLong = ["description", "shortDescription", "gallery", "includes", "excludes", "bring", "itinerary", "faqs", "policies", "services", "permissions", "history", "fieldRows", "details"].includes(field);
             const value = String(record[field] ?? "");
             const statusOptions = module === "reservations" ? ["Pendiente", "Confirmada", "Cancelada", "Finalizada"] : ["Activo", "Inactivo"];
+            const packageImageField = module === "packages" && ["mainImage", "gallery"].includes(field);
+            const galleryImages = value.split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
+
+            if (packageImageField) {
+              return (
+                <div key={field} className="grid gap-3 rounded-lg border border-black/10 bg-white p-4 md:col-span-2">
+                  <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+                    <div>
+                      <p className="text-sm font-bold text-obsidian">{labelOf(field)} obligatoria</p>
+                      <p className="mt-1 text-xs leading-5 text-charcoal/55">Carga archivo desde tu equipo. La URL no se edita manualmente.</p>
+                    </div>
+                    <label className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-obsidian px-5 text-sm font-semibold text-ivory shadow-sm transition hover:bg-charcoal">
+                      <Upload className="size-4" />
+                      {uploadingField === field ? "Subiendo..." : field === "gallery" ? "Cargar galeria" : "Cargar imagen"}
+                      <input type="file" accept="image/*" multiple={field === "gallery"} className="sr-only" onChange={(event) => field === "gallery" ? uploadGalleryImages(event.target.files) : uploadImageField(field, event.target.files?.[0])} />
+                    </label>
+                  </div>
+
+                  {field === "mainImage" ? (
+                    value ? (
+                      <div className="relative h-48 overflow-hidden rounded-lg border border-black/10 bg-[#F8F6F0]">
+                        <Image src={value} alt="Imagen principal cargada" fill sizes="520px" className="object-cover" unoptimized />
+                      </div>
+                    ) : (
+                      <div className="grid h-32 place-items-center rounded-lg border border-dashed border-black/20 bg-[#F8F6F0] text-sm font-semibold text-charcoal/55">Sin imagen principal</div>
+                    )
+                  ) : (
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      {galleryImages.length === 0 && <div className="grid h-28 place-items-center rounded-lg border border-dashed border-black/20 bg-[#F8F6F0] text-sm font-semibold text-charcoal/55 sm:col-span-3">Sin imagenes de galeria</div>}
+                      {galleryImages.map((image, index) => (
+                        <div key={`${image}-${index}`} className="relative h-28 overflow-hidden rounded-lg border border-black/10 bg-[#F8F6F0]">
+                          <Image src={image} alt={`Imagen de galeria ${index + 1}`} fill sizes="180px" className="object-cover" unoptimized />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
             return (
               <label key={field} className={cn("grid gap-2 text-sm font-bold text-obsidian", isLong && "md:col-span-2")}>
                 {labelOf(field)}
@@ -459,7 +560,7 @@ function EditModal({
               </label>
             );
           })}
-          {["mainImage", "gallery"].some((field) => fields.includes(field)) && (
+          {module !== "packages" && ["mainImage", "gallery"].some((field) => fields.includes(field)) && (
             <label className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-obsidian px-6 text-sm font-semibold text-ivory shadow-sm">
               <Upload className="size-4" />Subir imagen
               <input type="file" className="sr-only" onChange={() => window.alert("La subida de imÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡genes esta disponible desde el editor de tarifario conectado al hosting.")} />
@@ -488,8 +589,9 @@ function EditModal({
           )}
         </div>
         <div className="flex justify-end gap-3 border-t border-black/10 bg-white p-4">
+          {!packageImagesReady && <p className="mr-auto self-center text-sm font-semibold text-red-600">Carga imagen principal y galeria para guardar el paquete.</p>}
           <Button variant="ghost" onClick={onClose}>Cancelar</Button>
-          <Button variant="gold" onClick={onSave}><Save className="size-4" />Guardar registro</Button>
+          <Button variant="gold" disabled={!packageImagesReady} onClick={onSave}><Save className="size-4" />Guardar registro</Button>
         </div>
       </div>
     </div>

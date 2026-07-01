@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { defaultAdminContent, type AdminContent, type AdminReservation } from "@/lib/admin-content";
 import { isAdminRequest } from "@/lib/server/admin-auth";
+import { sendReservationEmail } from "@/lib/server/reservation-email";
 import { getJson, setJson } from "@/lib/server/upstash";
 
 const key = "spirit-qosqo:admin-content";
@@ -60,7 +61,12 @@ export async function POST(request: Request) {
     };
 
     await setJson(key, nextContent);
-    return NextResponse.json({ ok: true, reservation });
+    const email = await sendReservationEmail(reservation).catch((error) => ({
+      sent: false,
+      warning: error instanceof Error ? error.message : "No se pudo enviar el correo."
+    }));
+
+    return NextResponse.json({ ok: true, reservation, emailSent: email.sent, emailWarning: email.warning });
   } catch (error) {
     return NextResponse.json(
       { ok: false, error: error instanceof Error ? error.message : "Unable to create reservation" },

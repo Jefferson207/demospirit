@@ -92,6 +92,18 @@ type PaymentSummaryMethod = {
   fields: [string, string][];
 };
 
+type HotelOption = {
+  id: string;
+  name: string;
+  category: string;
+  city: string;
+  price: number;
+  description: string;
+  services: string[];
+  address: string;
+  image: string;
+};
+
 const whatsappNumber = company.whatsappNumber;
 const whatsappUrl = whatsappReservationUrl;
 const navItems = [
@@ -218,36 +230,6 @@ const bookingExtras = [
   { id: "almuerzo", label: "Almuerzo", price: 20 },
   { id: "cena", label: "Cena", price: 25 }
 ];
-const bookingHotelCards = {
-  "2 estrellas": [
-    { name: "Hotel Prisma Cusco", services: ["Desayuno", "WiFi", "Recepcion 24h"], price: 18, image: images.cusco },
-    { name: "Hotel Inkarri Cusco", services: ["Desayuno", "WiFi", "Centro historico"], price: 25, image: images.sacred },
-    { name: "Hospedaje El Triunfo", services: ["WiFi", "Bano privado", "Asistencia"], price: 30, image: images.moray }
-  ],
-  "3 estrellas": [
-    { name: "Hotel San Agustin Internacional", services: ["Desayuno", "WiFi", "Restaurante"], price: 35, image: images.cusco },
-    { name: "Suenos del Inka Hotel", services: ["Desayuno", "WiFi", "Ubicacion central"], price: 50, image: images.sacred },
-    { name: "Tierra Viva Cusco Centro", services: ["Desayuno", "WiFi", "Recepcion 24h"], price: 70, image: images.machu },
-    { name: "Maytaq Wasin Boutique Hotel", services: ["Desayuno", "WiFi", "Boutique"], price: 70, image: images.guide }
-  ],
-  "4 estrellas": [
-    { name: "Sonesta Hotel Cusco", services: ["Desayuno", "WiFi", "Restaurante"], price: 80, image: images.cusco },
-    { name: "Costa del Sol Wyndham Cusco", services: ["Desayuno", "WiFi", "Spa"], price: 120, image: images.sacred },
-    { name: "Novotel Cusco", services: ["Desayuno", "WiFi", "Centro historico"], price: 140, image: images.machu }
-  ],
-  "5 estrellas": [
-    { name: "JW Marriott El Convento Cusco", services: ["Desayuno", "Spa", "Lujo"], price: 180, image: images.cusco },
-    { name: "Palacio del Inka", services: ["Desayuno", "Spa", "Premium"], price: 300, image: images.sacred },
-    { name: "Belmond Hotel Monasterio", services: ["Desayuno", "Lujo", "Experiencia historica"], price: 500, image: images.machu }
-  ]
-};
-const hotelOptionsByCategory: Record<string, string[]> = {
-  "2 estrellas": ["Hotel Prisma Cusco", "Hotel Inkarri Cusco", "Hospedaje El Triunfo"],
-  "3 estrellas": ["Hotel San Agustin Internacional", "Suenos del Inka Hotel", "Tierra Viva Cusco Centro", "Maytaq Wasin Boutique Hotel"],
-  "4 estrellas": ["Sonesta Hotel Cusco", "Costa del Sol Wyndham Cusco", "Novotel Cusco"],
-  "5 estrellas": ["JW Marriott El Convento Cusco", "Palacio del Inka", "Belmond Hotel Monasterio"]
-};
-
 function getTourFilters(items: DisplayService[]) {
   const typeFilters = [
     items.some((item) => item.tipoServicio === "tour") ? "Tours" : "",
@@ -282,6 +264,24 @@ function getNumericPrice(item: DisplayService) {
 function formatExperiencePrice(item: DisplayService) {
   const price = getNumericPrice(item);
   return price ? `Desde USD ${price} por persona` : "Consultar precio";
+}
+
+function getPackageNights(item?: DisplayService | null) {
+  if (!item || item.tipoServicio !== "paquete") return 0;
+
+  const source = [
+    item.duracion,
+    item.duration,
+    item.nombre,
+    item.title,
+    item.descripcionCorta,
+    item.descripcionCompleta,
+    item.description
+  ].filter(Boolean).join(" ");
+  const match = source.match(/(\d+)\s*noches?/i);
+  const nights = match ? Number(match[1]) : 1;
+
+  return Number.isFinite(nights) && nights > 0 ? nights : 1;
 }
 
 function sortExperience(a: DisplayService, b: DisplayService) {
@@ -565,6 +565,7 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [tours, setTours] = useState<DisplayService[]>(fallbackTours);
+  const [hotels, setHotels] = useState<HotelOption[]>([]);
   const [bookingTourFilter, setBookingTourFilter] = useState(allToursFilter);
   const [selectedTour, setSelectedTour] = useState<DisplayService | null>(null);
   const [detailImage, setDetailImage] = useState("");
@@ -593,17 +594,24 @@ export default function Home() {
   const bookingBasePrice = bookingSelectedTour ? getNumericPrice(bookingSelectedTour) ?? 0 : 0;
   const bookingSelectedExtras = bookingExtras.filter((extra) => booking.extras.includes(extra.id));
   const bookingExtrasTotal = bookingSelectedExtras.reduce((sum, extra) => sum + extra.price, 0);
-  const bookingHotelOptions = (bookingHotelCards[booking.hotelCategory as keyof typeof bookingHotelCards] ?? bookingHotelCards["3 estrellas"]);
-  const bookingSubtotal = bookingBasePrice * paidTravelers + bookingExtrasTotal;
+  const hotelCategories = useMemo(() => Array.from(new Set(hotels.map((hotel) => hotel.category).filter(Boolean))), [hotels]);
+  const bookingHotelOptions = useMemo(() => hotels.filter((hotel) => hotel.category === booking.hotelCategory), [booking.hotelCategory, hotels]);
+  const bookingSelectedHotel = bookingHotelOptions.find((hotel) => hotel.name === booking.selectedHotel);
+  const bookingHotelNights = getPackageNights(bookingSelectedTour);
+  const bookingHotelPrice = bookingSelectedTour?.tipoServicio === "paquete" ? Number(bookingSelectedHotel?.price ?? 0) * bookingHotelNights : 0;
+  const bookingSubtotal = bookingBasePrice * paidTravelers + bookingHotelPrice + bookingExtrasTotal;
   const bookingTaxes = 0;
   const bookingTotal = bookingSubtotal + bookingTaxes;
   const detailBasePrice = selectedTour ? getNumericPrice(selectedTour) ?? 0 : 0;
   const detailTravelers = detailAdults + detailChildren;
   const detailSelectedExtras = detailExtras.filter((extra) => selectedExtras.includes(extra.id));
   const detailExtrasTotal = detailSelectedExtras.reduce((sum, extra) => sum + extra.price, 0);
+  const detailHotelOptions = useMemo(() => hotels.filter((hotel) => hotel.category === detailHotelCategory), [detailHotelCategory, hotels]);
+  const detailSelectedHotel = detailHotelOptions.find((hotel) => hotel.name === detailHotel);
+  const detailHotelNights = getPackageNights(selectedTour);
+  const detailHotelPrice = selectedTour?.tipoServicio === "paquete" ? Number(detailSelectedHotel?.price ?? 0) * detailHotelNights : 0;
   const detailSubtotal = detailBasePrice * detailTravelers;
-  const detailTotal = detailSubtotal + detailExtrasTotal;
-  const detailHotelOptions = hotelOptionsByCategory[detailHotelCategory] ?? [];
+  const detailTotal = detailSubtotal + detailHotelPrice + detailExtrasTotal;
   const relatedTours = selectedTour
     ? tours.filter((tour) => tour.slug !== selectedTour.slug && (tour.categoria === selectedTour.categoria || tour.tipoServicio === selectedTour.tipoServicio)).slice(0, 3)
     : [];
@@ -618,17 +626,37 @@ export default function Home() {
   useEffect(() => {
     const loadServices = async () => {
       try {
-        const servicesResponse = await fetch("/api/travel-services", { cache: "no-store" });
+        const [servicesResponse, hotelsResponse] = await Promise.all([
+          fetch("/api/travel-services", { cache: "no-store" }),
+          fetch("/api/hotels", { cache: "no-store" })
+        ]);
         const servicesPayload = (await servicesResponse.json()) as { services?: TravelService[] };
+        const hotelsPayload = (await hotelsResponse.json()) as { hotels?: HotelOption[] };
 
         setTours(mergeServicesWithPackageTariff(servicesPayload.services ?? travelServices));
+        setHotels(hotelsPayload.hotels ?? []);
       } catch {
         setTours(fallbackTours);
+        setHotels([]);
       }
     };
 
     loadServices();
   }, []);
+
+  useEffect(() => {
+    if (!hotelCategories.length) return;
+
+    setBooking((current) => {
+      if (hotelCategories.includes(current.hotelCategory)) return current;
+      return { ...current, hotelCategory: hotelCategories[0], selectedHotel: "", hotel: "" };
+    });
+
+    if (!hotelCategories.includes(detailHotelCategory)) {
+      setDetailHotelCategory(hotelCategories[0]);
+      setDetailHotel("");
+    }
+  }, [detailHotelCategory, hotelCategories]);
 
   useEffect(() => {
     if (!selectedTour) return;
@@ -726,8 +754,10 @@ Bebes: ${booking.babies}
 Total de viajeros: ${totalTravelers}
 Hotel: ${booking.selectedHotel || booking.hotel || "No aplica"}
 Categoría hotel: ${booking.hotelCategory}
+Noches hotel: ${bookingHotelNights}
 Extras: ${bookingSelectedExtras.map((extra) => `${extra.label} (+USD ${extra.price})`).join(", ") || "Sin extras"}
 Precio base: USD ${bookingBasePrice}
+Precio hotel: USD ${bookingHotelPrice}
 Precio extras: USD ${bookingExtrasTotal}
 Subtotal: USD ${bookingSubtotal}
 Impuestos: USD ${bookingTaxes}
@@ -767,29 +797,11 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
     try {
       setBookingSubmitting(true);
       const reservation = await createReservation("Pago ahora");
-      const methods = await loadPaymentSummary();
+      await loadPaymentSummary();
       setGeneratedReservation(reservation);
       setBookingStep(7);
       setToast("Reserva generada correctamente.");
       window.setTimeout(() => setToast(""), 2600);
-
-      const emailBody = [
-        `Reserva generada: ${reservation.code}`,
-        `Cliente: ${booking.name} ${booking.lastName}`,
-        `Tour: ${booking.tour}`,
-        `Fecha: ${booking.date}`,
-        `Total estimado: USD ${bookingTotal}`,
-        `WhatsApp: ${booking.phone}`,
-        "",
-        "El cliente eligio pagar ahora. Medios disponibles:",
-        ...(methods.length ? methods.map((method) => `- ${method.title}`) : ["- Ver medios configurados en la web"]),
-        "",
-        "Una vez realice el pago por cualquier medio, escribira al WhatsApp para validar la reserva."
-      ].join("\n");
-
-      window.setTimeout(() => {
-        window.location.href = `mailto:${company.email}?subject=${encodeURIComponent(`Reserva generada ${reservation.code}`)}&body=${encodeURIComponent(emailBody)}`;
-      }, 150);
     } catch (error) {
       setToast(error instanceof Error ? error.message : "No se pudo generar la reserva.");
       window.setTimeout(() => setToast(""), 2600);
@@ -1333,21 +1345,33 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
                           <div className="mt-5 rounded-lg border border-black/10 bg-white p-6 text-charcoal/70">Este tour no requiere hotel. Puedes continuar al siguiente paso.</div>
                         ) : (
                           <>
-                            <div className="mt-5 flex flex-wrap gap-2">
-                              {Object.keys(bookingHotelCards).map((category) => <Button key={category} variant={booking.hotelCategory === category ? "gold" : "default"} onClick={() => setBooking((current) => ({ ...current, hotelCategory: category, selectedHotel: "" }))}>{category.replace(" estrellas", "★")}</Button>)}
-                            </div>
-                            <div className="mt-5 grid gap-4 md:grid-cols-2">
-                              {bookingHotelOptions.map((hotel) => (
-                                <article key={hotel.name} className={cn("overflow-hidden rounded-lg border bg-white", booking.selectedHotel === hotel.name ? "border-gold" : "border-black/10")}>
-                                  <div className="relative h-36"><Image src={hotel.image} alt={hotel.name} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" /></div>
-                                  <div className="p-4">
-                                    <div className="flex items-start justify-between gap-3"><h4 className="font-black text-obsidian">{hotel.name}</h4><span className="rounded-full bg-gold/12 px-3 py-1 text-sm font-black text-obsidian">USD {hotel.price}/noche</span></div>
-                                    <div className="mt-3 flex flex-wrap gap-2">{hotel.services.map((service) => <span key={service} className="rounded-full bg-[#F8F6F0] px-3 py-1 text-xs font-bold text-charcoal/64">{service}</span>)}</div>
-                                    <Button className="mt-4 w-full" variant={booking.selectedHotel === hotel.name ? "gold" : "default"} onClick={() => setBooking((current) => ({ ...current, selectedHotel: hotel.name, hotel: hotel.name }))}>Seleccionar</Button>
+                            {hotelCategories.length === 0 ? (
+                              <div className="mt-5 rounded-lg border border-black/10 bg-white p-6 text-charcoal/70">No hay hoteles activos configurados en el admin.</div>
+                            ) : (
+                              <>
+                                <div className="mt-5 flex flex-wrap gap-2">
+                                  {hotelCategories.map((category) => <Button key={category} variant={booking.hotelCategory === category ? "gold" : "default"} onClick={() => setBooking((current) => ({ ...current, hotelCategory: category, selectedHotel: "", hotel: "" }))}>{category}</Button>)}
+                                </div>
+                                {bookingHotelOptions.length === 0 ? (
+                                  <div className="mt-5 rounded-lg border border-black/10 bg-white p-6 text-charcoal/70">No hay hoteles activos para esta categoria.</div>
+                                ) : (
+                                  <div className="mt-5 grid gap-4 md:grid-cols-2">
+                                    {bookingHotelOptions.map((hotel) => (
+                                      <article key={hotel.id} className={cn("overflow-hidden rounded-lg border bg-white", booking.selectedHotel === hotel.name ? "border-gold" : "border-black/10")}>
+                                        <div className="relative h-36"><Image src={hotel.image || images.cusco} alt={hotel.name} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" unoptimized={Boolean(hotel.image)} /></div>
+                                        <div className="p-4">
+                                          <div className="flex items-start justify-between gap-3"><h4 className="font-black text-obsidian">{hotel.name}</h4><span className="rounded-full bg-gold/12 px-3 py-1 text-sm font-black text-obsidian">USD {hotel.price}/noche</span></div>
+                                          <p className="mt-2 text-sm font-bold text-obsidian">{bookingHotelNights} noche{bookingHotelNights === 1 ? "" : "s"}: USD {bookingHotelPrice}</p>
+                                          <p className="mt-2 text-sm text-charcoal/60">{hotel.city}{hotel.address ? ` - ${hotel.address}` : ""}</p>
+                                          <div className="mt-3 flex flex-wrap gap-2">{hotel.services.map((service) => <span key={service} className="rounded-full bg-[#F8F6F0] px-3 py-1 text-xs font-bold text-charcoal/64">{service}</span>)}</div>
+                                          <Button className="mt-4 w-full" variant={booking.selectedHotel === hotel.name ? "gold" : "default"} onClick={() => setBooking((current) => ({ ...current, selectedHotel: hotel.name, hotel: hotel.name }))}>Seleccionar</Button>
+                                        </div>
+                                      </article>
+                                    ))}
                                   </div>
-                                </article>
-                              ))}
-                            </div>
+                                )}
+                              </>
+                            )}
                           </>
                         )}
                       </div>
@@ -1380,8 +1404,10 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
                               ["Fecha", booking.date],
                               ["Personas", `${totalTravelers} (${booking.adults} adultos, ${booking.children} niños, ${booking.babies} bebés)`],
                               ["Hotel", booking.selectedHotel || "No aplica"],
+                              ["Noches hotel", bookingHotelNights ? String(bookingHotelNights) : "No aplica"],
                               ["Extras", bookingSelectedExtras.map((extra) => extra.label).join(", ") || "Sin extras"],
                               ["Precio base", `USD ${bookingBasePrice}`],
+                              ["Precio hotel", `USD ${bookingHotelPrice}`],
                               ["Precio extras", `USD ${bookingExtrasTotal}`],
                               ["Subtotal", `USD ${bookingSubtotal}`],
                               ["Impuestos", `USD ${bookingTaxes}`],
@@ -1422,7 +1448,7 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
                         <div className="mt-5 rounded-lg border border-black/10 bg-[#F8F6F0] p-5">
                           <p className="text-sm font-bold uppercase tracking-[0.2em] text-charcoal/60">Codigo de reserva</p>
                           <p className="mt-2 text-3xl font-black text-obsidian">{generatedReservation?.code ?? "Pendiente"}</p>
-                          <p className="mt-4 text-sm leading-7 text-charcoal/70">Se preparo un correo para {company.email}. Revisa los medios de pago y conserva tu codigo.</p>
+                          <p className="mt-4 text-sm leading-7 text-charcoal/70">Enviamos la reserva a {company.email}. Revisa los medios de pago y conserva tu codigo.</p>
                         </div>
 
                         <div className="mt-5 rounded-lg border border-black/10 bg-white p-5">
@@ -1470,6 +1496,8 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
                       <div className="flex justify-between"><span>Fecha</span><strong>{booking.date}</strong></div>
                       <div className="flex justify-between"><span>Personas</span><strong>{totalTravelers}</strong></div>
                       <div className="flex justify-between"><span>Hotel</span><strong className="text-right">{booking.selectedHotel || "No aplica"}</strong></div>
+                      <div className="flex justify-between"><span>Noches hotel</span><strong>{bookingHotelNights || "No aplica"}</strong></div>
+                      <div className="flex justify-between"><span>Precio hotel</span><strong>USD {bookingHotelPrice}</strong></div>
                       <div className="flex justify-between"><span>Extras</span><strong>USD {bookingExtrasTotal}</strong></div>
                       <div className="flex justify-between border-t border-black/10 pt-3 text-lg text-obsidian"><span>Total</span><strong>USD {bookingTotal}</strong></div>
                     </div>
@@ -1592,18 +1620,24 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
 
                     {selectedTour.tipoServicio === "paquete" && (
                       <div className="rounded-lg border border-gold/20 bg-gold/10 p-4">
-                        <p className="font-bold text-obsidian">Categoría de hotel</p>
-                        <div className="mt-3 grid grid-cols-4 gap-2">
-                          {Object.keys(hotelOptionsByCategory).map((category) => (
-                            <button key={category} type="button" onClick={() => { setDetailHotelCategory(category); setDetailHotel(""); }} className={cn("rounded-full px-3 py-2 text-sm font-black transition", detailHotelCategory === category ? "bg-obsidian text-gold-soft" : "bg-white text-charcoal/70")}>{category.replace(" estrellas", "★")}</button>
-                          ))}
-                        </div>
-                        <label className="mt-4 grid gap-2 text-sm font-bold text-obsidian">Hotel disponible
-                          <select value={detailHotel} onChange={(event) => setDetailHotel(event.target.value)} className="h-12 rounded-2xl border border-black/10 bg-white px-4 text-sm font-bold text-charcoal outline-none">
-                            <option value="">Seleccionar hotel</option>
-                            {detailHotelOptions.map((hotel) => <option key={hotel}>{hotel}</option>)}
-                          </select>
-                        </label>
+                        <p className="font-bold text-obsidian">Categoria de hotel</p>
+                        {hotelCategories.length === 0 ? (
+                          <p className="mt-3 rounded-lg bg-white p-3 text-sm text-charcoal/70">No hay hoteles activos configurados en el admin.</p>
+                        ) : (
+                          <>
+                            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                              {hotelCategories.map((category) => (
+                                <button key={category} type="button" onClick={() => { setDetailHotelCategory(category); setDetailHotel(""); }} className={cn("rounded-full px-3 py-2 text-sm font-black transition", detailHotelCategory === category ? "bg-obsidian text-gold-soft" : "bg-white text-charcoal/70")}>{category}</button>
+                              ))}
+                            </div>
+                            <label className="mt-4 grid gap-2 text-sm font-bold text-obsidian">Hotel disponible
+                              <select value={detailHotel} onChange={(event) => setDetailHotel(event.target.value)} className="h-12 rounded-2xl border border-black/10 bg-white px-4 text-sm font-bold text-charcoal outline-none">
+                                <option value="">Seleccionar hotel</option>
+                                {detailHotelOptions.map((hotel) => <option key={hotel.id} value={hotel.name}>{hotel.name} - USD {hotel.price}/noche</option>)}
+                              </select>
+                            </label>
+                          </>
+                        )}
                       </div>
                     )}
 
@@ -1624,6 +1658,8 @@ Quedo atento a la confirmación de disponibilidad y precio.`;
                       <div className="mt-3 grid gap-2 text-sm text-charcoal/72">
                         <div className="flex justify-between"><span>Precio base</span><strong>USD {detailBasePrice || 0}</strong></div>
                         <div className="flex justify-between"><span>Extras</span><strong>USD {detailExtrasTotal}</strong></div>
+                        <div className="flex justify-between"><span>Noches hotel</span><strong>{detailHotelNights || "No aplica"}</strong></div>
+                        <div className="flex justify-between"><span>Hotel</span><strong>USD {detailHotelPrice}</strong></div>
                         <div className="flex justify-between"><span>Cantidad de personas</span><strong>{detailTravelers}</strong></div>
                         <div className="flex justify-between"><span>Subtotal</span><strong>USD {detailSubtotal}</strong></div>
                         <div className="flex justify-between border-t border-black/10 pt-2 text-lg text-obsidian"><span>Total</span><strong>USD {detailTotal}</strong></div>
